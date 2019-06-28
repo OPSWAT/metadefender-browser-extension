@@ -1,0 +1,37 @@
+@import "common";
+
+/** vars **/
+
+/** rules **/
+body {
+  width: 350px;
+
+  .header {
+    min-height: auto;
+
+    .metadefender-chrome-logo {
+      background-image: url('../images/metadefender-chrome-black.svg');
+      position: relative;
+      margin-top: 0;
+    }
+
+    .options-btn {
+      background: $colorWhite;
+      border: 1px solid $colorGrey;
+      padding: 4px 5px 3px 5px;
+      display: block;
+    }
+  }
+
+  .footer {
+    background-color: $colorWhite;
+    border-top: 1px solid $colorGrey;
+    padding: $padding;
+    height: 60px;
+  }
+
+  .header, .footer{
+    padding: $padding;
+    background-color: $colorWhite;
+  }
+}

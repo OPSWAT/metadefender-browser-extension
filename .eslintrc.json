@@ -1,0 +1,73 @@
+/**
+ * Check http://eslint.org/docs/rules/ to see what rules are enabled due to 'eslint:recommended' 
+ * and what rules can be auto-fixed 
+ */
+{
+    "env": {
+        "es6": true,
+        "node": true,
+        "jasmine": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 2017,
+        "sourceType": "module"
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+        "indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "curly": "error",
+        "camelcase": [
+            "error",
+            {
+                "properties": "never"
+            }
+        ],
+        "no-else-return": "warn",
+        "keyword-spacing": "warn",
+        "comma-spacing": "warn",
+        "array-bracket-spacing": "warn",
+        "arrow-spacing": "warn",
+        "block-spacing": "warn",
+        "computed-property-spacing": "warn",
+        "generator-star-spacing": ["warn", { "before": true, "after": true }],
+        "key-spacing": "warn",
+        "no-console": "off",
+        "require-atomic-updates": 0,
+        "eqeqeq": ["off" /*,"smart"*/ ]
+    },
+    "plugins": [
+        "jasmine"
+    ],
+    "globals": {
+        "_gaq": true,
+        "alert": true,
+        "angular": true,
+        "Blob": true,
+        "chrome": true,
+        "confirm": true,
+        "console": true,
+        "document": true,
+        "MCL": true,
+        "inject": true,
+        "window": true,
+        "XMLHttpRequest": true
+    }
+}

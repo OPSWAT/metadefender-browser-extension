@@ -1,0 +1,83 @@
+<div class="col-sm-12 about">
+
+    <h3 ng-bind-html="vm.__MSG.getMessage('aboutTitle')"></h3>
+
+    <p ng-bind-html="vm.__MSG.getMessage('aboutThankYou', {'__mclDomain__': vm.CONFIG.mclDomain})"></p>
+
+    <h4>
+        <span ng-bind-html="vm.__MSG.getMessage('aboutApiKeyInfo')"></span>
+    </h4>
+
+    <div class="file-information info-group label-150">
+        <div>
+            <label>API Key</label>
+            <span>{{vm.apikeyInfo.apikey}}</span>
+        </div>
+        <div>
+            <label>Reputation API Limit</label>
+            <span>{{vm.apikeyInfo.reputationLimit}}</span>
+        </div>
+        <div>
+            <label>Prevention API Limit</label>
+            <span>{{vm.apikeyInfo.preventionLimit}}</span>
+        </div>
+        <div>
+            <label>Feed API Limit</label>
+            <span>{{vm.apikeyInfo.feedLimit}}</span>
+        </div>
+        <div>
+            <label>Paid User</label>
+            <span>{{vm.__MSG.getMessage((vm.apikeyInfo.paidUser) ? 'yes' : 'no')}}</span>
+        </div>
+        <div>
+            <label>Limit Interval</label>
+            <span>{{vm.apikeyInfo.limitInterval}}</span>
+        </div>
+        <a ng-href="{{vm.CONFIG.opswatDomain}}/contact" target="_blank">{{vm.__MSG.getMessage('contactOpswat')}}</a>
+    </div>
+
+    <p ng-bind-html="vm.__MSG.getMessage('aboutMoreAboutMCL', {'__opswatDomain__': vm.CONFIG.opswatDomain})"></p>
+
+    <h4 ng-bind-html="vm.__MSG.getMessage('aboutHowToUse')"></h4>
+
+    <div class="media">
+        <div class="media-body" ng-bind-html="vm.__MSG.getMessage('aboutHowTo1')"></div>
+
+        <div class="media-right media-middle">
+            <img class="media-object" style="width:352px;height:281px" src="/images/how-to/right-click.png" alt="OPSWAT File Security for Chrome right click menu">
+        </div>
+    </div>
+
+    <div class="media">
+        <div class="media-left media-middle">
+            <img class="media-object" style="width:352px;height:281px" src="/images/how-to/open-settings.png" alt="OPSWAT File Security for Chrome settings">
+        </div>
+
+        <div class="media-body" ng-bind-html="vm.__MSG.getMessage('howToOpenSettings')"></div>
+    </div>
+
+    <div class="media">
+        <div class="media-body" ng-bind-html="vm.__MSG.getMessage('howToScanAll')"></div>
+
+        <div class="media-middle">
+            <img class="" src="/images/how-to/scan-all.png" alt="OPSWAT File Security for Chrome scan downloads">
+        </div>
+    </div>
+
+    <div class="media">
+        <div class="media-body" ng-bind-html="vm.__MSG.getMessage('howToSaveClean')"></div>
+
+        <div class="media-middle">
+            <img class="" src="/images/how-to/save-clean.png" alt="OPSWAT File Security for Chrome save clean files">
+        </div>
+    </div>
+
+    <div class="media">
+        <div class="media-body" ng-bind-html="vm.__MSG.getMessage('howToMoreInfo')"></div>
+
+        <div class="media-middle">
+            <img class="" src="/images/how-to/more-info.png" alt="OPSWAT File Security for Chrome save clean files">
+        </div>
+    </div>
+
+</div>

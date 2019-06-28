@@ -1,0 +1,20 @@
+<div class="col-sm-12 settings">
+    <ul class="list-group">
+        <li class="list-group-item">
+            <mcl-checkbox value="vm.settings.scanDownloads" label="{{vm.__MSG.getMessage('scanDownloads')}}" change="vm.settingsChanged('scanDownloads')" enabled="vm.isAllowedFileAccess" ></mcl-checkbox>
+            <div><sub class="warning" ng-if="!vm.isAllowedFileAccess">{{vm.__MSG.getMessage('fileAccessDisabled')}} <a href="" ng-click="vm.openExtensionSettings()">{{vm.__MSG.getMessage('goToExtension')}}</a></sub></div>
+            <div><sub>{{vm.__MSG.getMessage('scanDownloadsSub')}}</sub></div>
+        </li>
+        <li class="list-group-item">
+            <mcl-checkbox value="vm.settings.shareResults" label="{{vm.__MSG.getMessage('shareResults')}}" change="vm.settingsChanged('shareResults')" enabled="vm.apikeyInfo.paidUser"></mcl-checkbox>
+            <div><sub ng-if="!vm.apikeyInfo.paidUser" ng-bind-html="vm.__MSG.getMessage('shareResultsSub', {'__opswatDomain__': vm.CONFIG.opswatDomain})"></sub></div>
+        </li>
+        <li class="list-group-item">
+            <mcl-checkbox value="vm.settings.showNotifications" label="{{vm.__MSG.getMessage('showNotifications')}}" change="vm.settingsChanged('showNotifications')"></mcl-checkbox>
+        </li>
+        <li class="list-group-item">
+            <mcl-checkbox value="vm.settings.saveCleanFiles" label="{{vm.__MSG.getMessage('saveCleanFiles')}}" change="vm.settingsChanged('saveCleanFiles')"></mcl-checkbox>
+        </li>
+    </ul>
+
+</div>

@@ -1,0 +1,235 @@
+@import 'bootstrap.css';
+@import "./fonts";
+@import './variables';
+/** overwrite bootstrap rules **/
+
+html, body, .container {
+  height: 100%;
+}
+
+body {
+  .list-group {
+    margin-bottom: 0;
+  }
+
+  .list-group-item {
+    border-top: 1px solid $colorGreyLight;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    margin-bottom: -1px;
+    padding: $padding;
+  }
+
+  .list-group-item:first-child {
+    border-top: none;
+    border-radius: 0;
+  }
+
+  .list-group-item:last-child {
+    border-radius: 0;
+  }
+
+  .table-bordered {
+    border: 1px solid $colorGrey;
+  }
+
+  .table-bordered > tbody > tr > td {
+    border: none;
+  }
+
+  .table > thead > tr > th,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > tbody > tr > td,
+  .table > tfoot > tr > td {
+    padding: 18px 20px 17px;
+  }
+
+  .form-control {
+    border: 1px solid $colorGrey;
+    border-radius: 0;
+    height: 38px;
+  }
+
+  .input-group-addon {
+    border: 1px solid $colorGrey;
+    background-color: $colorWhite;
+    border-radius: 0;
+    color: $secondaryColor;
+  }
+
+  .input-group .form-control:last-child {
+    border-left: none;
+  }
+
+  .form-control:focus {
+    border-color: $colorGrey;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  a, button {
+    &.btn {
+      border: 1px solid;
+      border-radius: 0;
+      padding: 12px 20px 11px;
+      text-transform: uppercase;
+      font-weight: 500;
+
+      &.btn-blue {
+        background-color: $secondaryColor;
+        border-color: $secondaryColor;
+        color: $colorWhite;
+
+        &:hover {
+          background-color: #1f56bc;
+          border-color: #1f56bc;
+          color: $colorWhite;
+        }
+      }
+
+      &.btn-blue-outline {
+        background-color: $colorWhite;
+        border-color: $secondaryColor;
+        color: $secondaryColor;
+
+        &:hover {
+          border-color: $primaryColor;
+          color: $primaryColor;
+        }
+      }
+
+      &.btn-white {
+        background-color: $colorWhite;
+        border-color: $colorWhite;
+        color: $secondaryColor;
+
+        &:hover {
+          background-color: $colorGrey;
+          border-color: $primaryColor;
+          color: $secondaryColor;
+        }
+      }
+    }
+  }
+
+  .btn-black {
+    background-color: $colorBlack;
+    color: $colorWhite;
+  }
+
+  .btn-black:hover, .btn-black:focus, .btn-black:active {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak{
+    display: none !important;
+  }
+}
+
+/** common **/
+.text-11 {
+  font-size: 11px;
+}
+
+.text-12 {
+  font-size: 12px;
+}
+
+.text-13 {
+  font-size: 13px;
+}
+
+.text-14 {
+  font-size: 14px;
+}
+
+.text-15 {
+  font-size: 15px;
+}
+
+.text-16 {
+  font-size: 16px;
+}
+
+.font-regular {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 600;
+}
+
+a {
+  text-decoration: none;
+  color: $secondaryColor;
+
+  &:visited, &:focus, &:active {
+    text-decoration: none;
+    color: $secondaryColor;
+  }
+
+  &:hover {
+    text-decoration: none;
+    color: $primaryColor;
+  }
+}
+
+body {
+  font-family: Roboto-Regular, sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+
+  -webkit-font-smoothing: antialiased;
+  color: $colorBlack;
+  background-color: $colorWhite;
+}
+
+.header {
+  background-color: $primaryColor;
+  padding: 35px 0;
+  border-bottom: 1px solid $colorGrey;
+  min-height: 109px;
+
+  .metadefender-chrome-logo {
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: block;
+    width: 117px;
+    height: 53px;
+    position: absolute;
+    margin-top: -5px;
+  }
+}
+
+.mcl-icon {
+  font-family: mcl-ext-icons;
+  width: 32px;
+  text-align: center;
+  display: inline-block;
+
+  &.icon-cancel, &.icon-help {
+    color: $red;
+  }
+
+  &.icon-ok {
+    color: $green;
+  }
+
+  &.icon-spin {
+    color: $blue;
+  }
+}
+
+.center {
+  text-align: center;
+}
+
+.no-scans {
+  text-align: center;
+  padding: $padding;
+}
+

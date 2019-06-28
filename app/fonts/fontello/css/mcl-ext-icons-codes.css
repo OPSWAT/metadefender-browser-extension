@@ -1,0 +1,9 @@
+
+.icon-cog:before { content: '\e800'; } /* '' */
+.icon-right:before { content: '\e801'; } /* '' */
+.icon-trash-empty:before { content: '\e802'; } /* '' */
+.icon-ok:before { content: '\e807'; } /* '' */
+.icon-cancel:before { content: '\e808'; } /* '' */
+.icon-spin:before { content: '\e839'; } /* '' */
+.icon-help:before { content: '\f128'; } /* '' */
+.icon-search:before { content: '\f50d'; } /* '' */

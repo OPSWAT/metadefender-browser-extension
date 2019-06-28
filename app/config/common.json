@@ -1,0 +1,60 @@
+{
+  "env": "common",
+
+  "opswatDomain": "https://www.opswat.com",
+  "mclDomain": "https://metadefender.opswat.com",
+  "mclApikeyPage": "extension/get-apikey",
+
+  "metadefenderDomain": "https://api.metadefender.com",
+  "metadefenderVersion": "v4",
+
+  "googleAnalyticsId": "",
+  "gaEventCategory": {
+    "name": "chrome-extension",
+    "action": {
+      "linkClicked": "link-clicked",
+      "buttonClickd": "button-clicked",
+      "settingsChanged": "settings-changed"
+    },
+    "label": {
+      "scanHistory" : "Scan history link",
+      "metadefender": "MetaDefender link",
+      "scanDetails" : "Scan details link",
+      "loginButton" : "Login button",
+      "clearHistoryButton": "Clear history button"
+    },
+    "value": {
+      "loginButton": "login-button",
+      "deleteItemButton": "delete-history-item",
+      "clearHistoryButton": "clear-history"
+    }
+  },
+
+  "storageKey": {
+    "settings": "settings",
+    "scanHistory": "scanHistory",
+    "apikey": "apikey"
+  },
+
+  "contextMenu": {
+    "scanId": "scan_with_mcl"
+  },
+
+  "fileSizeLimit": 146800640,
+
+  "scanResults": {
+    "incrementor": 1.2,
+    "maxInterval": 300000
+  },
+
+  "authCookieName": "opswat-auth",
+
+  "sanitizationBuckets": [
+    "d.files.metadefender.com",
+    "t.files.metadefender.com",
+    "p.files.metadefender.com",
+    "g.files.metadefender.com"
+  ],
+
+  "browserNotificationTimeout": 5000
+}

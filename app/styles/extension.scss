@@ -1,0 +1,371 @@
+@import "common";
+
+body {
+  padding-bottom: 0;
+  overflow-y: scroll;
+
+  button {
+    &.btn {
+      &.small {
+        padding: 8px 11px 7px;
+      }
+    }
+  }
+
+  .header {
+
+    .metadefender-chrome-logo {
+      background-image: url('../images/metadefender-chrome.svg');
+    }
+
+    button {
+      line-height: 1;
+      padding: 12px 14px 11px;
+    }
+  }
+
+  .fixed {
+    position: fixed;
+  }
+
+  .padding-top {
+    padding-top: 40px;
+
+    @media screen and (max-width: 768px) {
+      padding-top: 10px;
+    }
+  }
+
+  .padding-bottom {
+    padding-bottom: 40px;
+  }
+
+  .full-height {
+    height: 100%;
+  }
+
+  .content {
+    border-left: 1px solid $colorGreyLight;
+    min-height: 400px;
+
+    .list-group-item {
+      padding: $padding;
+    }
+  }
+
+  .left-menu {
+    ul {
+      width: 262.5px;
+      margin-top: 9px;
+      padding: 0 20px 0 0;
+
+      @media screen and (max-width: 1200px) {
+        width: 212.5px;
+      }
+
+      @media screen and (max-width: 992px) {
+        width: 157.5px;
+      }
+
+      @media screen and (max-width: 768px) {
+        width: auto;
+        position: relative;
+      }
+
+      li {
+        padding: 0;
+
+        a {
+          display: block;
+          padding: 10px 0;
+          color: $colorGreyDark;
+          line-height: 20px;
+        }
+
+        &.selected {
+
+          a {
+            color: $colorBlacker;
+            font-weight: 600;
+
+            &:hover {
+              color: $colorBlacker;
+            }
+          }
+
+          &:after {
+            content: '\e801';
+            font-family: mcl-ext-icons;
+            position: absolute;
+            top: 9px;
+            right: 1px;
+            color: $colorBlacker;
+          }
+        }
+      }
+    }
+  }
+
+  h3 {
+    margin-top: 10px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid $colorGrey;
+  }
+
+  .clean {
+    color: $green;
+  }
+
+  .infected {
+    color: $red;
+  }
+
+  .scanning {
+    color: $blue;
+  }
+
+  .mcl-icon {
+    width: auto;
+  }
+
+  .about {
+    padding-right: 0px;
+
+    .info-group {
+      margin-top: 30px;
+      margin-bottom: 30px;
+
+      &.label-150 {
+        label {
+          width: 150px;
+        }
+      }
+
+      &.label-200 {
+        label {
+          width: 200px;
+        }
+      }
+
+      >div {
+        >label {
+          max-width: 100%;
+          margin-bottom: 16px;
+          color: $colorGreyDark;
+          font-weight: bold;
+          display: inline-block;
+          text-transform: uppercase;
+          vertical-align: top;
+        }
+      }
+    }
+
+    h4 {
+      margin-top: 30px;
+    }
+
+    .media {
+      margin-top: 20px
+    }
+
+    .media-object {
+      width: 400px;
+    }
+
+    .media-right {
+      padding-left: 30px;
+    }
+
+    .media-left {
+      padding-right: 30px;
+    }
+
+    .media-body {
+      font-style: italic;
+    }
+  }
+
+  .settings {
+    padding-right: 0px;
+
+    sub, sup {
+      font-size: 90%;
+    }
+
+    .list-group-item {
+      padding: $padding $padding $padding + 10;
+
+      sub {
+        padding-left: 60px;
+
+        &.warning {
+          color: $red;
+        }
+      }
+
+      .checkbox.mcl {
+        margin-bottom: 0px;
+
+        label {
+          padding-left: 60px;
+
+          &.disabled {
+            color: $colorGreyDark;
+
+            span {
+
+              &.mcl-checkbox {
+                cursor: not-allowed;
+
+                &.selected {
+                  background-color: $secondaryColor;
+                }
+              }
+
+              &.mcl-label {
+                cursor: text;
+              }
+            }
+          }
+
+          .text-secondary {
+            margin-top: 7px;
+            color: $colorGreyDark;
+          }
+        }
+
+        .mcl-checkbox {
+          width: 20px;
+          height: 20px;
+          display: inline-block;
+          border: 1px solid $colorGrey;
+          border-radius: 0;
+          margin: 27px 0 0 -50px;
+          line-height: normal;
+          float: left;
+
+          .icon-ok {
+            display: none;
+            color: #fff;
+
+            &:before {
+              margin-top: 3px;
+              margin-left: 3px;
+            }
+          }
+
+          &.selected {
+            background-color: $secondaryColor;
+            border: none;
+
+            .icon-ok {
+              display: inline-block;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .history {
+    margin-top: 10px;
+    padding-right: 0px;
+
+    .caption {
+      font-weight: 600;
+      line-height: 35px;
+    }
+
+    .no-results {
+      margin-top: 15px;
+      padding: $padding 0;
+    }
+
+    .table {
+
+      margin-top: $padding;
+
+      thead {
+        background-color: $colorGreyLighter;
+
+        th {
+          text-transform: uppercase;
+          border: none;
+          color: $colorBlackish;
+          white-space: nowrap;
+        }
+      }
+
+      tr {
+        border-bottom: 1px solid $colorGrey;
+
+        td {
+          vertical-align: middle;
+          position: relative;
+
+          &.action-column {
+            padding: 0;
+            text-align: center;
+          }
+
+          .icon-trash-empty {
+            display:none;
+          }
+        }
+
+        &:hover {
+          .icon-trash-empty {
+            display: inline-block;
+          }
+        }
+
+        .text-secondary {
+          color: $colorGreyDarker;
+        }
+      }
+    }
+
+    a {
+
+      &:hover {
+
+        &.scan-results {
+
+          &.color-0 {
+            color: #0080C2;
+          }
+
+          &.color-1 {
+            color: #009757;
+          }
+
+          &.color-2 {
+            color: #CA0000;
+          }
+
+          &.color-3 {
+            color: #0080C2;
+          }
+        }
+      }
+
+      &.scan-results {
+        &.color-0 {
+          color: $blue;
+        }
+
+        &.color-1 {
+          color: $green;
+        }
+
+        &.color-2 {
+          color: $red;
+        }
+
+        &.color-3 {
+          color: $blue;
+        }
+      }
+    }
+  }
+}

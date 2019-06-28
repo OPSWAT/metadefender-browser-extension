@@ -1,0 +1,55 @@
+<div class="col-sm-12 history">
+
+    <div ng-if="!vm.scanHistory.files.length" class="center no-scans" ng-bind-html="vm.__MSG.getMessage('noScansNotification')"></div>
+
+    <div ng-if="vm.scanHistory.files.length">
+        <div class="row">
+            <div class="col-xs-6 form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" ng-model="fileFilter.fileName" placeholder="{{vm.__MSG.getMessage('searcHistory')}}">
+                    <div class="input-group-addon"><span class="icon-search"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12 caption text-15 font-medium">
+                {{vm.scanHistory.files.length}} file<span ng-if="vm.scanHistory.files.length != 1">s</span> scanned
+                <button class="pull-right btn btn-blue-outline text-13 font-medium small" ng-click="vm.clearScanHistory()">Clear scan history</button>
+            </div>
+        </div>
+        <table class="table table-bordered" ng-show="filteredFiles.length">
+            <thead>
+                <tr class="text-13 font-medium">
+                    <th>filename</th>
+                    <th>scan time</th>
+                    <th>results</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="file in filteredFiles = (vm.scanHistory.files | filter: fileFilter.fileName) track by $index">
+                    <td>
+                        <a class="scan-results color-{{file.status}}" ng-href="{{file.scanResults}}" target="_blank" ng-click="vm.trackScanDetailsClicks()">
+                            {{file.fileName | decodeFileNameFilter}}
+                        </a>
+                        <div class='text-secondary text-11'>{{file.sha256}}</div>
+                        <div class='text-secondary text-13'><a ng-if="file.sanitizedFileURL" target="_blank" href="{{file.sanitizedFileURL}}">Download sanitized</a></div>
+                    </td>
+                    <td>{{vm.momentFrom(file.scanTime)}}</td>
+                    <td>
+                        <span ng-if="!file.scanResults" class="color-{{file.status}}">{{file.statusLabel}}</span>
+                        <a ng-if="file.scanResults" class="scan-results color-{{file.status}}" ng-href="{{file.scanResults}}" target="_blank" ng-click="vm.trackScanDetailsClicks()">{{file.statusLabel}}</a>
+                    </td>
+                    <td class="action-column"><span class="mcl-icon {{vm.getStatusIcon(file.status)}}"></span></td>
+                    <td class="action-column"><a ng-click="vm.removeFile(file)" href="" title="Remove file from scan history"><span class="mcl-icon icon-trash-empty"></span></a></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="center no-results" ng-hide="filteredFiles.length">
+            {{vm.__MSG.getMessage('noFilesFound')}}
+        </div>
+    </div>
+
+</div>
