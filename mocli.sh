@@ -6,35 +6,58 @@ cd ${CWD}
 ENVS=('local' 'dev' 'qa' 'prod')
 ENV="qa"
 
+declare -A CMDS_DESC
+CMDS_DESC=(
+    [developer]="Setup your developer environment"
+    [config]="Overwrite common configuration file with specified environment. Usage: mocli config <local|dev|qa|prod>"
+    [watch]="Starts a livereload server and watches all assets"
+    [test]="Runns unit tests and generates code coverage reports"
+    [release]="Create release versions using git-flow. Usage: mocli release [start|finish] <version>"
+    [release-p]="Create release version and increases patch number"
+    [hotfix]="Create a qa release from current branch and uploads it to bitbucket"
+    [pack]="Zips the dist/<vendor> directory. Usage: mocli pack [--production] [--vendor=firefox] [--env=qa]"
+    [help]="Show this message"
+)
+
 function printHelp() {
-cat << HELPDOC
-     ______________________________________________
-    |                         .__  .__             |
-    |     _____   ____   ____ |  | |__|            |
-    |    /     \ /  _ \_/ ___\|  | |  |            |
-    |   |  Y Y  \| |_) )  \___|  |_|  |            |
-    |   |__|_|  /|____/ \_____>____/__|            |
-    |         \/  Metadefender Cloud CLI           |
-    |                                              |
-    |______________________________________________|
+    echo " ______________________________________________  "
+    echo "|                         .__  .__             | "
+    echo "|     _____   ____   ____ |  | |__|            | "
+    echo "|    /     \ /  _ \_/ ___\|  | |  |            | "
+    echo "|   |  Y Y  \| |_) )  \___|  |_|  |            | "
+    echo "|   |__|_|  /|____/ \_____>____/__|            | "
+    echo "|         \/  MetaDefender Cloud CLI           | "
+    echo "|                                              | "
+    echo "|______________________________________________| "
+    echo "                                                 "
+    echo "I am your development wizard (0_0)"
+    echo "Your commands are:"
+    echo ""
+    line="                       "
+    for i in "${!CMDS_DESC[@]}"
+    do
+        printf "%s %s %s \n" "$i" "${line:${#i}}" "${CMDS_DESC[$i]}"
+    done
+}
 
-    I am your development wizard (0_0)
-    Your commands are:
+function gen_cmp(){
+    for i in "${!CMDS_DESC[@]}"
+    do
+        CMDS+=($i)
+    done
+    mkdir -p ~/.zsh/completion && touch ~/.zsh/completion/_mocli
+    echo -e "#compdef mocli.sh
+        _mocli(){
+            local line
 
-        developer   - Setup your developer environment
-        config      - Overwrite common configuration file with specified environment
-                      Usage: mocli config <local|dev|qa|prod>
-        watch       - Starts a livereload server and watches all assets
-        test        - Runns unit tests and generates code coverage reports
-        release     - Create release versions using git-flow
-                      Usage: mocli release [start|finish] <version>
-        release-p   - Create release version and increases patch number
-        hotfix      - Create a qa release from current branch and uploads it to bitbucket
-        pack        - Zips the dist/<vendor> directory
-                      Usage: mocli pack [--production] [--vendor=firefox] [--env=qa]
-        help        - Show this message
+            _arguments -C \
+                \"-h[Show help information]\" \
+                \"--h[Show help information]\" \
+                \"1: :("${CMDS[@]}")\" \
+                \"*::arg:->args\"
+        }
 
-HELPDOC
+        _mocli" > ~/.zsh/completion/_mocli
 }
 
 ###
@@ -98,6 +121,8 @@ while [[ $# -gt 0 ]]; do
 
             echo "-> generate config: prod"
             gulp config --prod > /dev/null
+
+            gen_cmp
 
             echo -e "-> Done\n"
             exit 0
@@ -233,6 +258,9 @@ while [[ $# -gt 0 ]]; do
             done
             ${CMD}
         ;;
+        gen-cmp)
+            gen_cmp
+            ;;
         help)
             printHelp
             exit 0
