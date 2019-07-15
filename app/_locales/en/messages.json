@@ -122,6 +122,10 @@
     "message": "Save clean files<div class='text-secondary text-14'>Download clean files on my computer after they are scanned.</div>",
     "description": ""
   },
+  "safeUrl": {
+    "message": "Enable safe URL<div class='text-secondary text-14'>Browse the web in safety and alert me when accessing harmful websites.</div>",
+    "description": ""
+  },
   "searcHistory": {
     "message": "Search history"
   },

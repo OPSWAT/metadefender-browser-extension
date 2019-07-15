@@ -15,6 +15,7 @@ import FileProcessor from '../common/file-processor';
 import cookieManager from './cookie-manager';
 import DownloadsManager from './download-manager';
 import { goToTab } from './navigation';
+import SafeUrl from './safe-url';
 
 const MCL_CONFIG = MCL.config;
 
@@ -54,6 +55,7 @@ class BackgroundTask {
         chrome.notifications.onClosed.addListener(() => { });
 
         browserMessage.addListener(this.messageListener.bind(this));
+
     }
     
     async init() {
@@ -82,6 +84,8 @@ class BackgroundTask {
                 this.setApikey(cookie.value);
             }
         });
+
+        SafeUrl.toggle(settings.safeUrl);
     }
 
     /**
@@ -222,6 +226,9 @@ class BackgroundTask {
                 if (settings.saveCleanFiles !== saveCleanFiles) {
                     this.updateContextMenu();
                 }
+
+                SafeUrl.toggle(settings.safeUrl);
+                
                 break;
             }
             case BROWSER_EVENT.SCAN_FILES_UPDATED: {
