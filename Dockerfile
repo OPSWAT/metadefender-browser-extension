@@ -1,6 +1,6 @@
 FROM node:11-alpine
 
-LABEL version="1.1"
+LABEL version="1.2"
 LABEL description="Linux alpine with node:11 and chromium browser"
 
 RUN set -x \
@@ -10,7 +10,8 @@ RUN set -x \
     && echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories
 
 RUN apk add --no-cache \
-    bash
+    bash \
+    python3
 
 RUN apk add --no-cache \
         chromium@edge \
@@ -18,6 +19,8 @@ RUN apk add --no-cache \
         nss@edge \
         freetype@edge \
         ttf-freefont@edge
+
+RUN pip3 install awscli
 
 RUN rm -rf /var/cache/* && mkdir /var/cache/apk
 
