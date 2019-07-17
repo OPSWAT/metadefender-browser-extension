@@ -91,12 +91,18 @@ function copy_secrets() {
         echo -e "{\n\t\"googleAnalyticsId\": \"\"\n}" > ./secrets.json
         echo -e "\nFailed to copy secrets from s3. Please update ./secrets.json manually.\n"
     fi
+}
 
+function copy_envs() {
     echo "-> copy environment specific files"
-    aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/local.json ./app/config/ > /dev/null 2>&1 
-    aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/dev.json ./app/config/ > /dev/null 2>&1 
-    aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/qa.json ./app/config/ > /dev/null 2>&1 
-    aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/prod.json ./app/config/ > /dev/null 2>&1 
+    ENVS=(local dev qa prod)
+    if [[ "$1" != "" ]]; then
+        ENVS=($1)
+    fi
+    for env in ${ENVS}; do
+        echo s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json
+        aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json ./app/config/ > /dev/null 2>&1 
+    done
 }
 
 if [[ $# == 0 ]]; then
@@ -109,6 +115,7 @@ while [[ $# -gt 0 ]]; do
         developer)
             # copy the google analytics ID. Create this file manually if you don't have access
             copy_secrets
+            copy_envs
             
             echo "-> install gulp-cli"
             npm list -g --depth=0 gulp-cli > /dev/null 2>&1 || npm i -g gulp-cli > /dev/null
@@ -125,6 +132,10 @@ while [[ $# -gt 0 ]]; do
             gen_cmp
 
             echo -e "-> Done\n"
+            exit 0
+        ;;
+        copy-envs)
+            copy_envs ${2}
             exit 0
         ;;
         config)
