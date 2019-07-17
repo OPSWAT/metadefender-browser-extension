@@ -96,10 +96,10 @@ function copy_secrets() {
 function copy_envs() {
     echo "-> copy environment specific files"
     ENVS=(local dev qa prod)
-    if [[ "$1" != "" ]]; then
-        ENVS=($1)
+    if [[ "${1}" != "" ]]; then
+        ENVS=(${1})
     fi
-    for env in ${ENVS}; do
+    for env in ${ENVS[@]}; do
         echo s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json
         aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json ./app/config/ > /dev/null 2>&1 
     done
@@ -132,6 +132,10 @@ while [[ $# -gt 0 ]]; do
             gen_cmp
 
             echo -e "-> Done\n"
+            exit 0
+        ;;
+        copy-secrets)
+            copy_secrets
             exit 0
         ;;
         copy-envs)

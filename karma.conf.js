@@ -6,6 +6,11 @@ module.exports = function(config) {
         frameworks: [
             'jasmine'
         ],
+        client: {
+            jasmine: {
+                random: false
+            }
+        },
         files: [
             'test/karma.js'
         ],

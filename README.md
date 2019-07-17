@@ -169,6 +169,8 @@ To rebuild the docker image run:
 ```bash
 IMG=opswat/metadefender-browser-extension && VER=1.0
 docker build -f Dockerfile . -t ${IMG}:${VER} -t ${IMG}:latest
+docker push ${IMG}:${VER}
+docker push ${IMG}:latest
 ```
 
 ## Contributing
