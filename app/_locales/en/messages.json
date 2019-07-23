@@ -126,6 +126,9 @@
     "message": "Enable safe URL<div class='text-secondary text-14'>Browse the web in safety and alert me when accessing harmful websites.</div>",
     "description": ""
   },
+  "safeUrlSub": {
+    "message": "Read more about <a target='blank' href='https://onlinehelp.opswat.com/mdcloud/2.1_Safe_URL_redirect.html'>Safe URL Redirect</a>"
+  },
   "searcHistory": {
     "message": "Search history"
   },
