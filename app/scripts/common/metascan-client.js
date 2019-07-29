@@ -1,7 +1,7 @@
 'use strict';
 
 import 'chromereload/devonly';
-import { SANITIZATION } from '../constants/workflows';
+import { SANITIZATION, UNARCHIVE } from '../constants/workflows';
 import browserMessage from '../common/browser/browser-message';
 import { BROWSER_EVENT } from '../common/browser/browser-message-event';
 
@@ -169,6 +169,7 @@ function fileUpload({fileName, fileData, sampleSharing, password, canBeSanitized
             'Content-Type': 'application/octet-stream',
             'samplesharing': sampleSharing,
             'filename': fileName,
+            'rule': UNARCHIVE,
             'x-source': 'chrome_extension'
         };
 
@@ -177,7 +178,7 @@ function fileUpload({fileName, fileData, sampleSharing, password, canBeSanitized
         }
 
         if (canBeSanitized) {
-            additionalHeaders.rule = SANITIZATION;
+            additionalHeaders.rule += ',' + SANITIZATION;
         }
 
         let options = {
