@@ -1,4 +1,6 @@
 import chrome from 'sinon-chrome';
+import sinon from 'sinon';
+import xhr from 'xhr';
 import SafeUrl from './safe-url';
 
 describe('app/scripts/background/safe-url.js', () => {
@@ -26,7 +28,7 @@ describe('app/scripts/background/safe-url.js', () => {
             expect(enabled).toBeTruthy();
             expect(callArgs.length).toEqual(3);
             expect(typeof callArgs[0]).toBe('function');
-            expect(callArgs[1]).toEqual({urls: ['<all_urls>']});
+            expect(callArgs[1]).toEqual({urls: ['http://*/*', 'https://*/*'], types: ['main_frame']});
             expect(callArgs[2]).toEqual(['blocking']);
         });
 
@@ -49,42 +51,72 @@ describe('app/scripts/background/safe-url.js', () => {
     
     });
 
-    describe('_safeRedirect', () => {
+    describe('_handleUrlValidatorResponse', () => {
 
-        it('should ignore page resource requests and invalid urls', () => {
-        
-            expect(typeof SafeUrl._safeRedirect({tabId: 0, type: 'main_frame', url: 'https://'})).toBe('undefined');
-            expect(typeof SafeUrl._safeRedirect({tabId: 1, type: 'image', url: 'https://'})).toBe('undefined');
-            expect(typeof SafeUrl._safeRedirect({tabId: 1, type: 'main_frame', url: ''})).toBe('undefined');
-            expect(typeof SafeUrl._safeRedirect({tabId: 1, type: 'main_frame', url: 'file://'})).toBe('undefined');
-        
+        it('should mark url as infected', () => {
+            SafeUrl._handleUrlValidatorResponse('a1', 'error', {});
+            expect(SafeUrl._cleanUrls.has('a1')).toBeTruthy();
+            
+            SafeUrl._handleUrlValidatorResponse('a2', '', {headers: {status: '200'}});
+            expect(SafeUrl._cleanUrls.has('a2')).toBeTruthy();
+
+            SafeUrl._handleUrlValidatorResponse('a3', '', {headers: {status: '404'}});
+            expect(SafeUrl._cleanUrls.has('a3')).toBeTruthy();
         });
+
+        it('should mark the url as infected', () => {
+            SafeUrl._handleUrlValidatorResponse('b1', '', {headers: {status: '400'}});
+            expect(SafeUrl._infectedUrls.has('b1')).toBeTruthy();
+        });
+    
+    });
+
+    describe('_doSafeRedirect', () => {
 
         it('should not redirect metadefender safe redirect endpoint', () => {
-
-            expect(typeof SafeUrl._safeRedirect({tabId: 1, type: 'main_frame', url: `${MCL.config.mclDomain}/safe-redirect/`})).toBe('undefined');
-
+            expect(typeof SafeUrl._doSafeRedirect({type: 'main_frame', url: `${MCL.config.mclDomain}/safe-redirect/`})).toBe('undefined');
         });
 
-        it('should redirect on first access and not after redirect', () => { 
-
+        it('should not redirect clean URLs', () => {
             const testUrl = 'http://metadefender.opswat.com';
             const details = {
-                tabId: 1, 
-                type: 'main_frame', 
                 url: testUrl
             };
+            sinon.stub(xhr, 'get').callsFake(() => SafeUrl._handleUrlValidatorResponse(testUrl, 'error', {}));
 
-            const redirect = SafeUrl._safeRedirect(details);
+            const redirect = SafeUrl._doSafeRedirect(details);
+            expect(typeof redirect).toBe('undefined');
 
+            xhr.get.restore();
+        });
+
+        it('should redirect infected URLs', () => {
+            const testUrl = 'http://infected.url';
+            const details = {
+                url: testUrl
+            };
+            sinon.stub(xhr, 'get').callsFake(() => SafeUrl._handleUrlValidatorResponse(testUrl, '', {headers: {status: '400'}}));
+
+            const redirect = SafeUrl._doSafeRedirect(details);
             expect(typeof redirect.redirectUrl).toBe('string');
             expect(redirect.redirectUrl.startsWith(`${MCL.config.mclDomain}/safe-redirect/`)).toBeTruthy();
             expect(redirect.redirectUrl.endsWith(encodeURIComponent(testUrl))).toBeTruthy();
 
-            expect(typeof SafeUrl._safeRedirect(details)).toBe('undefined');
-
+            xhr.get.restore();
         });
 
+        it('should not redirect infected URLs on second access', () => {
+            const testUrl = 'http://infected.url/access';
+            const details = {
+                url: testUrl
+            };
+            sinon.stub(xhr, 'get').callsFake(() => SafeUrl._handleUrlValidatorResponse(testUrl, '', {headers: {status: '400'}}));
+
+            SafeUrl._doSafeRedirect(details);
+            expect(typeof SafeUrl._doSafeRedirect(details)).toBe('undefined');
+            
+            xhr.get.restore();
+        });
     });
 
 });
