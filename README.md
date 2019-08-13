@@ -1,5 +1,7 @@
 # MetaDefender browser extension
 
+[![metadefender-browser-extension](https://david-dm.org/opswat/metadefender-browser-extension.svg)](https://david-dm.org/opswat/metadefender-browser-extension)
+
 ## Intro
 
 OPSWAT File Security for Chrome, provides the ability to quickly scan a file for malware prior to download directly from the browser. At the moment this only works with google chrome, but can be extended to any other browser.
@@ -167,6 +169,8 @@ To rebuild the docker image run:
 ```bash
 IMG=opswat/metadefender-browser-extension && VER=1.0
 docker build -f Dockerfile . -t ${IMG}:${VER} -t ${IMG}:latest
+docker push ${IMG}:${VER}
+docker push ${IMG}:latest
 ```
 
 ## Contributing

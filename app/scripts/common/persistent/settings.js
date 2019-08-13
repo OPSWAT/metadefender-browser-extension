@@ -19,6 +19,7 @@ function Settings() {
         shareResults: true,
         showNotifications: true,
         saveCleanFiles: false,
+        safeUrl: false,
 
         // methods
         init: init,
@@ -61,7 +62,8 @@ async function save(){
         scanDownloads: this.scanDownloads,
         shareResults: this.shareResults,
         showNotifications: this.showNotifications,
-        saveCleanFiles: this.saveCleanFiles
+        saveCleanFiles: this.saveCleanFiles,
+        safeUrl: this.safeUrl
     }});
     await BrowserMessage.send({event: BROWSER_EVENT.SETTINGS_UPDATED});
 }

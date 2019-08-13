@@ -15,6 +15,10 @@
         <li class="list-group-item">
             <mcl-checkbox value="vm.settings.saveCleanFiles" label="{{vm.__MSG.getMessage('saveCleanFiles')}}" change="vm.settingsChanged('saveCleanFiles')"></mcl-checkbox>
         </li>
+        <li class="list-group-item">
+            <mcl-checkbox value="vm.settings.safeUrl" label="{{vm.__MSG.getMessage('safeUrl')}}" change="vm.settingsChanged('safeUrl')"></mcl-checkbox>
+            <div><sub ng-bind-html="vm.__MSG.getMessage('safeUrlSub')"></sub></div>
+        </li>
     </ul>
 
 </div>
