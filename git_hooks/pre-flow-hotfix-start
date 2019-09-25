@@ -3,6 +3,9 @@
 VERSION=$1
 echo "Incrementing version to $VERSION"
 
+git checkout customer
+git pull
+
 sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/g" package.json
 sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/g" app/manifest.json
 
