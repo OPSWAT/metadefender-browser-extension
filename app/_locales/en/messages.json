@@ -48,7 +48,7 @@
     "description": ""
   },
   "aboutThankYou": {
-    "message": "Thank you for installing <strong>OPSWAT File Security for Chrome</strong>! This extension gives you the ability to scan downloads* for malware with 30+ anti-malware engines using OPSWAT's <a target='_blank' href='__mclDomain__/#!/?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud</a>.<br/><small>*  maximum file size is 140 MB</small>",
+    "message": "Thank you for installing <strong>OPSWAT File Security for Chrome</strong>! This extension gives you the ability to scan downloads* for malware with 30+ anti-malware engines using OPSWAT's <a target='_blank' href='__mclDomain__/#!/?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud</a>.",
     "description": ""
   },
   "aboutApiKeyInfo": {
@@ -60,7 +60,7 @@
     "description": ""
   },
   "aboutMoreAboutMCL": {
-    "message": "Read more about <a target='_blank' href='__opswatDomain__/products/metadefender/enterprise?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud Licensing</a> options",
+    "message": "Read more about  <a target='_blank' href='__mclDomain__/licensing?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud Licensing</a> options",
     "description": ""
   },
   "aboutHowToUse": {
@@ -79,17 +79,11 @@
     "message": "To access the OPSWAT File Security for Chrome extension settings page, right click on the 'OPSWAT File Security for Chrome' button in the Chrome top bar and select 'Options' from the drop down menu",
     "description": ""
   },
-  "howToScanAll": {
-    "message": "If you would like to automatically scan all downloads, click on the 'OPSWAT File Security for Chrome button' in the Chrome top bar and select the box to 'Scan downloads'",
-    "description": ""
+  "chromeExtensionHelp": {
+    "message": "Read more about OPSWAT File Security for Chrome extension settings on our <a target='blank' href='https://onlinehelp.opswat.com/mdcloud/OPSWAT_File_Security_for_Chrome.html'>online help</a> page."
   },
-  "howToSaveClean": {
-    "message": "If you would like to automatically download the scanned files with no threat detected, go to OPSWAT File Security for Chrome settings page and enable 'Save clean files'",
-    "description": ""
-  },
-  "howToMoreInfo": {
-    "message": "To view more information about the scan results, go to scan history page and click on the file result",
-    "description": ""
+  "githubInfo": {
+    "message": "The chrome extension is an open-source tool developed by OPSWAT, the source code is published on github: <a target='blank' href='https://github.com/OPSWAT/metadefender-browser-extension'>metadefender-browser-extension</a>"
   },
   "contactOpswat": {
     "message": "Contact OPSWAT Sales to increase your limits",
@@ -129,6 +123,22 @@
   "safeUrlSub": {
     "message": "Read more about <a target='blank' href='https://onlinehelp.opswat.com/mdcloud/2.1_Safe_URL_redirect.html'>Safe URL Redirect</a>"
   },
+  "useCore": {
+    "message": "On-premise scanning using MetaDefender Core <div class='text-secondary text-14'>Send your files to a private <a target='blank' href='https://onlinehelp.opswat.com/corev4/8._MetaDefender_Core_Developer_Guide.html'>MetaDefender Core server</a></div>",
+    "description": ""
+  },
+  "useCoreSub": {
+    "message": ""
+  },
+  "coreUrl": {
+    "message": "URL"
+  },
+  "coreApikey": {
+    "message": "Apikey"
+  },
+  "coreRule": {
+    "message": "Workflow"
+  },
   "searcHistory": {
     "message": "Search history"
   },
@@ -139,6 +149,22 @@
   "scanStatusInfected": {
     "message": "Threats detected",
     "description": ""
+  },
+  "coreSettingsSave": {
+    "message": "Validate & Save",
+    "description": "Save core settings button label"
+  },
+  "coreSettingsSavedNotification": {
+    "message": "Core settings saved!"
+  },
+  "coreSettingsInvalidNotification": {
+    "message": "Core settings are not valid!"
+  },
+  "coreSettingsInvalidApikey": {
+    "message": "Invalid MetaDefender Core apikey!"
+  },
+  "coreSettingsInvalidUrl": {
+    "message": "Could not connect to a MetaDefender Core server at the specified URL!"
   },
   "scanStatusScanning": {
     "message": "Scan in progress...",
@@ -157,7 +183,7 @@
     "description": ""
   },
   "unsupportedUrl": {
-    "message": "Url not supported.\nYou may be able to scan the file by downloading it while 'Scan Downloads' is enabled"
+    "message": "URL not supported.\nYou may be able to scan the file by downloading it while 'Scan Downloads' is enabled"
   },
   "errorWhileDownloading": {
     "message": "We encountered an error while downloading this file. Please try again",
@@ -166,6 +192,9 @@
   "errorCors": {
     "message": "Unable to access local file. Please make sure 'Allow access to file URLs' is enabled for OPSWAT extension",
     "description": ""
+  },
+  "scanFileError": {
+    "message": "There was an error while scanning the file. Please try again later"
   },
   "fileAccessDisabled": {
     "message": "To use this feature, 'Allow access to file URLs' must be enabled for OPSWAT extension"

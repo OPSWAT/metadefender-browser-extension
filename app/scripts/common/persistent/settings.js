@@ -12,24 +12,25 @@ import BrowserMessage from './../browser/browser-message';
  * @returns {{scanDownloads: boolean, shareResults: boolean, showNotifications: boolean, saveCleanFiles: boolean, init: init, merge: merge, save: save, load: load}}
  * @constructor
  */
-function Settings() {
+const Settings = {
+    scanDownloads: true,
+    shareResults: true,
+    showNotifications: true,
+    saveCleanFiles: false,
+    safeUrl: false,
+    useCore: false,
+    coreUrl: '',
+    coreApikey: '',
+    coreRule: '',
 
-    return {
-        scanDownloads: true,
-        shareResults: true,
-        showNotifications: true,
-        saveCleanFiles: false,
-        safeUrl: false,
+    // methods
+    init: init,
+    merge: merge,
+    save: save,
+    load: load,
+};
 
-        // methods
-        init: init,
-        merge: merge,
-        save: save,
-        load: load,
-    };
-}
-
-export const settings = Settings();
+export const settings = Settings;
 
 /**
  *
@@ -58,13 +59,12 @@ function merge(newData) {
  * @returns {Promise.<void>}
  */
 async function save(){
-    await BrowserStorage.set({[MCL.config.storageKey.settings]: {
-        scanDownloads: this.scanDownloads,
-        shareResults: this.shareResults,
-        showNotifications: this.showNotifications,
-        saveCleanFiles: this.saveCleanFiles,
-        safeUrl: this.safeUrl
-    }});
+    const settingKeys = ['scanDownloads', 'shareResults', 'showNotifications', 'saveCleanFiles', 'safeUrl', 'useCore', 'coreUrl', 'coreApikey', 'coreRule'];
+    const data = {};
+    for (const key of settingKeys) {
+        data[key] = this[key];
+    }
+    await BrowserStorage.set({[MCL.config.storageKey.settings]: data});
     await BrowserMessage.send({event: BROWSER_EVENT.SETTINGS_UPDATED});
 }
 

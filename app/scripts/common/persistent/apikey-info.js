@@ -17,6 +17,8 @@ function ApikeyInfo() {
         feedLimit: null,
         paidUser: null,
         limitInterval: 'Daily',
+        maxUploadFileSize: null,
+        sandboxLimit: null,
         loggedIn: true,
 
         // methods
@@ -64,7 +66,9 @@ async function save() {
         feedLimit: this.feedLimit,
         paidUser: this.paidUser,
         limitInterval: this.limitInterval,
-        loggedIn: this.loggedIn
+        maxUploadFileSize: this.maxUploadFileSize,
+        sandboxLimit: this.sandboxLimit,
+        loggedIn: this.loggedIn,
     }});
 }
 
@@ -78,6 +82,8 @@ function parseMclInfo(info) {
     this.feedLimit = info.limit_feed;
     this.paidUser = info.paid_user;
     this.limitInterval = info.time_interval;
+    this.maxUploadFileSize = info.max_upload_file_size;
+    this.sandboxLimit = info.limit_sandbox;
 }
 
 /**

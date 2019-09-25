@@ -31,11 +31,14 @@
             <tbody>
                 <tr ng-repeat="file in filteredFiles = (vm.scanHistory.files | filter: fileFilter.fileName) track by $index">
                     <td>
-                        <a class="scan-results color-{{file.status}}" ng-href="{{file.scanResults}}" target="_blank" ng-click="vm.trackScanDetailsClicks()">
-                            {{file.fileName | decodeFileNameFilter}}
-                        </a>
-                        <div class='text-secondary text-11'>{{file.sha256}}</div>
-                        <div class='text-secondary text-13'><a ng-if="file.sanitizedFileURL" target="_blank" href="{{file.sanitizedFileURL}}">Download sanitized</a></div>
+                        <span ng-class="{'icon-server': file.useCore, 'icon-cloud': !file.useCore}" class="mcl-icon scan-type"></span>
+                        <div>
+                            <a class="scan-results color-{{file.status}}" ng-href="{{file.scanResults}}" target="_blank" ng-click="vm.trackScanDetailsClicks()">
+                                {{file.fileName | decodeFileNameFilter}}
+                            </a>
+                            <div class='text-secondary text-11'>{{file.sha256}}</div>
+                            <div class='text-secondary text-13'><a ng-if="file.sanitizedFileURL" target="_blank" href="{{file.sanitizedFileURL}}">Download sanitized</a></div>
+                        </div>
                     </td>
                     <td>{{vm.momentFrom(file.scanTime)}}</td>
                     <td>
@@ -43,7 +46,7 @@
                         <a ng-if="file.scanResults" class="scan-results color-{{file.status}}" ng-href="{{file.scanResults}}" target="_blank" ng-click="vm.trackScanDetailsClicks()">{{file.statusLabel}}</a>
                     </td>
                     <td class="action-column"><span class="mcl-icon {{vm.getStatusIcon(file.status)}}"></span></td>
-                    <td class="action-column"><a ng-click="vm.removeFile(file)" href="" title="Remove file from scan history"><span class="mcl-icon icon-trash-empty"></span></a></td>
+                    <td class="action-column"><a ng-click="vm.removeFile(file)" href="" title="Remove file from scan history"><span class="mcl-icon icon-trash"></span></a></td>
                 </tr>
             </tbody>
         </table>

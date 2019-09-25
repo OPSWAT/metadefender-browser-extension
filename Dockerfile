@@ -1,6 +1,6 @@
 FROM node:11-alpine
 
-LABEL version="1.2"
+LABEL version="1.3"
 LABEL description="Linux alpine with node:11 and chromium browser"
 
 RUN set -x \
@@ -9,9 +9,7 @@ RUN set -x \
     && echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories \
     && echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories
 
-RUN apk add --no-cache \
-    bash \
-    python3
+RUN apk add --no-cache bash python3 pkgconfig autoconf automake libtool nasm build-base zlib-dev
 
 RUN apk add --no-cache \
         chromium@edge \

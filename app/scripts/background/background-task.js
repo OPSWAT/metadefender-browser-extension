@@ -9,11 +9,12 @@ import { BROWSER_EVENT } from '../common/browser/browser-message-event';
 import { settings } from '../common/persistent/settings';
 import { apikeyInfo } from '../common/persistent/apikey-info';
 import { scanHistory } from '../common/persistent/scan-history';
+import CoreClient from '../common/core-client';
 import MetascanClient from '../common/metascan-client';
 import FileProcessor from '../common/file-processor';
 
 import cookieManager from './cookie-manager';
-import DownloadsManager from './download-manager';
+import DownloadManager from './download-manager';
 import { goToTab } from './navigation';
 import SafeUrl from './safe-url';
 
@@ -22,20 +23,9 @@ const MCL_CONFIG = MCL.config;
 class BackgroundTask {
 
     constructor() {
-
         this.apikeyInfo = apikeyInfo;
         this.settings = settings;
         this.scanHistory = scanHistory;
-
-        MetascanClient
-            .configure({
-                pollingIncrementor: MCL_CONFIG.scanResults.incrementor,
-                pollingMaxInterval: MCL_CONFIG.scanResults.maxInterval
-            })
-            .setHost(MCL_CONFIG.metadefenderDomain)
-            .setVersion(MCL_CONFIG.metadefenderVersion);
-
-        this.fileProcessor = new FileProcessor(MetascanClient);
 
         cookieManager.onChange(info => {
             const cookie = info.cookie;
@@ -55,22 +45,33 @@ class BackgroundTask {
         chrome.notifications.onClosed.addListener(() => { });
 
         browserMessage.addListener(this.messageListener.bind(this));
-
     }
     
     async init() {
         const settings = this.settings;
         const apiKeyInfo = this.apikeyInfo;
         const scanHistory = this.scanHistory;
-        const fileProcessor = this.fileProcessor;
 
         await settings.init();
         await apiKeyInfo.init();
         await scanHistory.init();
         await scanHistory.cleanPendingFiles();
-        await fileProcessor.init();
+        
+        MetascanClient.configure({
+            pollingIncrementor: MCL_CONFIG.scanResults.incrementor,
+            pollingMaxInterval: MCL_CONFIG.scanResults.maxInterval
+        })
+            .setHost(MCL_CONFIG.metadefenderDomain)
+            .setVersion(MCL_CONFIG.metadefenderVersion);
 
-        this.downloadsManager = new DownloadsManager(fileProcessor);
+        CoreClient.configure({
+            apikey: settings.coreApikey,
+            endpoint: settings.coreUrl,
+            pollingIncrementor: MCL_CONFIG.scanResults.incrementor,
+            pollingMaxInterval: MCL_CONFIG.scanResults.maxInterval,
+        });
+
+        this.downloadsManager = new DownloadManager(FileProcessor);
         const downloadsManager = this.downloadsManager;
 
         chrome.downloads.onCreated.addListener(downloadsManager.trackInProgressDownloads.bind(downloadsManager));
@@ -113,7 +114,8 @@ class BackgroundTask {
         try {
             cookieData = JSON.parse(cookieData);
         } catch (error) {
-            console.log('setApikey failed', error);
+            browserNotification.create(error, 'info');
+            _gaq.push(['exception', {exDescription: 'background-task:setApikey' + JSON.stringify(error)}]);
         }
 
         if (apikeyInfo.apikey === cookieData.apikey && apikeyInfo.loggedIn === cookieData.loggedIn) {
@@ -193,7 +195,10 @@ class BackgroundTask {
     /**
      * Extension notifications click event handler
      */
-    async handleNotificationClicks() {
+    async handleNotificationClicks(notificationId) {
+        if (notificationId == 'info') {
+            return;
+        }
         goToTab('history');
     }
 
@@ -222,6 +227,11 @@ class BackgroundTask {
                 let saveCleanFiles = settings.saveCleanFiles;
 
                 await settings.load();
+
+                CoreClient.configure({
+                    apikey: settings.coreApikey,
+                    endpoint: settings.coreUrl
+                });
 
                 if (settings.saveCleanFiles !== saveCleanFiles) {
                     this.updateContextMenu();

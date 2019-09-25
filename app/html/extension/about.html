@@ -4,6 +4,10 @@
 
     <p ng-bind-html="vm.__MSG.getMessage('aboutThankYou', {'__mclDomain__': vm.CONFIG.mclDomain})"></p>
 
+    <p ng-bind-html="vm.__MSG.getMessage('githubInfo')"></p>
+    
+    <p ng-bind-html="vm.__MSG.getMessage('chromeExtensionHelp')"></p>
+
     <h4>
         <span ng-bind-html="vm.__MSG.getMessage('aboutApiKeyInfo')"></span>
     </h4>
@@ -26,17 +30,21 @@
             <span>{{vm.apikeyInfo.feedLimit}}</span>
         </div>
         <div>
+            <label>Sandbox API Limit</label>
+            <span>{{vm.apikeyInfo.sandboxLimit}}</span>
+        </div>
+        <div>
             <label>Paid User</label>
             <span>{{vm.__MSG.getMessage((vm.apikeyInfo.paidUser) ? 'yes' : 'no')}}</span>
         </div>
         <div>
-            <label>Limit Interval</label>
-            <span>{{vm.apikeyInfo.limitInterval}}</span>
+            <label>Maximum file size</label>
+            <span>{{vm.apikeyInfo.maxUploadFileSize}} MB</span>
         </div>
         <a ng-href="{{vm.CONFIG.opswatDomain}}/contact" target="_blank">{{vm.__MSG.getMessage('contactOpswat')}}</a>
     </div>
 
-    <p ng-bind-html="vm.__MSG.getMessage('aboutMoreAboutMCL', {'__opswatDomain__': vm.CONFIG.opswatDomain})"></p>
+    <p ng-bind-html="vm.__MSG.getMessage('aboutMoreAboutMCL', {'__mclDomain__': vm.CONFIG.mclDomain})"></p>
 
     <h4 ng-bind-html="vm.__MSG.getMessage('aboutHowToUse')"></h4>
 
@@ -55,29 +63,4 @@
 
         <div class="media-body" ng-bind-html="vm.__MSG.getMessage('howToOpenSettings')"></div>
     </div>
-
-    <div class="media">
-        <div class="media-body" ng-bind-html="vm.__MSG.getMessage('howToScanAll')"></div>
-
-        <div class="media-middle">
-            <img class="" src="/images/how-to/scan-all.png" alt="OPSWAT File Security for Chrome scan downloads">
-        </div>
-    </div>
-
-    <div class="media">
-        <div class="media-body" ng-bind-html="vm.__MSG.getMessage('howToSaveClean')"></div>
-
-        <div class="media-middle">
-            <img class="" src="/images/how-to/save-clean.png" alt="OPSWAT File Security for Chrome save clean files">
-        </div>
-    </div>
-
-    <div class="media">
-        <div class="media-body" ng-bind-html="vm.__MSG.getMessage('howToMoreInfo')"></div>
-
-        <div class="media-middle">
-            <img class="" src="/images/how-to/more-info.png" alt="OPSWAT File Security for Chrome save clean files">
-        </div>
-    </div>
-
 </div>

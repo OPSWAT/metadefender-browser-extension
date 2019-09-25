@@ -40,7 +40,7 @@ async function create(message, id, fileInfected) {
             title: chrome.i18n.getMessage('appName'),
             message: message,
             priority: 1,
-            isClickable: true
+            isClickable: (typeof fileInfected !== 'undefined')
         };
 
         if (typeof id === 'undefined') {
@@ -50,8 +50,8 @@ async function create(message, id, fileInfected) {
             chrome.notifications.create(String(id), optionObject, clearNotification);
         }
 
-    } catch (e) {
-        console.error(e);
+    } catch (error) {
+        _gaq.push(['exception', {exDescription: 'browser-notification:create' + JSON.stringify(error)}]);
     }
 }
 
