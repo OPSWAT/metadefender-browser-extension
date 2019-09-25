@@ -94,7 +94,7 @@ body {
           }
 
           &:after {
-            content: '\e801';
+            content: '\e805';
             font-family: mcl-ext-icons;
             position: absolute;
             top: 9px;
@@ -195,6 +195,27 @@ body {
     .list-group-item {
       padding: $padding $padding $padding + 10;
 
+      &.useCore {
+
+        .form-horizontal {
+          padding-top: 15px;
+          padding-left: 60px;
+
+          label.control-label {
+            font-weight: 400;
+          }
+        }
+
+        .btn {
+          line-height: 1px;
+          height: 38px;
+        }
+
+        p.rule-label {
+          padding: 7px 12px;
+        }
+      }
+
       sub {
         padding-left: 60px;
 
@@ -246,7 +267,7 @@ body {
 
           .icon-ok {
             display: none;
-            color: #fff;
+            color: $colorWhite;
 
             &:before {
               margin-top: 3px;
@@ -303,18 +324,28 @@ body {
           vertical-align: middle;
           position: relative;
 
+          &:first-child {
+            display: flex;
+
+            .scan-type {
+              padding: 4px 10px 0 0;
+              font-size: 2rem;
+              color: $colorGreyDarker;
+            }
+          }
+
           &.action-column {
             padding: 0;
             text-align: center;
           }
 
-          .icon-trash-empty {
+          .icon-trash {
             display:none;
           }
         }
 
         &:hover {
-          .icon-trash-empty {
+          .icon-trash {
             display: inline-block;
           }
         }

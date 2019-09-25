@@ -60,13 +60,25 @@ async function download(link, fileData, fileName) {
     });
 }
 
+/**
+ * Checks if an URL points to a sanitized file.
+ * 
+ * @param {string} url a file url
+ * @returns {boolean} `true` if the url provided is of a sanitized file
+ */
 function isSanitizedFile(url) {
     const urlLow = url.toLowerCase();
 
+    // metadefender cloud sanitized files
     for (let bucket of MCL.config.sanitizationBuckets) {
         if (urlLow.indexOf(bucket) > -1 ) {
             return true;
         }
+    }
+
+    // metadefender core sanitized files
+    if (urlLow.indexOf('/file/converted/') > -1 && urlLow.indexOf('?apikey=') > -1) {
+        return true;
     }
 }
 
