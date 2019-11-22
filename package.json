@@ -1,7 +1,7 @@
 {
   "name": "opswat-file-security-chrome",
   "private": true,
-  "version": "3.9.0",
+  "version": "3.9.1",
   "description": "Scan files and downloads with OPSWAT File Security for Chrome",
   "repository": {
     "type": "git",
@@ -31,9 +31,9 @@
     ]
   },
   "dependencies": {
-    "angular": "1.7.8",
-    "angular-route": "1.7.8",
-    "angular-sanitize": "1.7.8",
+    "angular": "1.7.9",
+    "angular-route": "1.7.9",
+    "angular-sanitize": "1.7.9",
     "bootstrap": "3.4.1",
     "browser-cookies": "1.2.0",
     "moment": "2.24.0",
@@ -43,7 +43,7 @@
     "xhr": "2.5.0"
   },
   "devDependencies": {
-    "angular-mocks": "1.7.8",
+    "angular-mocks": "1.7.9",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
     "babel-loader": "7.1.5",
