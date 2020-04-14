@@ -47,7 +47,7 @@
     "maxInterval": 300000
   },
 
-  "authCookieName": "opswat-auth",
+  "authCookieName": "__Host-opswat-auth",
 
   "sanitizationBuckets": [
     "d.files.metadefender.com",
