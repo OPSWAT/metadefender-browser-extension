@@ -80,11 +80,17 @@ class BackgroundTask {
 
         this.setupContextMenu(settings.saveCleanFiles);
 
-        cookieManager.get( cookie => {
-            if (cookie) {
-                this.setApikey(cookie.value);
-            }
-        });
+        function getAuthCookie() {
+            cookieManager.get( cookie => {
+                if (cookie) {
+                    this.setApikey(cookie.value);
+                } else {
+                    setTimeout(getAuthCookie.bind(this), 300);
+                }
+            });
+        }
+
+        getAuthCookie.call(this);
 
         SafeUrl.toggle(settings.safeUrl);
     }
