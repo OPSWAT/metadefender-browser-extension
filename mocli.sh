@@ -86,7 +86,8 @@ function read_env() {
 
 function copy_secrets() {
     echo "-> copy secrets"
-    aws s3 cp s3://mcl-artifacts/mcl-browser-extension/secrets.json . > /dev/null 2>&1 
+    aws s3 cp s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/secrets.json ./secrets.json > /dev/null 2>&1 
+
     if [[ "$?" != "0" ]]; then
         echo -e "{\n\t\"googleAnalyticsId\": \"\"\n}" > ./secrets.json
         echo -e "\nFailed to copy secrets from s3. Please update ./secrets.json manually.\n"
@@ -100,8 +101,8 @@ function copy_envs() {
         ENVS=(${1})
     fi
     for env in ${ENVS[@]}; do
-        echo s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json
-        aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json ./app/config/ > /dev/null 2>&1 
+        echo s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json
+        aws s3 cp s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json ./app/config/ > /dev/null 2>&1 
     done
 }
 
