@@ -268,7 +268,7 @@ class FileProcessor {
     async scanFile(file, linkUrl, fileData, downloadItem, useCore) {
         try {
             file.useCore = useCore;
-            scanHistory.save();
+            await scanHistory.save();
 
             let response = useCore
                 ? await this.scanWithCore(file, fileData)
@@ -279,7 +279,7 @@ class FileProcessor {
             }
 
             file.dataId = response.data_id;
-            scanHistory.save();
+            await scanHistory.save();
             await this.startStatusPolling(file, linkUrl, fileData, !!downloadItem);
 
         } catch (error) {

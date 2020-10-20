@@ -26,24 +26,24 @@ class BackgroundTask {
         this.apikeyInfo = apikeyInfo;
         this.settings = settings;
         this.scanHistory = scanHistory;
-
+        
         cookieManager.onChange(info => {
             const cookie = info.cookie;
-    
+            
             if (!MCL_CONFIG.mclDomain.endsWith(cookie.domain) || MCL_CONFIG.authCookieName !== cookie.name || info.removed) {
                 return;
             }
-    
+            
             this.setApikey(cookie.value);
         });
         
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
-
+        
         chrome.contextMenus.onClicked.addListener(this.handleContextMenuClicks.bind(this));
-
+        
         chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
         chrome.notifications.onClosed.addListener(() => { });
-
+        
         browserMessage.addListener(this.messageListener.bind(this));
     }
     
@@ -51,12 +51,18 @@ class BackgroundTask {
         const settings = this.settings;
         const apiKeyInfo = this.apikeyInfo;
         const scanHistory = this.scanHistory;
-
-        await settings.init();
-        await apiKeyInfo.init();
-        await scanHistory.init();
-        await scanHistory.cleanPendingFiles();
         
+        (async() => {
+            try {
+                await settings.init();
+                await apiKeyInfo.init();
+                await scanHistory.init();
+                await scanHistory.cleanPendingFiles();
+            } catch (error) {
+                console.log(error);
+            }
+        })();
+
         MetascanClient.configure({
             pollingIncrementor: MCL_CONFIG.scanResults.incrementor,
             pollingMaxInterval: MCL_CONFIG.scanResults.maxInterval
@@ -101,11 +107,11 @@ class BackgroundTask {
      */
     setupContextMenu(saveCleanFiles) {
         let title = (saveCleanFiles) ? 'contextMenuScanAndDownloadTitle' : 'contextMenuScanTitle';
-        chrome.contextMenus.create({
+        chrome.contextMenus.removeAll(() => chrome.contextMenus.create({
             id: MCL.config.contextMenu.scanId,
             title: chrome.i18n.getMessage(title),
             contexts: ['link', 'image', 'video', 'audio']
-        });
+        }));
     }
 
     /**
@@ -128,24 +134,29 @@ class BackgroundTask {
             return;
         }
 
-        const response = await MetascanClient.apikey.info(cookieData.apikey);
-
-        if (response && response.error) {
-            browserNotification.create(response.error.messages.join(', '));
-            return;
-        }
-
-        this.apikeyInfo.apikey = cookieData.apikey;
-        this.apikeyInfo.loggedIn = cookieData.loggedIn;
-        this.apikeyInfo.parseMclInfo(response);
+        try {
+            const response = await MetascanClient.apikey.info(cookieData.apikey);
+    
+            if (response && response.error) {
+                browserNotification.create(response.error.messages.join(', '));
+                return;
+            }
+    
+            this.apikeyInfo.apikey = cookieData.apikey;
+            this.apikeyInfo.loggedIn = cookieData.loggedIn;
+            this.apikeyInfo.parseMclInfo(response);
         
-        await apikeyInfo.save();
+            await apikeyInfo.save();
+    
+            this.settings.shareResults = this.settings.shareResults || !this.apikeyInfo.paidUser;
+            await this.settings.save();
 
-        this.settings.shareResults = this.settings.shareResults || !this.apikeyInfo.paidUser;
-        await this.settings.save();
+            await browserMessage.send({ event: BROWSER_EVENT.APIKEY_UPDATED });
+            await browserMessage.send({ event: BROWSER_EVENT.CLOSE_LOGIN });
 
-        browserMessage.send({ event: BROWSER_EVENT.APIKEY_UPDATED });
-        browserMessage.send({ event: BROWSER_EVENT.CLOSE_LOGIN });
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     onInstallExtensionListener(details) {

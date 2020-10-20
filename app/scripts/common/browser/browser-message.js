@@ -20,7 +20,9 @@ export default browserMessage;
 function send(data, options) {
     return new Promise((resolve) => {
         return chrome.runtime.sendMessage(data, options, (response) => {
-            resolve(response);
+            if (!chrome.runtime.lastError) {
+                resolve(response);
+            }
         });
     });
 }

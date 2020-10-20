@@ -69,7 +69,7 @@ async function save(){
     await BrowserStorage.set({[MCL.config.storageKey.scanHistory]: {
         files: this.files
     }});
-    BrowserMessage.send({event: BROWSER_EVENT.SCAN_FILES_UPDATED});
+    await BrowserMessage.send({event: BROWSER_EVENT.SCAN_FILES_UPDATED});
 }
 
 async function cleanPendingFiles() {
