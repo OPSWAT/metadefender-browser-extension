@@ -18,11 +18,9 @@
 <div class="header">
     <div class="container">
         <div class="row">
-            <div class="col-sm-12">
-                <div class="pull-right">
-                    <button ng-if="!vm.apikeyInfo.loggedIn" class="btn btn-blue text-14" ng-click="vm.login()">Sign In</button>
-                </div>
+            <div class="col-12 d-flex flex-row align-items-center justify-content-between flex-wrap">
                 <div class="metadefender-chrome-logo"></div>
+                <button ng-if="!vm.apikeyInfo.loggedIn" class="btn btn-blue text-14" ng-click="vm.login()">Sign In</button>
             </div>
         </div>
     </div>

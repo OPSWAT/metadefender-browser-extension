@@ -11,7 +11,7 @@ import UglifyJsPlugin  from 'uglifyjs-webpack-plugin';
 
 const ENV = args.production ? 'production' : (args.devbuild ? 'devbuild' : 'development');
 
-gulp.task('scripts', () => {
+export default gulp.task('scripts', () => {
     return gulp.src(['app/scripts/*.js', '!app/scripts/**/*.spec.js'])
         .pipe(plumber({
             // Webpack will log the errors

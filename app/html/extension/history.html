@@ -4,7 +4,7 @@
 
     <div ng-if="vm.scanHistory.files.length">
         <div class="row">
-            <div class="col-xs-6 form-group">
+            <div class="col-6 form-group">
                 <div class="input-group">
                     <input type="text" class="form-control" ng-model="fileFilter.fileName" placeholder="{{vm.__MSG.getMessage('searcHistory')}}">
                     <div class="input-group-addon"><span class="icon-search"></span></div>
@@ -13,9 +13,9 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-12 caption text-15 font-medium">
+            <div class="col-12 caption text-15 font-medium d-flex flex-row align-items-center justify-content-between">
                 {{vm.scanHistory.files.length}} file<span ng-if="vm.scanHistory.files.length != 1">s</span> scanned
-                <button class="pull-right btn btn-blue-outline text-13 font-medium small" ng-click="vm.clearScanHistory()">Clear scan history</button>
+                <button class="btn btn-blue-outline text-13 font-medium small" ng-click="vm.clearScanHistory()">Clear scan history</button>
             </div>
         </div>
         <table class="table table-bordered" ng-show="filteredFiles.length">

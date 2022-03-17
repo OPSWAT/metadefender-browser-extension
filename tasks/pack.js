@@ -15,7 +15,7 @@ function getPackFileType () {
     }
 }
 
-gulp.task('pack', ['build'], () => {
+gulp.task('pack', gulp.series('build', () => {
     let environment = args.env || 'prod';
     let name = packageDetails.name;
     let version = packageDetails.version;
@@ -29,4 +29,4 @@ gulp.task('pack', ['build'], () => {
             let filenameStyled = colors.magenta(`./packages/${filename}`);
             log(`Packed ${distStyled} to ${filenameStyled}`);
         });
-});
+}));

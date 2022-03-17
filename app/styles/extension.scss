@@ -318,7 +318,7 @@ body {
       }
 
       tr {
-        border-bottom: 1px solid $colorGrey;
+        border-bottom: 1px solid $colorGrey !important;
 
         td {
           vertical-align: middle;

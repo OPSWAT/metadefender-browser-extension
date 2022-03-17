@@ -3,7 +3,7 @@ import xhr from 'xhr';
 import uniqid from 'uniqid';
 import SparkMD5 from 'spark-md5';
 import {SCAN_STATUS} from '../constants/file';
-import mime from 'mime-types';
+// import mime from 'mime-types';
 
 function ScanFile() {
 
@@ -42,7 +42,7 @@ const URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 async function download(link, fileData, fileName) {
     let fileUrl;
     const fileExtension = fileName && fileName.match(/(?<=\.)[^.]*$/);
-    const fileType = Array.isArray(fileExtension) ? mime.lookup(fileExtension[0]) : "text/plain";
+    const fileType = Array.isArray(fileExtension) ? 'pdf' : "text/plain";
 
     try {
         fileUrl = URL.createObjectURL(new Blob([fileData], { type: fileType }));

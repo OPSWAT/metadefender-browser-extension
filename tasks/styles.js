@@ -3,10 +3,12 @@ import gulpif from 'gulp-if';
 import gutil from 'gulp-util';
 import sourcemaps from 'gulp-sourcemaps';
 import less from 'gulp-less';
-import sass from 'gulp-sass';
+import gulpSass from 'gulp-sass';
+import datrSass from 'sass';
 import cleanCSS from 'gulp-clean-css';
 import livereload from 'gulp-livereload';
-import gulpSequence from 'gulp-sequence';
+
+const sass = gulpSass(datrSass);
 
 import args from './lib/args';
 
@@ -54,7 +56,7 @@ gulp.task('styles:sass', function () {
         .pipe(gulpif(args.watch, livereload()));
 });
 
-gulp.task('styles', gulpSequence(
+gulp.task('styles', gulp.series(
     'styles:vendors',
     //'styles:css',
     //'styles:less',

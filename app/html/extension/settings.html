@@ -29,10 +29,9 @@
             <mcl-checkbox value="vm.coreSettings.useCore" label="{{vm.__MSG.getMessage('useCore')}}"  change="vm.settingsChanged('useCore')"></mcl-checkbox>
             <form name="coreSettingsForm" class="form-horizontal">
                 <fieldset ng-disabled="!vm.coreSettings.useCore">
-
-                    <div class="form-group has-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.apikey.groupClass">
-                        <label for="coreApikey" class="control-label col-sm-2">{{vm.__MSG.getMessage('coreApikey')}}</label>
-                        <div class="col-sm-10">
+                    <div class="form-group ml-auto col-12 d-flex flex-row align-items-start has-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.apikey.groupClass">
+                        <label for="coreApikey" class="col-2 text-right mr-2 control-label">{{vm.__MSG.getMessage('coreApikey')}}</label>
+                        <div class="w-100">
                             <input id="coreApikey" class="form-control" type="text" aria-describedby="coreApikeyStatus"
                                 ng-model="vm.coreSettings.apikey.value" ng-blur="vm.validateCoreSettings()"/>
                             <span class="form-control-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.apikey.value && vm.coreSettings.apikey.iconClass" aria-hidden="true"></span>
@@ -40,9 +39,9 @@
                         </div>
                     </div>
 
-                    <div class="form-group has-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.url.groupClass">
-                        <label for="coreUrl" class="control-label col-sm-2">{{vm.__MSG.getMessage('coreUrl')}}</label>
-                        <div class="col-sm-10">
+                    <div class="form-group ml-auto col-12 d-flex flex-row align-items-start has-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.url.groupClass">
+                        <label for="coreUrl" class="col-2 text-right mr-2 control-label">{{vm.__MSG.getMessage('coreUrl')}}</label>
+                        <div class="w-100">
                             <input id="coreUrl" class="form-control" type="text" aria-describedby="coreUrlStatus"
                                 ng-model="vm.coreSettings.url.value" ng-blur="vm.validateCoreSettings()"/>
                             <span class="form-control-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.url.value && vm.coreSettings.url.iconClass" aria-hidden="true"></span>
@@ -50,18 +49,18 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="coreRule" class="control-label col-sm-2">{{vm.__MSG.getMessage('coreRule')}}</label>
-                        <div class="col-sm-5">
-                            <select id="coreRule" class="form-control" 
-                                ng-disabled="!vm.coreSettings.scanRules.length"
-                                ng-model="vm.coreSettings.rule.value"
-                                ng-options="rule as rule for rule in vm.coreSettings.scanRules">
-                                <option value="">-- Default rule --</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-5">
-                            <button ng-disabled="!coreSettingsForm.$dirty" class="btn btn-blue pull-right" type="button" ng-click="vm.settingsChanged('coreSettings')">{{vm.__MSG.getMessage('coreSettingsSave')}}</button>
+                    <div class="form-group ml-auto col-12 d-flex flex-row align-items-start">
+                        <label for="coreRule" class="col-2 text-right mr-2 control-label">{{vm.__MSG.getMessage('coreRule')}}</label>
+                        <div class="w-100 d-flex flex-row align-items-center justify-content-between">
+                            <div class="col-sm-6 p-0">
+                                <select id="coreRule" class="form-control" 
+                                    ng-disabled="!vm.coreSettings.scanRules.length"
+                                    ng-model="vm.coreSettings.rule.value"
+                                    ng-options="rule as rule for rule in vm.coreSettings.scanRules">
+                                    <option value="">-- Default rule --</option>
+                                </select>
+                            </div>
+                            <button ng-disabled="!coreSettingsForm.$dirty" class="btn btn-blue" type="button" ng-click="vm.settingsChanged('coreSettings')">{{vm.__MSG.getMessage('coreSettingsSave')}}</button>
                         </div>
                     </div>
                 </fieldset>

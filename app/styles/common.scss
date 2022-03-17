@@ -12,13 +12,30 @@ body {
     margin-bottom: 0;
   }
 
+  .has-error,
+  .help-block {
+    color: $dareDevil;
+  }
+
+  .has-error .form-control-feedback {
+    color: $dareDevil;
+  }
+
+  .has-error .form-control {
+    border-color: $dareDevil;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+  }
+
   .list-group-item {
-    border-top: 1px solid $colorGreyLight;
     border-left: none;
     border-right: none;
     border-bottom: none;
-    margin-bottom: -1px;
     padding: $padding;
+    border-bottom: 1px solid $colorGreyLight;
+  }
+
+  .table > :not(:first-child) {
+    border-top: none !important;
   }
 
   .list-group-item:first-child {
@@ -51,6 +68,7 @@ body {
     border: 1px solid $colorGrey;
     border-radius: 0;
     height: 38px;
+    font-size: 14px;
   }
 
   .input-group-addon {
@@ -58,10 +76,41 @@ body {
     background-color: $colorWhite;
     border-radius: 0;
     color: $secondaryColor;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
   }
 
   .input-group .form-control:last-child {
     border-left: none;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+
+    &.ml-auto {
+      margin-left: auto !important;
+    }
+
+    &.align-items-start {
+      label {
+        margin-top: 10px;
+      }
+    }
+  }
+
+  label {
+    &.text-right {
+      text-align: right;
+    }
+
+    &.mr-2 {
+      margin-right: 10px;
+    }
   }
 
   .form-control:focus {
@@ -200,7 +249,6 @@ body {
     display: block;
     width: 117px;
     height: 53px;
-    position: absolute;
     margin-top: -5px;
   }
 }

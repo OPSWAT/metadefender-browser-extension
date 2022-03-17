@@ -10,18 +10,18 @@
     <link rel="stylesheet" type="text/css" href="../styles/popup.css">
 </head>
 <body>
-    <div class="header">
-        <div class="pull-right">
+    <div class="header d-flex flex-row align-items-center justify-content-between">
+        <div class="metadefender-chrome-logo"></div>
+        <div>
             <a class="options-btn" href='' ng-click="vm.goToSettings()"><span class="icon-cog text-14"></span></a>
         </div>
-        <div class="metadefender-chrome-logo"></div>
     </div>
 
     <div class="container-fluid">
         <div ng-show="!vm.latestScans.length" class="no-scans" ng-bind-html="vm.__MSG.getMessage('noScansNotification')"></div>
 
         <ul ng-show="vm.latestScans.length" class="list-group row">
-            <li class="list-group-item" ng-repeat="file in vm.latestScans">
+            <li class="list-group-item d-flex flex-row align-items-center justify-content-between" ng-repeat="file in vm.latestScans">
                 <a ng-if="file.scanResults" ng-href="{{file.scanResults}}" target="_blank" title="{{file.fileName | decodeFileNameFilter}}" ng-click="vm.gaTrack('view-details')">{{file.fileName | decodeFileNameFilter | limitTo : 35}}</a>
                 <span ng-if="!file.scanResults">{{file.fileName | decodeFileNameFilter | limitTo : 35}}</span>
                 <span class="pull-right mcl-icon {{vm.getStatusIcon(file.status)}}"></span>
@@ -29,10 +29,8 @@
         </ul>
     </div>
 
-    <div class="footer">
-        <span class="pull-right">
-            <a href='' ng-click="vm.goToHistory()" class="text-14">View Scan History<span class="mcl-icon icon-right"></span></a>
-        </span>
+    <div class="footer d-flex justify-content-end">
+        <a href='' ng-click="vm.goToHistory()" class="text-14">View Scan History<span class="mcl-icon icon-right"></span></a>
     </div>
 
     <script src="../scripts/popup.js"></script>

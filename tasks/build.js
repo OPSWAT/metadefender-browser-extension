@@ -1,9 +1,17 @@
 import gulp from 'gulp';
-import gulpSequence from 'gulp-sequence';
+import clean from './clean';
+import styles from './styles';
+import scripts from './scripts';
+import html from './pages';
+import locales from './locales';
+import images from './images';
+import fonts from './fonts';
+import manifest from './manifest';
+import chromereload from './chromereload';
 
-gulp.task('build', gulpSequence(
+gulp.task('build', gulp.series(
     'clean',
-    [
+    gulp.parallel(
         'styles',
         'scripts',
         'html',
@@ -12,5 +20,5 @@ gulp.task('build', gulpSequence(
         'fonts',
         'manifest',
         'chromereload'
-    ]
+    )
 ));
