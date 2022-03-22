@@ -1,0 +1,37 @@
+image: node:11.13.0
+clone:
+  depth: full
+options:
+  docker: true
+  size: 2x
+pipelines:
+  branches:
+    '{master}':
+      - step:
+          name: SonarQube analysis
+          script:
+            - pipe: sonarsource/sonarqube-scan:1.0.0
+              variables:
+                SONAR_HOST_URL: ${SONAR_HOST_URL} # Get the value from the repository/workspace variable.
+                SONAR_TOKEN: ${SONAR_TOKEN} # Get the value from the repository/workspace variable. You shouldn't set secret in clear text here.
+          services:
+            - docker
+          size: 2x
+  pull-requests:
+    '**':
+      - step:
+          name: SonarQube PR analysis
+          script:
+            - pipe: sonarsource/sonarqube-scan:1.0.0
+              variables:
+                SONAR_HOST_URL: ${SONAR_HOST_URL} # Get the value from the repository/workspace variable.
+                SONAR_TOKEN: ${SONAR_TOKEN} # Get the value from the repository/workspace variable. You shouldn't set secret in clear text here.
+          services:
+            - docker
+          size: 2x
+definitions:
+  services:
+    docker:
+      memory: 4096
+  caches:
+    sonar: ~/.sonar
