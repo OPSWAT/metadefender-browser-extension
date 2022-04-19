@@ -16,6 +16,7 @@ CMDS_DESC=(
     [release-p]="Create release version and increases patch number"
     [hotfix]="Create a qa release from current branch and uploads it to bitbucket"
     [pack]="Zips the dist/<vendor> directory. Usage: mocli pack [--production] [--vendor=firefox] [--env=qa]"
+    [sonar-scan]="Running SonarQube Scanner from the Docker image. Usage: sonar-scan [<token>]"
     [help]="Show this message"
 )
 
@@ -104,6 +105,25 @@ function copy_envs() {
         echo s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json
         aws s3 cp s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json ./app/config/ > /dev/null 2>&1 
     done
+}
+
+function sonar_scan() {
+    SONARQUBE_URL=https://sonar.opswat.com
+    SONARQUBE_CACHE_DIR=${CWD}/.sonar/cache
+    if [[ "${1}" != "" ]]; then
+        SONARQUBE_TOKEN=${1}
+    else
+        echo "Please pass 'SONARQUBE_TOKEN' as an argument and run the scanner again"
+        exit 1
+    fi
+
+    docker run \
+        --rm \
+        -e SONAR_HOST_URL="${SONARQUBE_URL}" \
+        -e SONAR_LOGIN="${SONARQUBE_TOKEN}" \
+        -v ${SONARQUBE_CACHE_DIR}:/opt/sonar-scanner/.sonar/cache \
+        -v "${CWD}:/usr/src" \
+        sonarsource/sonar-scanner-cli
 }
 
 if [[ $# == 0 ]]; then
@@ -276,6 +296,10 @@ while [[ $# -gt 0 ]]; do
         ;;
         gen-cmp)
             gen_cmp
+            ;;
+        sonar-scan)
+            sonar_scan ${2}
+            exit $?
             ;;
         help)
             printHelp
