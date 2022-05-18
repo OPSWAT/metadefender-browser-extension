@@ -37,7 +37,7 @@
                                 {{file.fileName | decodeFileNameFilter}}
                             </a>
                             <div class='text-secondary text-11'>{{file.sha256}}</div>
-                            <div class='text-secondary text-13'><a ng-if="file.sanitizedFileURL" target="_blank" href="{{file.sanitizedFileURL}}">Download sanitized</a></div>
+                            <div class='text-secondary text-13'><a ng-if="file.sanitizedFileURL" target="_blank" rel="noopener" href="{{file.sanitizedFileURL}}">Download sanitized</a></div>
                         </div>
                     </td>
                     <td>{{vm.momentFrom(file.scanTime)}}</td>
