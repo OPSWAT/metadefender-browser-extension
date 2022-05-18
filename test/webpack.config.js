@@ -7,7 +7,7 @@ module.exports = {
                 /\.spec\.js$/
             ],
             loader: 'istanbul-instrumenter-loader',
-            query: {
+            options: {
                 esModules: true
             }
         }]

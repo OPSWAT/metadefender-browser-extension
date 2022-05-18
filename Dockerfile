@@ -1,26 +1,17 @@
-FROM node:11-alpine
+FROM node:12.16-slim
 
-LABEL version="1.3"
-LABEL description="Linux alpine with node:11 and chromium browser"
+LABEL version="1.4"
+LABEL description="Linux with node:12 and chromium browser"
 
-RUN set -x \
-    && apk update \
-    && apk upgrade \
-    && echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories \
-    && echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories
+RUN apt update
 
-RUN apk add --no-cache bash python3 pkgconfig autoconf automake libtool nasm build-base zlib-dev
+RUN apt install -y bash python3 pkg-config autoconf automake libtool nasm build-essential zlib1g-dev
 
-RUN apk add --no-cache \
-        chromium@edge \
-        harfbuzz@edge \
-        nss@edge \
-        freetype@edge \
-        ttf-freefont@edge
+RUN apt install -y chromium libharfbuzz-dev libnss3-dev libfreetype6-dev ttf-freefont python-pip
 
-RUN pip3 install awscli
+RUN pip install awscli
 
-RUN rm -rf /var/cache/* && mkdir /var/cache/apk
+RUN rm -rf /var/cache/* && mkdir /var/cache/apt
 
 WORKDIR /opt/mo
 

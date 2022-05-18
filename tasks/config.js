@@ -27,8 +27,7 @@ gulp.task('config', function(cb) {
     try {
         const confEnv = JSON.parse(fs.readFileSync(`./app/config/${env()}.json`));
         config = merge(confCommon, confEnv);
-    }
-    catch (error) {
+    } catch (error) {
         console.log('\nINFO: Using common config!\n');
     }
 

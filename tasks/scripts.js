@@ -29,6 +29,10 @@ export default gulp.task('scripts', () => {
             ].concat(args.production ? [
                 new UglifyJsPlugin()
             ] : []),
+            optimization: {
+                runtimeChunk: false,
+                splitChunks: false
+            },
             module: {
                 rules: [{
                     test: /\.js$/,
@@ -37,6 +41,9 @@ export default gulp.task('scripts', () => {
                     }
 
                 }]
+            },
+            resolve: {
+                extensions: ['.js']
             }
         },
         webpack,
