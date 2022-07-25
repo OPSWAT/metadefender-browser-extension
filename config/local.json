@@ -1,0 +1,6 @@
+{
+  "env": "local",
+
+  "mclDomain": "https://metadefender.local",
+  "metadefenderDomain": "https://api.metadefender.local:9999"
+}

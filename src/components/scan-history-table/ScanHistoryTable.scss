@@ -1,0 +1,55 @@
+@import "../../assets/style/colors.scss";
+@import '../../../node_modules/bootstrap/scss/functions';
+@import '../../../node_modules/bootstrap/scss/variables';
+@import '../../../node_modules/bootstrap/scss/mixins/_breakpoints.scss';
+
+.table {
+    border-color: $colorGrey;
+
+    thead {
+        background-color: $colorGreyLighter;
+    }
+    
+    tr {
+        border-bottom: 1px solid $colorGrey;
+
+        th {
+            border-bottom-width: 1px !important;
+            border-color: $colorGrey !important;
+            border-left: none;
+            border-right: none;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        td {
+            vertical-align: middle;
+            
+            &:first-of-type {
+                display: flex;
+                align-items: center;   
+            }
+
+            small {
+                word-break: break-all;
+            }
+
+            & .noThreatsFound {
+                color: $green;
+
+                a:link,
+                a:visited,
+                a:hover {
+                    word-break: break-word;
+                    &:not(.trash) {
+                        color: $green;
+                    }
+                }
+            }
+        }
+
+        .icon-spin {
+            color: $secondaryColor;
+        }
+    }
+}

@@ -2,17 +2,21 @@
  * Check http://eslint.org/docs/rules/ to see what rules are enabled due to 'eslint:recommended' 
  * and what rules can be auto-fixed 
  */
-{
+ {
     "env": {
         "es6": true,
         "node": true,
-        "jasmine": true
+        "jasmine": true,
+        "webextensions": true
     },
     "parserOptions": {
         "ecmaVersion": 2017,
         "sourceType": "module"
     },
-    "extends": "eslint:recommended",
+    "parser": "babel-eslint",
+    "extends": [
+        "plugin:react/recommended"
+    ],
     "rules": {
         "indent": [
             "error",

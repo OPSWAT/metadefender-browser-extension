@@ -16,6 +16,8 @@ app/config/dev.json
 app/config/qa.json
 app/config/prod.json
 secrets.json
+build
+docs
 
 *.log
 

@@ -1,0 +1,166 @@
+@import "../../../assets/style/colors.scss";
+@import '../../../../node_modules/bootstrap/scss/functions';
+@import '../../../../node_modules/bootstrap/scss/variables';
+@import '../../../../node_modules/bootstrap/scss/mixins/_breakpoints.scss';
+
+.form-group-wrapper {
+    padding: 20px 0;
+
+    &:not(:last-of-type) {
+        border-bottom: 1px solid $colorGreyLight;
+    }
+
+    @include media-breakpoint-up(sm) {
+        &:first-of-type {
+            padding-top: 10px;
+        }
+    }
+
+    p {
+        margin-bottom: 0;
+        margin-top: 7px;
+    }
+
+    .form-with-inputs {
+        margin-top: 20px;
+        padding-left: 30px;
+
+        .form-group {
+            margin-bottom: 15px;
+
+            @include media-breakpoint-down(sm) {
+                padding-left: 12px;
+            }
+
+            @include media-breakpoint-up(md) {
+                align-items: center;
+                display: flex;
+            }
+
+            @include media-breakpoint-down(xs) {
+                padding-left: 0;
+            }
+
+            .form-label {
+                font-size: 13px;
+
+                @include media-breakpoint-up(sm) {
+                    min-width: 10ch;
+                    text-align: right;
+                    padding: 0;
+                    padding-right: 20px;
+                }
+
+                @include media-breakpoint-down(xs) {
+                    padding-left: 0;
+                }
+            }
+        }
+
+        .btn {
+            width: 100%;
+            padding: 9px 20px;
+            min-width: 160px;
+            max-width: 160px;
+            float: right;
+
+            @include media-breakpoint-down(sm) {
+                margin-top: 15px;
+                max-width: 50%;
+            }
+        }
+    }
+
+    .form-group {
+        user-select: none;
+        position: relative;
+        margin-bottom: 0;
+        font-size: 15px;
+        padding-left: 30px;
+        
+        @include media-breakpoint-up(sm) {
+            padding-left: 40px;
+        }
+    
+        &:not(.disabled) {
+            cursor: pointer;
+    
+            .form-check-label {
+                cursor: pointer;
+            }
+        }
+    
+        &.disabled {
+            cursor: not-allowed;
+
+            .form-check-label {
+                cursor: not-allowed;
+            }
+        }
+
+        .text-secondary {
+            color: $colorGreyDark !important;
+        }
+
+        sub {
+            display: block;
+            line-height: 18px;
+            margin-top: 8px;
+
+            &.warning {
+                color: red;
+            }
+        }
+    
+        .form-check {   
+            position: unset;  
+            padding-left: 0;
+               
+            .form-check-input {
+                display: none;
+            }
+    
+            .form-check-label {
+                &:before {
+                    content: "";
+                    display: inline-block;
+                    position: absolute;
+                    width: 20px;
+                    height: 20px;
+                    top: 1.5px;
+                    left: 0;
+                    background-color:$colorWhite;
+                    border: 1px solid $colorGrey;
+                    border-radius: 4px;
+
+                    @include media-breakpoint-up(sm) {
+                        left: 10px;
+                    }
+                }
+
+                p {
+                    &.label {
+                        margin-top: 0;
+                        color: $colorBlack;
+                    }
+
+                    .text-secondary {
+                        margin-top: 10px;
+                    }
+                }
+            }
+    
+            .form-check-input:checked + .form-check-label {
+                &:before {
+                    content: '\e808';
+                    font-family: mcl-ext-icons;
+                    background-color: $secondaryColor !important;
+                    border: 1px solid $secondaryColor;
+                    color: $colorWhite;
+                    text-align: center;
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+}

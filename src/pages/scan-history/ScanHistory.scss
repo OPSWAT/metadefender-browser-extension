@@ -1,0 +1,53 @@
+@import "../../assets/style/colors.scss";
+
+.history {
+    &--search__input {
+        .form-control {
+            border: 1px solid $colorGrey;
+        }
+
+        .btn {
+            padding: 6px 10px;
+
+            &.btn-outline-primary {
+                border: 1px solid $colorGrey;
+                opacity: 1;
+            }
+        }
+    }
+
+    .btn {
+        &.small {
+            padding: 8px 11px 7px;
+            box-shadow: none;
+        }
+    }
+
+    &--scanned__files {
+        font-weight: 600;
+        font-size: 15px;
+        line-height: 25px;
+    }
+
+    &--scan__info {
+        .btn {
+            &:hover {
+                background: transparent;
+                color: $colorBlacker;
+                border: 1px solid $colorBlacker;
+            }
+        }
+    }
+
+    .icon-cloud {
+        font-size: 2rem;
+        line-height: 0;
+        color: $colorGreyDark;
+        display: inline-flex;
+        align-items: center;
+
+        &:before {
+            vertical-align: middle;
+        }
+    }
+}

@@ -1,0 +1,6 @@
+{
+  "env": "qa",
+
+  "mclDomain": "https://mcl-qa.opswat.com",
+  "metadefenderDomain": "https://api-qa-uswest2.metadefender.com"
+}

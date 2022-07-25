@@ -9,12 +9,13 @@ ENV="qa"
 declare -A CMDS_DESC
 CMDS_DESC=(
     [developer]="Setup your developer environment"
-    [config]="Overwrite common configuration file with specified environment. Usage: mocli config <local|dev|qa|prod>"
     [watch]="Starts a livereload server and watches all assets"
-    [test]="Runns unit tests and generates code coverage reports"
+    [test]="Runns unit tests"
+    [coverage]="Runns unit tests and generates code coverage reports"
     [release]="Create release versions using git-flow. Usage: mocli release [start|finish] <version>"
     [release-p]="Create release version and increases patch number"
     [hotfix]="Create a qa release from current branch and uploads it to bitbucket"
+    [docs]="Create a documentation for the components"
     [pack]="Zips the dist/<vendor> directory. Usage: mocli pack [--production] [--vendor=firefox] [--env=qa]"
     [sonar-scan]="Running SonarQube Scanner from the Docker image. Usage: sonar-scan [<token>]"
     [help]="Show this message"
@@ -103,7 +104,7 @@ function copy_envs() {
     fi
     for env in ${ENVS[@]}; do
         echo s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json
-        aws s3 cp s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json ./app/config/ > /dev/null 2>&1 
+        aws s3 cp s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json ./config/ > /dev/null 2>&1 
     done
 }
 
@@ -138,17 +139,19 @@ while [[ $# -gt 0 ]]; do
             copy_secrets
             copy_envs
             
-            echo "-> install gulp-cli"
-            npm list -g --depth=0 gulp-cli > /dev/null 2>&1 || npm i -g gulp-cli > /dev/null
+            echo "-> install webpack-cli"
+            npm list -g --depth=0 webpack-cli > /dev/null 2>&1 || npm i -g webpack-cli > /dev/null
 
             echo "-> install packages"
+            rm -rf ./node_modules/
+            rm -rf ./package-lock.json
             npm install > /dev/null
 
             echo "-> copy git-flow hooks"
             cp git_hooks/* .git/hooks/
 
-            echo "-> generate config: prod"
-            gulp config --prod > /dev/null
+            # echo "-> generate config: prod"
+            # gulp config --prod > /dev/null
 
             gen_cmp
 
@@ -163,22 +166,37 @@ while [[ $# -gt 0 ]]; do
             copy_envs ${2}
             exit 0
         ;;
-        config)
-            TOKEN_OK=`in_array "${2}" "${ENVS[@]}"`
-            if [[ ${TOKEN_OK} = 0 ]]; then
-                gulp config --${2}
-            else
-                echo "Invalid environment token!"
-                echo "Usage: mocli config <local|dev|qa|prod>"
-            fi
+        watch)
+            export ENVIRONMENT=${2:-${ENV}}
+            npm run start
             exit 0
         ;;
-        watch)
-            gulp --watch
+        build)
+            echo "Removing dist/ folder"
+            rm -rf dist
+            
+            echo "Building Chrome Extensions for ${ENVIRONMENT}"
+            export ENVIRONMENT=${2:-${ENV}}
+            npm run build
             exit 0
         ;;
         test)
             npm run test
+            exit 0
+        ;;
+        coverage)
+            npm run test:coverage
+            exit 0
+        ;;
+        docs)
+            if [[ `npm list -g -s | grep -c jsdoc` -eq 0 ]]; then
+                echo "Installing jsdoc globally"
+                npm install -g jsdoc
+            fi
+
+            echo "Generating documentation to docs/"
+            jsdoc -c jsdoc.conf.json
+
             exit 0
         ;;
         release)
@@ -210,7 +228,7 @@ while [[ $# -gt 0 ]]; do
                 publish)
                     read_env
 
-                    gulp config --${ENV}
+                    export ENVIRONMENT=${2:-${ENV}}
                     gulp pack --production --env=${ENV}
                 ;;
             esac
@@ -246,7 +264,7 @@ while [[ $# -gt 0 ]]; do
                 publish)
                     read_env
 
-                    gulp config --${ENV}
+                    export ENVIRONMENT=${2:-${ENV}}
                     gulp pack --production --env=${ENV}
                 ;;
             esac
@@ -279,7 +297,7 @@ while [[ $# -gt 0 ]]; do
                 publish)
                     read_env
 
-                    gulp config --${ENV}
+                    export ENVIRONMENT=${2:-${ENV}}
                     gulp pack --production --env=${ENV}
                 ;;
             esac
@@ -287,12 +305,16 @@ while [[ $# -gt 0 ]]; do
             exit 0;
         ;;
         pack)
-            CMD='gulp'
-            while [[ $# -gt 0 ]]; do
-                CMD="${CMD} ${1}"
-                shift
-            done
-            ${CMD}
+            export ENVIRONMENT=${2:-${ENV}}
+            VENDOR=${3:-'chrome'}
+
+            if [[ `npm list -g -s | grep -c webextension-toolbox` -eq 0 ]]; then
+                echo "Installing webextension-toolbox globally"
+                sudo npm install -g webextension-toolbox
+            fi
+
+            webextension-toolbox build -s ./src --config ./webextension-toolbox-config.js ${VENDOR}
+            exit 0
         ;;
         gen-cmp)
             gen_cmp

@@ -1,0 +1,329 @@
+{
+    "appName": {
+      "message": "OPSWAT File Security for Chrome",
+      "description": "The name of the application"
+    },
+    "appShortName": {
+      "message": "OPSWAT for Chrome",
+      "description": "The short_name (maximum of 12 characters recommended) is a short version of the app's name"
+    },
+    "appDescription": {
+      "message": "Scan files and downloads with OPSWAT File Security for Chrome",
+      "description": "The description of the application"
+    },
+    "browserActionTitle": {
+      "message": "OPSWAT File Security for Chrome",
+      "description": "The title of the browser action button"
+    },
+    "contextMenuScanTitle": {
+      "message": "Scan with OPSWAT",
+      "description": ""
+    },
+    "contextMenuScanAndDownloadTitle": {
+      "message": "Scan and download with OPSWAT",
+      "description": ""
+    },
+    "noScansNotification": {
+      "message": "No files scanned so far.<br />Scan files using the context menu or enable automatic scans from settings page!",
+      "description": "The message displayed when no files have been scanned"
+    },
+    "noFilesFound": {
+      "message": "There were no results matching your query",
+      "description": "The message displayed when no files match the search criteria"
+    },
+    "menuScanHistory": {
+      "message": "Scan History",
+      "description": ""
+    },
+    "menuSettings": {
+      "message": "Settings",
+      "description": ""
+    },
+    "menuAbout": {
+      "message": "About",
+      "description": ""
+    },
+    "aboutTitle": {
+      "message": "About OPSWAT File Security for Chrome",
+      "description": ""
+    },
+    "aboutThankYou": {
+      "message": "Thank you for installing <strong>OPSWAT File Security for Chrome</strong>! This extension gives you the ability to scan downloads* for malware with 30+ anti-malware engines using OPSWAT's <a target='_blank' href='__mclDomain__/#!/?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud</a>.",
+      "description": ""
+    },
+    "aboutApiKeyInfo": {
+      "message": "Your MetaDefender API KEY info",
+      "description": ""
+    },
+    "refreshApiKey": {
+      "message": "Refresh API KEY",
+      "description": ""
+    },
+    "aboutMoreAboutMCL": {
+      "message": "Read more about  <a target='_blank' href='__mclDomain__/licensing?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud Licensing</a> options",
+      "description": ""
+    },
+    "aboutHowToUse": {
+      "message": "How to use OPSWAT File Security for Chrome",
+      "description": ""
+    },
+    "aboutHowTo1": {
+      "message": "On any web page, right click on the download link for the file you would like to scan for malware. In the context menu, select 'Scan with OPSWAT'. OPSWAT File Security for Chrome will begin analyzing the file at the selected URL, and results will be available on the Scan History page. Last 3 scans are also visible in the extension popup",
+      "description": ""
+    },
+    "aboutHowTo2": {
+      "message": "If you would like to automatically scan all downloads, go to OPSWAT File Security for Chrome settings page and enable 'Scan downloads'",
+      "description": ""
+    },
+    "howToOpenSettings": {
+      "message": "To access the OPSWAT File Security for Chrome extension settings page, right click on the 'OPSWAT File Security for Chrome' button in the Chrome top bar and select 'Options' from the drop down menu",
+      "description": ""
+    },
+    "chromeExtensionHelp": {
+      "message": "Read more about OPSWAT File Security for Chrome extension settings on our <a target='blank' href='https://onlinehelp.opswat.com/mdcloud/OPSWAT_File_Security_for_Chrome.html'>online help</a> page."
+    },
+    "githubInfo": {
+      "message": "The chrome extension is an open-source tool developed by OPSWAT, the source code is published on github: <a target='blank' href='https://github.com/OPSWAT/metadefender-browser-extension'>metadefender-browser-extension</a>"
+    },
+    "contactOpswat": {
+      "message": "Contact OPSWAT Sales to increase your limits",
+      "description": ""
+    },
+    "deleteHistoryConfirmation": {
+      "message": "Are you sure you want to clear all scan history?\nThis action can not be undone",
+      "description": ""
+    },
+    "scanDownloads": {
+      "message": "Scan downloads<div class='text-secondary text-14'>Automatically scan all downloaded files. Files are scanned only after the file is downloaded on the computer. A notification* will inform you when the scan is complete.</div>",
+      "description": ""
+    },
+    "scanDownloadsSub": {
+      "message": "* Chrome Notifications must be enabled"
+    },
+    "shareResults": {
+      "message": "Share scan results<div class='text-secondary text-14'>Anonymously share scan results with the community to help improve vulnerability detection.</div>",
+      "description": ""
+    },
+    "shareResultsSub": {
+      "message": "You must have a paid account to disable this option. <a target='_blank' href='__opswatDomain__/products/metadefender/enterprise?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>Learn more</a>",
+      "description": ""
+    },
+    "showNotifications": {
+      "message": "Show Chrome Notifications<div class='text-secondary text-14'>Enable chrome notifications to be notified when a scan is complete.</div>",
+      "description": ""
+    },
+    "saveCleanFiles": {
+      "message": "Save clean files<div class='text-secondary text-14'>Download clean files on my computer after they are scanned.</div>",
+      "description": ""
+    },
+    "safeUrl": {
+      "message": "Enable safe URL<div class='text-secondary text-14'>Browse the web in safety and alert me when accessing harmful websites.</div>",
+      "description": ""
+    },
+    "safeUrlSub": {
+      "message": "Read more about <a target='blank' href='https://onlinehelp.opswat.com/mdcloud/2.1_Safe_URL_redirect.html'>Safe URL Redirect</a>"
+    },
+    "useCore": {
+      "message": "On-premise scanning using MetaDefender Core <div class='text-secondary text-14'>Send your files to a private <a target='blank' href='https://onlinehelp.opswat.com/corev4/8._MetaDefender_Core_Developer_Guide.html'>MetaDefender Core server</a></div>",
+      "description": ""
+    },
+    "useCoreSub": {
+      "message": ""
+    },
+    "coreUrl": {
+      "message": "URL"
+    },
+    "coreApikey": {
+      "message": "Apikey"
+    },
+    "coreRule": {
+      "message": "Workflow"
+    },
+    "searcHistory": {
+      "message": "Search history"
+    },
+    "scanStatusClean": {
+      "message": "No threats detected",
+      "description": ""
+    },
+    "scanStatusInfected": {
+      "message": "Threats detected",
+      "description": ""
+    },
+    "coreSettingsSave": {
+      "message": "Validate & Save",
+      "description": "Save core settings button label"
+    },
+    "coreSettingsSavedNotification": {
+      "message": "Core settings saved!"
+    },
+    "coreSettingsInvalidNotification": {
+      "message": "Core settings are not valid!"
+    },
+    "coreSettingsInvalidApikey": {
+      "message": "Invalid MetaDefender Core apikey!"
+    },
+    "coreSettingsInvalidUrl": {
+      "message": "Could not connect to a MetaDefender Core server at the specified URL!"
+    },
+    "scanStatusScanning": {
+      "message": "Scan in progress...",
+      "description": ""
+    },
+    "apikeyNotFound": {
+      "message": "API Key not found",
+      "description": ""
+    },
+    "unableToScanFTP": {
+      "message": "We are unable to scan files hosted on FTP servers. Please try another file",
+      "description": ""
+    },
+    "unableToScanFileProtocol": {
+      "message": "We are unable to scan file:// protocol. Please upload the file you would like to scan at metadefender.opswat.com",
+      "description": ""
+    },
+    "unsupportedUrl": {
+      "message": "URL not supported.\nYou may be able to scan the file by downloading it while 'Scan Downloads' is enabled"
+    },
+    "errorWhileDownloading": {
+      "message": "We encountered an error while downloading this file. Please try again",
+      "description": ""
+    },
+    "errorCors": {
+      "message": "Unable to access local file. Please make sure 'Allow access to file URLs' is enabled for OPSWAT extension",
+      "description": ""
+    },
+    "scanFileError": {
+      "message": "There was an error while scanning the file. Please try again later"
+    },
+    "fileAccessDisabled": {
+      "message": "To use this feature, 'Allow access to file URLs' must be enabled for OPSWAT extension"
+    },
+    "fileSizeLimitExceeded": {
+      "message": "Your file exceeded the file size limit. Please select a file less than 140 MB"
+    },
+    "fileEmpty": {
+      "message": "File is empty. Please select another file",
+      "description": ""
+    },
+    "fileScanComplete": {
+      "message": " has been scanned. ",
+      "description": ""
+    },
+    "goToExtension": {
+      "message": "Go to extension details"
+    },
+    "noThreatDetected": {
+      "message": "\n\nNo threat detected. ",
+      "description": ""
+    },
+    "threatDetected": {
+      "message": "\n\nThreat detected!",
+      "description": ""
+    },
+    "scanStarted": {
+      "message": "Scan started for ",
+      "description": ""
+    },
+    "undefinedApiKey": {
+      "message": "Can't retrieve Api Key. Please go to About page and hit 'Refresh ApiKey' or contact support",
+      "description": ""
+    },
+    "deleteTooltip": {
+      "message": "Remove file from scan history",
+      "description": ""
+    },
+    "scanResult0": {
+      "message": "No threats found",
+      "description": ""
+    },
+    "scanResult1": {
+      "message": "Infected / Known",
+      "description": ""
+    },
+    "scanResult2": {
+      "message": "Suspicious",
+      "description": ""
+    },
+    "scanResult3": {
+      "message": "Failed to scan",
+      "description": ""
+    },
+    "scanResult4": {
+      "message": "Cleaned / Deleted",
+      "description": ""
+    },
+    "scanResult5": {
+      "message": "Unknown",
+      "description": ""
+    },
+    "scanResult6": {
+      "message": "Quarantined",
+      "description": ""
+    },
+    "scanResult7": {
+      "message": "Skipped clean",
+      "description": ""
+    },
+    "scanResult8": {
+      "message": "Skipped infected",
+      "description": ""
+    },
+    "scanResult9": {
+      "message": "Exceeded archive depth",
+      "description": ""
+    },
+    "scanResult10": {
+      "message": "Not scanned / No scan results",
+      "description": ""
+    },
+    "scanResult11": {
+      "message": "Aborted",
+      "description": ""
+    },
+    "scanResult12": {
+      "message": "Encrypted",
+      "description": ""
+    },
+    "scanResult13": {
+      "message": "Exceeded archive size",
+      "description": ""
+    },
+    "scanResult14": {
+      "message": "Exceeded archive file number",
+      "description": ""
+    },
+    "scanResult15": {
+      "message": "Password protected document",
+      "description": ""
+    },
+    "scanResult16": {
+      "message": "Exceeded archive timeout",
+      "description": ""
+    },
+    "scanResult17": {
+      "message": "Mismatch",
+      "description": ""
+    },
+    "scanResult18": {
+      "message": "Potentially vulnerable file",
+      "description": ""
+    },
+    "scanResult255": {
+      "message": "Scan in progress",
+      "description": ""
+    },
+    "yes": {
+      "message": "yes",
+      "description": ""
+    },
+    "no": {
+      "message": "no",
+      "description": ""
+    },
+    "_": {
+      "message": "",
+      "description": ""
+    }
+  }
+  
