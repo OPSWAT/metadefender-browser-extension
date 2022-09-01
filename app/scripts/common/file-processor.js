@@ -189,7 +189,10 @@ class FileProcessor {
         file.dataId = info.data_id;
 
         if (file.useCore) {
-            file.scanResults = `${settings.coreUrl}/#/user/dashboard/processinghistory/dataId/${file.dataId}`;
+            if (settings.corev4 ===true){
+                file.scanResults = `${settings.coreUrl}/#/user/dashboard/processinghistory/dataId/${file.dataId}`;
+            } 
+            file.scanResults = `${settings.coreUrl}/#/user/scanResult/type=dataId&value=${file.dataId}`;
             const postProcessing =  info.process_info && info.process_info.post_processing;
             const sanitizationSuccessfull = postProcessing && postProcessing.sanitization_details && postProcessing.sanitization_details.description === 'Sanitized successfully.';
             const sanitized = postProcessing && postProcessing.actions_ran.indexOf('Sanitized') !== -1;
@@ -239,7 +242,10 @@ class FileProcessor {
         let response;
 
         if (file.useCore) {
-            file.scanResults = `${settings.coreUrl}/#/user/dashboard/processinghistory/dataId/${file.dataId}`;
+            if (settings.corev4 ===true){
+                file.scanResults = `${settings.coreUrl}/#/user/dashboard/processinghistory/dataId/${file.dataId}`;
+            } 
+            file.scanResults = `${settings.coreUrl}/#/user/scanResult/type=dataId&value=${file.dataId}`;
             await scanHistory.save();
             response = await CoreClient.file.poolForResults(file.dataId, 3000);
 
@@ -249,7 +255,7 @@ class FileProcessor {
             await scanHistory.save();
             response = await MetascanClient.setAuth(apikeyInfo.apikey).file.poolForResults(file.dataId, 3000);
         }
-
+        
         if (response.error) {
             return;
         }

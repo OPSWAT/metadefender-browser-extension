@@ -27,6 +27,8 @@
 
         <li class="list-group-item useCore">
             <mcl-checkbox value="vm.coreSettings.useCore" label="{{vm.__MSG.getMessage('useCore')}}"  change="vm.settingsChanged('useCore')"></mcl-checkbox>
+
+           
             <form name="coreSettingsForm" class="form-horizontal">
                 <fieldset ng-disabled="!vm.coreSettings.useCore">
 
@@ -40,6 +42,7 @@
                         </div>
                     </div>
 
+
                     <div class="form-group has-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.url.groupClass">
                         <label for="coreUrl" class="control-label col-sm-2">{{vm.__MSG.getMessage('coreUrl')}}</label>
                         <div class="col-sm-10">
@@ -47,6 +50,21 @@
                                 ng-model="vm.coreSettings.url.value" ng-blur="vm.validateCoreSettings()"/>
                             <span class="form-control-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.url.value && vm.coreSettings.url.iconClass" aria-hidden="true"></span>
                             <span id="coreUrlHelpBlock" class="help-block" ng-if="vm.coreSettings.useCore && vm.coreSettings.url.valid === false">{{vm.__MSG.getMessage('coreSettingsInvalidUrl')}}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group has-feedback" value="vm.settings.corev4" change="vm.settingsChanged('corev4')" ng-class="vm.coreSettings.corev4">
+                        <label for="coreUrl" class="control-label col-sm-2">{{vm.__MSG.getMessage('CoreV4')}}</label>
+                        <div class="col-sm-10 ">
+                            <div class="checkbox mcl ">
+                                <label class="test1" ng-click="disabled ? null : onClick()" ng-class="{'disabled': disabled}">
+                                    <span class="mcl-checkbox test" ng-class="{'selected': value}"><span class="icon-ok"></span></span>
+                                    <span class="mcl-label text-15 test1" ng-bind-html="label"></span>
+                                </label>
+                            </div>
+                            <!-- <mcl-checkbox class="test" value="vm.coreSettings.coreV4" change="vm.settingsChanged('coreV4')"></mcl-checkbox> -->
+                            <!-- <span class="form-control-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.v4.value && vm.coreSettings.v4.iconClass" aria-hidden="true"></span>
+                            <span id="coreUrlHelpBlock" class="help-block" ng-if="vm.coreSettings.useCore && vm.coreSettings.v4.valid === false">{{vm.__MSG.getMessage('coreSettingsInvalidUrl')}}</span> -->
                         </div>
                     </div>
 
