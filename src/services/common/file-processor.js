@@ -178,7 +178,7 @@ class FileProcessor {
         }
         file.sha256 = info.file_info.sha256;
         file.dataId = info.data_id;
-
+        
         if (file.useCore) {
             if (settings.coreV4 ===true ){
                 file.scanResults = `${settings.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
@@ -230,7 +230,7 @@ class FileProcessor {
      */
     async startStatusPolling(file, linkUrl, fileData, downloaded) {
         let response;
-
+       
         if (file.useCore) {
             if (settings.coreV4 === true){
                 file.scanResults = `${settings.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
