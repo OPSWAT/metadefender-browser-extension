@@ -31,7 +31,6 @@ function settingsController($scope, $timeout, browserTranslate, browserExtension
             groupClass: {},
             iconClass: {},
         },
-        corev4: false,
         rule: {
             value: ''
         },
@@ -64,7 +63,6 @@ function settingsController($scope, $timeout, browserTranslate, browserExtension
         vm.coreSettings.useCore = vm.settings.useCore;
         vm.coreSettings.apikey.value = vm.settings.coreApikey || '';
         vm.coreSettings.url.value = vm.settings.coreUrl || '';
-        vm.coreSettings.corev4.value = vm.settings.corev4 || false;
         vm.coreSettings.rule.value = vm.settings.coreRule || '';
 
         vm.isAllowedFileAccess = await browserExtension.isAllowedFileSchemeAccess();
@@ -91,7 +89,7 @@ function settingsController($scope, $timeout, browserTranslate, browserExtension
             $scope.coreSettingsForm.$setPristine();
             vm.settings.coreApikey = vm.coreSettings.apikey.value;
             vm.settings.coreUrl = vm.coreSettings.url.value;
-            vm.settings.corev4 = vm.coreSettings.corev4.value;
+            
             if (await vm.validateCoreSettings()) {
                 vm.settings.useCore = vm.coreSettings.useCore;
                 vm.settings.coreRule = vm.coreSettings.rule.value;
