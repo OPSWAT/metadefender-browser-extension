@@ -20,6 +20,7 @@ const Settings = {
     safeUrl: false,
     useCore: false,
     coreUrl: '',
+    corev4: false,
     coreApikey: '',
     coreRule: '',
 
@@ -59,7 +60,7 @@ function merge(newData) {
  * @returns {Promise.<void>}
  */
 async function save(){
-    const settingKeys = ['scanDownloads', 'shareResults', 'showNotifications', 'saveCleanFiles', 'safeUrl', 'useCore', 'coreUrl', 'coreApikey', 'coreRule'];
+    const settingKeys = ['scanDownloads', 'shareResults', 'showNotifications', 'saveCleanFiles', 'safeUrl', 'useCore', 'corev4', 'coreUrl', 'coreApikey', 'coreRule'];
     const data = {};
     for (const key of settingKeys) {
         data[key] = this[key];

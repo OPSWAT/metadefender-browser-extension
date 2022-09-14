@@ -230,6 +230,11 @@ body {
         label {
           padding-left: 60px;
 
+          &.coreV4 {
+            padding-left: 0px !important;
+          }
+  
+
           &.disabled {
             color: $colorGreyDark;
 
@@ -245,6 +250,7 @@ body {
 
               &.mcl-label {
                 cursor: text;
+
               }
             }
           }
@@ -265,6 +271,10 @@ body {
           line-height: normal;
           float: left;
 
+          &.corev4{
+            margin: 0px !important;
+          }
+
           .icon-ok {
             display: none;
             color: $colorWhite;
@@ -274,6 +284,7 @@ body {
               margin-left: 3px;
             }
           }
+
 
           &.selected {
             background-color: $secondaryColor;

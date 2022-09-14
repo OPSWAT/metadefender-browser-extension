@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CWD=$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )
+CWD=$(cd "$(dirname "${BASH_SOURCE[0]}")/" && pwd)
 cd ${CWD}
 
 ENVS=('local' 'dev' 'qa' 'prod')
@@ -34,15 +34,13 @@ function printHelp() {
     echo "Your commands are:"
     echo ""
     line="                       "
-    for i in "${!CMDS_DESC[@]}"
-    do
+    for i in "${!CMDS_DESC[@]}"; do
         printf "%s %s %s \n" "$i" "${line:${#i}}" "${CMDS_DESC[$i]}"
     done
 }
 
-function gen_cmp(){
-    for i in "${!CMDS_DESC[@]}"
-    do
+function gen_cmp() {
+    for i in "${!CMDS_DESC[@]}"; do
         CMDS+=($i)
     done
     mkdir -p ~/.zsh/completion && touch ~/.zsh/completion/_mocli
@@ -57,7 +55,7 @@ function gen_cmp(){
                 \"*::arg:->args\"
         }
 
-        _mocli" > ~/.zsh/completion/_mocli
+        _mocli" >~/.zsh/completion/_mocli
 }
 
 ###
@@ -79,16 +77,16 @@ function read_env() {
         ENV=qa
     fi
     if [ "${ENV}" != "qa" ] && [ "${ENV}" != "prod" ] && [ "${ENV}" != "dev" ]; then
-        echo "Invalid option. Opperation canceled";
+        echo "Invalid option. Opperation canceled"
         exit 1
     fi
 }
 
 function copy_secrets() {
     echo "-> copy secrets"
-    aws s3 cp s3://mcl-artifacts/mcl-browser-extension/secrets.json . > /dev/null 2>&1 
+    aws s3 cp s3://mcl-artifacts/mcl-browser-extension/secrets.json . >/dev/null 2>&1
     if [[ "$?" != "0" ]]; then
-        echo -e "{\n\t\"googleAnalyticsId\": \"\"\n}" > ./secrets.json
+        echo -e "{\n\t\"googleAnalyticsId\": \"\"\n}" >./secrets.json
         echo -e "\nFailed to copy secrets from s3. Please update ./secrets.json manually.\n"
     fi
 }
@@ -101,7 +99,7 @@ function copy_envs() {
     fi
     for env in ${ENVS[@]}; do
         echo s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json
-        aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json ./app/config/ > /dev/null 2>&1 
+        aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json ./app/config/ >/dev/null 2>&1
     done
 }
 
@@ -112,178 +110,179 @@ fi
 
 while [[ $# -gt 0 ]]; do
     case "${1}" in
-        developer)
-            # copy the google analytics ID. Create this file manually if you don't have access
-            copy_secrets
-            copy_envs
-            
-            echo "-> install gulp-cli"
-            npm list -g --depth=0 gulp-cli > /dev/null 2>&1 || npm i -g gulp-cli > /dev/null
+    developer)
+        echo Nodejs version: $(node -v)
+        # copy the google analytics ID. Create this file manually if you don't have access
+        copy_secrets
+        copy_envs
 
-            echo "-> install packages"
-            npm install > /dev/null
+        echo "-> install gulp-cli"
+        npm list -g --depth=0 gulp-cli >/dev/null 2>&1 || npm i -g gulp-cli >/dev/null
 
-            echo "-> copy git-flow hooks"
-            cp git_hooks/* .git/hooks/
+        echo "-> install packages"
+        npm install --legacy-peer-deps >/dev/null
 
-            echo "-> generate config: prod"
-            gulp config --prod > /dev/null
+        echo "-> copy git-flow hooks"
+        cp git_hooks/* .git/hooks/
 
-            gen_cmp
+        echo "-> generate config: prod"
+        gulp config --prod >/dev/null
 
-            echo -e "-> Done\n"
-            exit 0
+        gen_cmp
+
+        echo -e "-> Done\n"
+        exit 0
         ;;
-        copy-secrets)
-            copy_secrets
-            exit 0
+    copy-secrets)
+        copy_secrets
+        exit 0
         ;;
-        copy-envs)
-            copy_envs ${2}
-            exit 0
+    copy-envs)
+        copy_envs ${2}
+        exit 0
         ;;
-        config)
-            TOKEN_OK=`in_array "${2}" "${ENVS[@]}"`
-            if [[ ${TOKEN_OK} = 0 ]]; then
-                gulp config --${2}
-            else
-                echo "Invalid environment token!"
-                echo "Usage: mocli config <local|dev|qa|prod>"
-            fi
-            exit 0
+    config)
+        TOKEN_OK=$(in_array "${2}" "${ENVS[@]}")
+        if [[ ${TOKEN_OK} = 0 ]]; then
+            gulp config --${2}
+        else
+            echo "Invalid environment token!"
+            echo "Usage: mocli config <local|dev|qa|prod>"
+        fi
+        exit 0
         ;;
-        watch)
-            gulp --watch
-            exit 0
+    watch)
+        gulp --watch
+        exit 0
         ;;
-        test)
-            npm run test
-            exit 0
+    test)
+        npm run test
+        exit 0
         ;;
-        release)
-            if [[ $# -lt 2 ]]; then
-                echo "Invalid number of arguments"
-                echo "Usage: mocli release <start|stop|publish> [version]"
-                exit 1
-            fi
+    release)
+        if [[ $# -lt 2 ]]; then
+            echo "Invalid number of arguments"
+            echo "Usage: mocli release <start|stop|publish> [version]"
+            exit 1
+        fi
 
-            C_VERSION=`cat package.json | jq .version | sed 's/"//g'`
-            VERSION=`echo ${C_VERSION} | cut -d'.' -f2`
-            if [[ ${2} == "start" ]]; then
-                VERSION=$((VERSION + 1))
-            fi
-            VERSION=`echo ${C_VERSION} | sed -r "s/.[0-9]+.[0-9]+/.${VERSION}.0/"`
-            if [[ $# = 3 ]]; then
-                VERSION=${3}
-            fi
+        C_VERSION=$(cat package.json | jq .version | sed 's/"//g')
+        VERSION=$(echo ${C_VERSION} | cut -d'.' -f2)
+        if [[ ${2} == "start" ]]; then
+            VERSION=$((VERSION + 1))
+        fi
+        VERSION=$(echo ${C_VERSION} | sed -r "s/.[0-9]+.[0-9]+/.${VERSION}.0/")
+        if [[ $# = 3 ]]; then
+            VERSION=${3}
+        fi
 
-            case "${2}" in
-                start)
-                    git flow release start ${VERSION}
-                    git flow release publish ${VERSION}
-                ;;
-                finish)
-                    git flow release finish -Fp ${VERSION}
-                    git checkout customer
-                ;;
-                publish)
-                    read_env
-
-                    gulp config --${ENV}
-                    gulp pack --production --env=${ENV}
-                ;;
-            esac
-
-            exit 0;
-        ;;
-        release-p)
-            if [[ $# -lt 2 ]]; then
-                echo "Invalid number of arguments"
-                echo "Usage: mocli patch <start|stop|publish> [version]"
-                exit 1
-            fi
-
-            C_VERSION=`cat package.json | jq .version | sed 's/"//g'`
-            VERSION=`echo ${C_VERSION} | cut -d'.' -f3`
-            if [[ ${2} == "start" ]]; then
-                VERSION=$((VERSION + 1))
-            fi
-            VERSION=`echo ${C_VERSION} | sed -r "s/.[0-9]+$/.${VERSION}/"`
-            if [[ $# = 3 ]]; then
-                VERSION=${3}
-            fi
-
-            case "${2}" in
-                start)
-                    git flow release start ${VERSION}
-                    git flow release publish ${VERSION}
-                ;;
-                finish)
-                    git flow release finish -Fp ${VERSION}
-                    git checkout customer
-                ;;
-                publish)
-                    read_env
-
-                    gulp config --${ENV}
-                    gulp pack --production --env=${ENV}
-                ;;
-            esac
-        ;;
-        hotfix)
-            if [[ $# -lt 2 ]]; then
-                echo "Invalid number of arguments"
-                echo "Usage: mocli hotfix <start|stop|publish> [version]"
-            fi
-
-            C_VERSION=`cat package.json | jq .version | sed 's/"//g'`
-            VERSION=`echo ${C_VERSION} | cut -d'.' -f3`
-            if [[ ${2} == "start" ]]; then
-                VERSION=$((VERSION + 1))
-            fi
-            VERSION=`echo ${C_VERSION} | sed -r "s/.[0-9]+$/.${VERSION}/"`
-            if [[ $# = 3 ]]; then
-                VERSION=${3}
-            fi
-
-            case "${2}" in
-                start)
-                    git flow hotfix start ${VERSION}
-                    git flow hotfix publish ${VERSION}
-                ;;
-                finish)
-                    git flow hotfix finish -Fp ${VERSION}
-                    git checkout customer
-                ;;
-                publish)
-                    read_env
-
-                    gulp config --${ENV}
-                    gulp pack --production --env=${ENV}
-                ;;
-            esac
-
-            exit 0;
-        ;;
-        pack)
-            CMD='gulp'
-            while [[ $# -gt 0 ]]; do
-                CMD="${CMD} ${1}"
-                shift
-            done
-            ${CMD}
-        ;;
-        gen-cmp)
-            gen_cmp
+        case "${2}" in
+        start)
+            git flow release start ${VERSION}
+            git flow release publish ${VERSION}
             ;;
-        help)
-            printHelp
-            exit 0
+        finish)
+            git flow release finish -Fp ${VERSION}
+            git checkout customer
+            ;;
+        publish)
+            read_env
+
+            gulp config --${ENV}
+            gulp pack --production --env=${ENV}
+            ;;
+        esac
+
+        exit 0
         ;;
-        *)
-            echo "Unknown parameter: ${1}"
-            printHelp
-            exit 1;
+    release-p)
+        if [[ $# -lt 2 ]]; then
+            echo "Invalid number of arguments"
+            echo "Usage: mocli patch <start|stop|publish> [version]"
+            exit 1
+        fi
+
+        C_VERSION=$(cat package.json | jq .version | sed 's/"//g')
+        VERSION=$(echo ${C_VERSION} | cut -d'.' -f3)
+        if [[ ${2} == "start" ]]; then
+            VERSION=$((VERSION + 1))
+        fi
+        VERSION=$(echo ${C_VERSION} | sed -r "s/.[0-9]+$/.${VERSION}/")
+        if [[ $# = 3 ]]; then
+            VERSION=${3}
+        fi
+
+        case "${2}" in
+        start)
+            git flow release start ${VERSION}
+            git flow release publish ${VERSION}
+            ;;
+        finish)
+            git flow release finish -Fp ${VERSION}
+            git checkout customer
+            ;;
+        publish)
+            read_env
+
+            gulp config --${ENV}
+            gulp pack --production --env=${ENV}
+            ;;
+        esac
+        ;;
+    hotfix)
+        if [[ $# -lt 2 ]]; then
+            echo "Invalid number of arguments"
+            echo "Usage: mocli hotfix <start|stop|publish> [version]"
+        fi
+
+        C_VERSION=$(cat package.json | jq .version | sed 's/"//g')
+        VERSION=$(echo ${C_VERSION} | cut -d'.' -f3)
+        if [[ ${2} == "start" ]]; then
+            VERSION=$((VERSION + 1))
+        fi
+        VERSION=$(echo ${C_VERSION} | sed -r "s/.[0-9]+$/.${VERSION}/")
+        if [[ $# = 3 ]]; then
+            VERSION=${3}
+        fi
+
+        case "${2}" in
+        start)
+            git flow hotfix start ${VERSION}
+            git flow hotfix publish ${VERSION}
+            ;;
+        finish)
+            git flow hotfix finish -Fp ${VERSION}
+            git checkout customer
+            ;;
+        publish)
+            read_env
+
+            gulp config --${ENV}
+            gulp pack --production --env=${ENV}
+            ;;
+        esac
+
+        exit 0
+        ;;
+    pack)
+        CMD='gulp'
+        while [[ $# -gt 0 ]]; do
+            CMD="${CMD} ${1}"
+            shift
+        done
+        ${CMD}
+        ;;
+    gen-cmp)
+        gen_cmp
+        ;;
+    help)
+        printHelp
+        exit 0
+        ;;
+    *)
+        echo "Unknown parameter: ${1}"
+        printHelp
+        exit 1
         ;;
     esac
     shift

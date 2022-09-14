@@ -1,7 +1,7 @@
 {
   "name": "opswat-file-security-chrome",
   "private": true,
-  "version": "3.9.3",
+  "version": "3.9.4",
   "description": "Scan files and downloads with OPSWAT File Security for Chrome",
   "repository": {
     "type": "git",
@@ -23,7 +23,11 @@
     "lint-fix": "node ./node_modules/eslint/bin/eslint.js . --fix -f visualstudio",
     "test": "karma start karma.conf.js --browsers ChromeHeadless",
     "test-ci": "karma start karma.conf.js --browsers CustomChromiumHeadless",
-    "test-docker": "docker run -v `pwd`:/opt/mo -it --rm opswat/metadefender-browser-extension:latest sh -c 'npm run test-ci'"
+    "test-docker": "docker run -v `pwd`:/opt/mo -it --rm opswat/metadefender-browser-extension:latest sh -c 'npm run test-ci'",
+    "preinstall": "npx npm-force-resolutions"
+  },
+  "resolutions": {
+    "graceful-fs": "^4.2.10"
   },
   "standard": {
     "globals": [
@@ -36,6 +40,7 @@
     "angular-sanitize": "1.7.9",
     "bootstrap": "3.4.1",
     "browser-cookies": "1.2.0",
+    "gulp-install": "^1.1.0",
     "moment": "2.24.0",
     "spark-md5": "3.0.0",
     "uniqid": "5.0.3",

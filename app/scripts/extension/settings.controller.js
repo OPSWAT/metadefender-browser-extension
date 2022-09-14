@@ -34,9 +34,9 @@ function settingsController($scope, $timeout, browserTranslate, browserExtension
         rule: {
             value: ''
         },
-        scanRules: [],
+        scanRules: [],      
     };
-    
+   
     vm.settingsChanged = settingsChanged;
     vm.openExtensionSettings = openExtensionSettings;
     vm.validateCoreSettings = validateCoreSettings;
@@ -89,6 +89,7 @@ function settingsController($scope, $timeout, browserTranslate, browserExtension
             $scope.coreSettingsForm.$setPristine();
             vm.settings.coreApikey = vm.coreSettings.apikey.value;
             vm.settings.coreUrl = vm.coreSettings.url.value;
+            
             if (await vm.validateCoreSettings()) {
                 vm.settings.useCore = vm.coreSettings.useCore;
                 vm.settings.coreRule = vm.coreSettings.rule.value;
@@ -108,7 +109,7 @@ function settingsController($scope, $timeout, browserTranslate, browserExtension
             if (!vm.coreSettings.useCore || await vm.validateCoreSettings()) {
                 vm.settings.useCore = vm.coreSettings.useCore;
             }
-        }
+        }       
         else if (key === 'scanDownloads' && !vm.settings[key]) {
             vm.isAllowedFileAccess = await browserExtension.isAllowedFileSchemeAccess();
             vm.settings[key] = vm.isAllowedFileAccess;
@@ -173,10 +174,10 @@ function settingsController($scope, $timeout, browserTranslate, browserExtension
                 setInputState(vm.coreSettings.apikey, 'error');
                 $timeout(() => { $scope.$apply(); });
                 return false;
-            }
+            } 
             setInputState(vm.coreSettings.url, 'error');
             $timeout(() => { $scope.$apply(); });
-            return false;
+            return false;         
         }
     }
 }
@@ -209,4 +210,3 @@ function setInputState(element, state) {
         }
     }
 }
-

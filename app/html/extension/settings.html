@@ -20,6 +20,7 @@
             <mcl-checkbox value="vm.settings.saveCleanFiles" label="{{vm.__MSG.getMessage('saveCleanFiles')}}" change="vm.settingsChanged('saveCleanFiles')"></mcl-checkbox>
         </li>
 
+
         <li class="list-group-item">
             <mcl-checkbox value="vm.settings.safeUrl" label="{{vm.__MSG.getMessage('safeUrl')}}" change="vm.settingsChanged('safeUrl')"></mcl-checkbox>
             <div><sub ng-bind-html="vm.__MSG.getMessage('safeUrlSub')"></sub></div>
@@ -27,6 +28,8 @@
 
         <li class="list-group-item useCore">
             <mcl-checkbox value="vm.coreSettings.useCore" label="{{vm.__MSG.getMessage('useCore')}}"  change="vm.settingsChanged('useCore')"></mcl-checkbox>
+
+           
             <form name="coreSettingsForm" class="form-horizontal">
                 <fieldset ng-disabled="!vm.coreSettings.useCore">
 
@@ -40,6 +43,7 @@
                         </div>
                     </div>
 
+
                     <div class="form-group has-feedback" ng-class="vm.coreSettings.useCore && vm.coreSettings.url.groupClass">
                         <label for="coreUrl" class="control-label col-sm-2">{{vm.__MSG.getMessage('coreUrl')}}</label>
                         <div class="col-sm-10">
@@ -50,6 +54,20 @@
                         </div>
                     </div>
 
+                    <div class="form-group has-feedback" value="vm.coreSettings.corev4" change="vm.settingsChanged('corev4')" >
+                        <label for="corev4" class="control-label col-sm-2">{{vm.__MSG.getMessage('CoreV4')}}</label>
+                        <div class="col-sm-10 ">
+                            <div class="checkbox mcl ">
+                                <label class="coreV4" ng-click="disabled ? null : vm.settingsChanged('corev4')" ng-class="vm.coreSettings.useCore && vm.coreSettings.corev4">
+                                    <span class="mcl-checkbox corev4" ng-class="{'selected':vm.settings.corev4 }"><span class="icon-ok"></span></span>
+                                    <span class="mcl-label text-15 coreV4" ng-bind-html="label"></span>
+                                </label>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    
                     <div class="form-group">
                         <label for="coreRule" class="control-label col-sm-2">{{vm.__MSG.getMessage('coreRule')}}</label>
                         <div class="col-sm-5">
