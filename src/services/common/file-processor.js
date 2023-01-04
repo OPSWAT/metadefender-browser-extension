@@ -35,14 +35,12 @@ class FileProcessor {
      */
     async processTarget(linkUrl, downloadItem) {
         await apikeyInfo.load();
+        await scanHistory.load();
         if (!apikeyInfo.apikey) {
             BrowserNotification.create(chrome.i18n.getMessage('undefinedApiKey'));
             return;
         }
-
-        CoreClient.configure({
-            apikey: getApikeyValue(apikeyInfo)
-        });
+        
 
         const file = new ScanFile();
 
@@ -175,14 +173,19 @@ class FileProcessor {
      */
     async handleFileScanResults(file, info, linkUrl, fileData, downloaded) {
         if (info.scan_results) {
-            file.status = ScanFile().getScanStatus(info.scan_results.scan_all_result_i);
-            file.statusLabel = ScanFile().getScanStatusLabel(info.scan_results.scan_all_result_i);
+            file.status = new ScanFile().getScanStatus(info.scan_results.scan_all_result_i);
+            file.statusLabel = new ScanFile().getScanStatusLabel(info.scan_results.scan_all_result_i);
         }
         file.sha256 = info.file_info.sha256;
         file.dataId = info.data_id;
 
         if (file.useCore) {
-            file.scanResults = `${settings.coreUrl}/#/user/dashboard/processinghistory/dataId/${file.dataId}`;
+            if (settings.coreV4 ===true ){
+                file.scanResults = `${settings.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
+
+            } else {
+                file.scanResults = `${settings.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
+            }
             const postProcessing = info.process_info?.post_processing;
             const sanitizationSuccessfull = postProcessing?.sanitization_details?.description === 'Sanitized successfully.';
             const sanitized = postProcessing?.actions_ran.indexOf('Sanitized') !== -1;
@@ -201,12 +204,11 @@ class FileProcessor {
                 file.sanitizedFileURL = info.sanitized.file_path;
             }
         }
-
+        
         await scanHistory.save();
 
         let notificationMessage = file.fileName + chrome.i18n.getMessage('fileScanComplete');
         notificationMessage += (file.status === ScanFile.STATUS.INFECTED) ? chrome.i18n.getMessage('threatDetected') : chrome.i18n.getMessage('noThreatDetected');
-
         await BrowserNotification.create(notificationMessage, file.id, file.status === ScanFile.STATUS.INFECTED);
 
         this.callOnScanCompleteListeners({
@@ -230,7 +232,11 @@ class FileProcessor {
         let response;
 
         if (file.useCore) {
-            file.scanResults = `${settings.coreUrl}/#/user/dashboard/processinghistory/dataId/${file.dataId}`;
+            if (settings.coreV4 === true){
+                file.scanResults = `${settings.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
+            } else {
+                file.scanResults = `${settings.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
+            }
             response = await CoreClient.file.poolForResults(file.dataId, 3000);
         } else {
             file.scanResults = `${MCL.config.mclDomain}/results/file/${file.dataId}/regular/overview`;
@@ -273,7 +279,7 @@ class FileProcessor {
             await this.startStatusPolling(file, linkUrl, fileData, !!downloadItem);
         } catch (error) {
             BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));
-            _gaq.push(['exception', { exDescription: 'file-processor:scanFile' + JSON.stringify(error) }]);
+            global._gaq?.push(['exception', { exDescription: 'file-processor:scanFile' + JSON.stringify(error) }]);
         }
     }
 

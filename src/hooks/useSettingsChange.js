@@ -37,12 +37,16 @@ export default (initialCoreSettings = defaultCoreSettings) => {
      * @param {object} coreSettingsParam 
      */
     const onSettingsChanged = async (key, coreSettingsParam) => {
+        console.log('coreSettingsParam', coreSettingsParam);
         if (key === 'coreSettings') {
             settings.coreApikey = coreSettingsParam.apikey;
             settings.coreUrl = coreSettingsParam.url;
+            settings.coreV4 = coreSettingsParam.isCoreV4;
 
-            if (await validateCoreSettings()) {
-                settings.useCore = coreSettings.useCore;
+            const validCore = await validateCoreSettings();
+
+            if (validCore) {
+                settings.useCore = coreSettingsParam.useCore;
                 settings.coreRule = coreSettings.rule.value;
                 await BrowserNotification.create(BrowserTranslate.getMessage('coreSettingsSavedNotification'), 'info');
             } else {
@@ -75,24 +79,23 @@ export default (initialCoreSettings = defaultCoreSettings) => {
 
     /** Validate core settings based on user's updates */
     const validateCoreSettings = async () => {
-        if (!coreSettings.apikey.value || !coreSettings.url.value) {
+        if (!settings.coreApikey || !settings.coreUrl) {
             return;
         }
         CoreClient.configure({
-            apikey: coreSettings.apikey.value,
-            endpoint: coreSettings.url.value
+            apikey: settings.coreApikey,
+            endpoint: settings.coreUrl
         });
 
         try {
             await CoreClient.version();
-            const rules = await CoreClient.rules('');
-            coreSettings.scanRules = rules.map(rule => rule.name);
-
-            setCoreSettings(coreSettings);
+            // const rules = await CoreClient.rules('');
+            // coreSettings.scanRules = rules.map(rule => rule.name);
+            coreSettings.scanRules = ['multiscan'];
+            setCoreSettings({...coreSettings, scanRules: ['multiscan'], useCore:settings.useCore, coreV4:settings.coreV4, coreApikey: settings.coreApikey, coreUrl:settings.coreUrl});
 
             return true;
         } catch (error) {
-            console.log(error);
             if (error.statusCode === 403) {
                 setCoreSettings({ ...coreSettings, useCore: false });
                 return false;
@@ -106,8 +109,21 @@ export default (initialCoreSettings = defaultCoreSettings) => {
         (async () => {
             const settingsData = await settings.load();
             setCurrentSettings(settingsData.settings);
+            setCoreSettings({
+                ...coreSettings,
+                useCore: settingsData.settings.useCore,
+                apikey: {
+                    value: settingsData.settings.coreApikey || ''
+                },
+                url: {
+                    value: settingsData.settings.coreUrl || ''
+                },
+                rule: {
+                    value: settingsData.settings.coreRule || ''
+                }
+            });
         })();
     }, []);
 
-    return { currentSettings, coreSettings, onSettingsChanged, setCoreSettings };
+    return { currentSettings, coreSettings, onSettingsChanged, setCoreSettings, validateCoreSettings };
 };

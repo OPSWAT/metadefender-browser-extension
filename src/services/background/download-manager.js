@@ -8,27 +8,28 @@ class DownloadManager {
         this.fileProcessor = fileProcessor;
         this.settings = settings;
 
-        this.settings.init();
+        settings.init();
 
         fileProcessor.addOnScanCompleteListener(this.onScanComplete.bind(this));
     }
 
     async onScanComplete(payload) {
+        const settings = this.settings;
         const { status, downloaded, fileData, linkUrl, name } = payload;
 
-        if (this.settings.saveCleanFiles && status === ScanFile.STATUS.CLEAN && !downloaded) {
+        if (settings.saveCleanFiles && status === ScanFile.STATUS.CLEAN && !downloaded) {
             const dlId = await ScanFile().download(linkUrl, fileData, name);
             this.ignoreDownloads.push(dlId);
         }
     }
 
     trackInProgressDownloads(downloadItem) {
-        if (!this.settings.scanDownloads) {
+        if (!settings.scanDownloads) {
             return;
         }
 
         if (downloadItem.state === 'in_progress') {
-            this.activeDownloads[downloadItem.id] = downloadItem;
+            this.activeDownloads[downloadItem?.id] = downloadItem;
         }
     }
 
@@ -41,17 +42,17 @@ class DownloadManager {
     updateActiveDownloads(downloadItem) {
         const ignoreDownloads = this.ignoreDownloads;
         const activeDownloads = this.activeDownloads;
-
+        
         if (!this.settings.scanDownloads || typeof downloadItem.filename === 'undefined') {
             return;
         }
 
-        const ignoreDl = ignoreDownloads.indexOf(downloadItem.id);
+        const ignoreDl = ignoreDownloads.indexOf(downloadItem?.id);
         if (ignoreDl >= 0) {
 
             // download initiated by extension, don't download again
-            ignoreDownloads.splice(ignoreDownloads.indexOf(downloadItem.id), 1);
-            delete activeDownloads[downloadItem.id];
+            ignoreDownloads.splice(ignoreDownloads.indexOf(downloadItem?.id), 1);
+            delete activeDownloads[downloadItem?.id];
             return;
         }
 
@@ -62,9 +63,9 @@ class DownloadManager {
             idx = filepath.lastIndexOf('/');
         }
         const filename = filepath.substring(idx + 1);
-
-        activeDownloads[downloadItem.id].filename = filename;
-        activeDownloads[downloadItem.id].localPath = 'file://' + filepath;
+        
+        activeDownloads[downloadItem?.id].filename = filename;
+        activeDownloads[downloadItem?.id].localPath = 'file://' + filepath;
     }
 
     /**
@@ -74,28 +75,30 @@ class DownloadManager {
      * @returns {Promise.<void>}
      */
     async processCompleteDownloads(downloadItem) {
-        if (!this.settings.scanDownloads) {
+        const settings = this.settings;
+        const activeDownloads = this.activeDownloads;
+        if (!settings?.scanDownloads) {
             return;
         }
 
-        if (typeof downloadItem.state === 'undefined' || downloadItem.state.current !== 'complete') {
+        if (typeof downloadItem.state === 'undefined' || downloadItem?.state?.current !== 'complete') {
             return;
         }
 
-        if (!this.activeDownloads[downloadItem.id]) {
+        if (!activeDownloads[downloadItem?.id]) {
             return;
         }
-
-        downloadItem = this.activeDownloads[downloadItem.id];
+        
+        downloadItem = activeDownloads[downloadItem?.id];
         await this.processTarget(downloadItem.url, downloadItem);
-        delete this.activeDownloads[downloadItem.id];
+        delete activeDownloads[downloadItem?.id];
     }
 
     /**
      * Process context menu event targets.
      * 
      * @param linkUrl
-     * @param downloadItem
+    // @param downloadItem
      * @returns {Promise.<void>}
      */
     async processTarget(linkUrl, downloadItem) {

@@ -71,6 +71,26 @@
         }
     }
 
+    .other-content {
+        padding-left: 30px;
+        
+        sub {
+            display: block;
+            line-height: 18px;
+            margin-top: 8px;
+
+            &.warning {
+                color: red;
+            }
+        }
+    }
+        
+    @include media-breakpoint-up(sm) {
+        .other-content {
+            padding-left: 40px;
+        }
+    }
+
     .form-group {
         user-select: none;
         position: relative;
@@ -100,16 +120,6 @@
 
         .text-secondary {
             color: $colorGreyDark !important;
-        }
-
-        sub {
-            display: block;
-            line-height: 18px;
-            margin-top: 8px;
-
-            &.warning {
-                color: red;
-            }
         }
     
         .form-check {   

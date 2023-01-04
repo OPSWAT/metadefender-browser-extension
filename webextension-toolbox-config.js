@@ -8,7 +8,13 @@ const configSettings = require('./config/config')();
 
 module.exports = {
     webpack: (config) => {
-        config.entry = { popup: './index.js', background: './services/background/background-task.js' },
+        config.entry = {
+            popup: './index.js', 
+            background: {
+                import: './services/background/background-task.js',
+                filename: 'background.js'
+            }
+        },
 
         config.module.rules = [
             {

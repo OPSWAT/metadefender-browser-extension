@@ -17,6 +17,7 @@ function Settings() {
         saveCleanFiles: false,
         safeUrl: false,
         useCore: false,
+        coreV4: false,
         coreUrl: '',
         coreApikey: '',
         coreRule: '',
@@ -26,6 +27,8 @@ function Settings() {
         merge: merge,
         save: save,
         load: load,
+
+        
     };
 };
 
@@ -58,13 +61,18 @@ function merge(newData) {
  * @returns {Promise.<void>}
  */
 async function save() {
-    const settingKeys = ['scanDownloads', 'shareResults', 'showNotifications', 'saveCleanFiles', 'safeUrl', 'useCore', 'coreUrl', 'coreApikey', 'coreRule'];
+    const settingKeys = ['scanDownloads', 'shareResults', 'showNotifications', 'saveCleanFiles', 'safeUrl', 'useCore', 'coreV4', 'coreUrl', 'coreApikey', 'coreRule'];
     const data = {};
-    for (const key of settingKeys) {
-        data[key] = this[key];
+    try {
+        for (const key of settingKeys) {
+            data[key] = this[key];
+        }
+    }
+    catch (error) {
+        console.error(error);
     }
 
-    await BrowserStorage.set({ [MCL.config.storageKey.settings]: data });
+    return await BrowserStorage.set({ [MCL.config.storageKey.settings]: data });
 }
 
 /**

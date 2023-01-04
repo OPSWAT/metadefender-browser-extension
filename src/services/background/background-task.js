@@ -12,6 +12,7 @@ import { goToTab } from './navigation';
 import SafeUrl from './safe-url';
 import browserNotification from '../common/browser/browser-notification';
 import browserStorage from '../common/browser/browser-storage';
+import '../common/ga-tracking';
 
 const MCL_CONFIG = MCL.config;
 export default class BackgroundTask {
@@ -20,6 +21,8 @@ export default class BackgroundTask {
         this.settings = settings;
         this.scanHistory = scanHistory;
         this.downloadsManager = new DownloadManager(FileProcessor);
+        
+        chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
 
         cookieManager.onChange(({ cookie, removed }) => {
             if (!MCL_CONFIG.mclDomain.endsWith(cookie.domain) || MCL_CONFIG.authCookieName !== cookie.name || removed) {
@@ -28,8 +31,6 @@ export default class BackgroundTask {
 
             this.setApikey(cookie.value);
         });
-
-        browserStorage.addListener(this.messageListener.bind(this));
     }
 
     getApikeyInfo() {
@@ -59,6 +60,7 @@ export default class BackgroundTask {
             } catch (error) {
                 console.log(error);
             }
+
         })();
 
         MetascanClient.configure({
@@ -88,6 +90,8 @@ export default class BackgroundTask {
         getAuthCookie.call(this);
 
         SafeUrl.toggle(settingsObj.safeUrl);
+
+
     }
 
     /**
@@ -146,7 +150,7 @@ export default class BackgroundTask {
     }
 
     onInstallExtensionListener(details) {
-        this.setupContextMenu(settings.saveCleanFiles);
+        this.setupContextMenu(this.settings.saveCleanFiles);
         if (details.reason === 'install') {
             chrome.tabs.create({
                 url: `${MCL.config.mclDomain}/extension/get-apikey`
@@ -155,8 +159,25 @@ export default class BackgroundTask {
             chrome.tabs.create({
                 url: 'index.html#/about'
             });
+            
+            chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
+
+            chrome.contextMenus.onClicked.addListener(this.handleContextMenuClicks.bind(this));
+                
+            chrome.downloads.onCreated.addListener(this.downloadsManager.trackInProgressDownloads.bind(this.downloadsManager));
+            chrome.downloads.onChanged.addListener(this.downloadsManager.updateActiveDownloads.bind(this.downloadsManager));
+            chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
+            browserStorage.addListener(this.messageListener.bind(this));
+
         } else if (details.reason === 'update') {
             this.updateExtensionFrom(details.previousVersion);
+            chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
+
+            chrome.contextMenus.onClicked.addListener(this.handleContextMenuClicks.bind(this));
+                
+            chrome.downloads.onCreated.addListener(this.downloadsManager.trackInProgressDownloads.bind(this.downloadsManager));
+            chrome.downloads.onChanged.addListener(this.downloadsManager.updateActiveDownloads.bind(this.downloadsManager));
+            chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
         }
     }
 
@@ -164,14 +185,12 @@ export default class BackgroundTask {
         if (info.menuItemId !== MCL_CONFIG.contextMenu.scanId) {
             return;
         }
-
         if (!this.apikeyInfo.apikey) {
             this.init();
         }
 
         const target = info.srcUrl || info.linkUrl || info.pageUrl;
-        await this.processTarget(target);
-        chrome.contextMenus.onClicked.removeListener(this.handleContextMenuClicks.bind(this));
+        await this.processTarget(target);        
     }
 
     /**
@@ -216,10 +235,9 @@ export default class BackgroundTask {
      */
     updateContextMenu(saveCleanFiles) {
         const title = (saveCleanFiles) ? 'contextMenuScanAndDownloadTitle' : 'contextMenuScanTitle';
-
         chrome.contextMenus.update(MCL.config.contextMenu.scanId, {
             title: chrome.i18n.getMessage(title)
-        });
+        }); 
     }
 
     /**
@@ -229,39 +247,37 @@ export default class BackgroundTask {
      * @returns {Promise.<void>}
      */
     async messageListener(message) {
-        const settingsObj = this.settings;
+        const settingsObj = await this.settings.load();
         const apikeyInfoObj = this.apikeyInfo;
 
         if (Object.keys(message).includes('settings')) {
             const saveCleanFiles = message.settings.newValue.saveCleanFiles;
+            this.settings.saveCleanFiles = saveCleanFiles;
+            const useCore = message.settings.newValue.useCore;
+            this.settings.useCore = useCore;
+            const coreApikey = message.settings.newValue.coreApikey;
+            this.settings.coreApikey = coreApikey;
+            const coreUrl = message.settings.newValue.coreUrl;
+            this.settings.coreUrl = coreUrl;
+            const coreV4 = message.settings.newValue.coreV4;
+            this.settings.coreV4 = coreV4;
 
-            await settingsObj.load();
             const apikey = await apikeyInfoObj.load();
 
             CoreClient.configure({
-                apikey: apikey.apikey?.apikey,
-                endpoint: settingsObj.coreUrl
+                apikey: coreApikey,
+                endpoint: coreUrl
             });
 
             this.updateContextMenu(saveCleanFiles);
-
             if (message.settings?.oldValue?.safeUrl !== message.settings.newValue.safeUrl) {
                 SafeUrl.toggle(message.settings.newValue.safeUrl);
             }
+
+            await this.settings.save();
         }
     }
+
 }
 
 export const Task = new BackgroundTask();
-
-const downloadsManager = Task.downloadsManager;
-
-chrome.downloads.onCreated.addListener(downloadsManager.trackInProgressDownloads.bind(downloadsManager));
-chrome.downloads.onChanged.addListener(downloadsManager.updateActiveDownloads.bind(downloadsManager));
-chrome.downloads.onChanged.addListener(downloadsManager.processCompleteDownloads.bind(downloadsManager));
-
-chrome.notifications.onClicked.addListener(Task.handleNotificationClicks.bind(Task));
-
-chrome.contextMenus.onClicked.addListener(Task.handleContextMenuClicks.bind(Task));
-
-chrome.runtime.onInstalled.addListener(Task.onInstallExtensionListener.bind(Task));

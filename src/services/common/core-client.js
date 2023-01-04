@@ -80,7 +80,6 @@ function fileUpload({ fileData, fileName, rule }) {
         'user_agent': 'chrome_extension',
         'filename': fileName,
     };
-
     if (rule) {
         httpHeaders.rule = rule;
         httpHeaders.workflow = rule;

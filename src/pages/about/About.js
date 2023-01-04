@@ -115,7 +115,7 @@ const About = () => {
     />;
 };
 
-About.prototype = {
+About.propTypes = {
     apikeyData: PropTypes.any
 };
 

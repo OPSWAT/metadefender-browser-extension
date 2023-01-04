@@ -2,7 +2,7 @@ import { Link } from '@reach/router';
 import PropTypes from 'prop-types';
 import React, { useMemo } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from '../header/Header';
 import './SidebarLayout.scss';
 
@@ -26,11 +26,11 @@ const MENU_ITEMS = [
 ];
 
 const SidebarLayout = ({ className, content, currentPage }) => {
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const handleOnMenuClick = (page) => {
         if (page !== currentPage) {
-            history.push(page);
+            navigate(`/${page}`);
         }
     };
 

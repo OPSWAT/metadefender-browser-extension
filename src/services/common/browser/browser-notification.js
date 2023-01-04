@@ -29,9 +29,8 @@ async function create(message, id, fileInfected) {
         icon = (fileInfected) ? '/images/ext-notification-infected.png' : '/images/ext-notification-clean.png';
     }
 
-    await settings.load();
-
-    if (!settings.showNotifications) {
+    const currentSettings = await settings.load();
+    if (!currentSettings.settings.showNotifications) {
         return;
     }
 
@@ -44,7 +43,6 @@ async function create(message, id, fileInfected) {
             priority: 1,
             isClickable: (typeof fileInfected !== 'undefined')
         };
-
         if (typeof id === 'undefined') {
             chrome.notifications.create(optionObject, clearNotification);
         }
@@ -53,7 +51,8 @@ async function create(message, id, fileInfected) {
         }
 
     } catch (error) {
-        _gaq.push(['exception', { exDescription: 'browser-notification:create' + JSON.stringify(error) }]);
+        console.log(error);
+        global._gaq.push(['exception', { exDescription: 'browser-notification:create' + JSON.stringify(error) }]);
     }
 }
 

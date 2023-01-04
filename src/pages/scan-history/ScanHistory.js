@@ -88,10 +88,11 @@ const ScanHistory = () => {
         scanTime: item.scanTime,
         results: item.statusLabel,
         status: item.status,
-        id: item.id
+        id: item.id, 
+        useCore: item?.useCore
     }));
 
-    const handleSearch = (e) => setSearchValue(e.target.value);
+    const handleSearch = (e) => setSearchValue(e.target?.value);
 
     const filesPlacehoder = useMemo(() => totalScannedFiles !== 1 ? 'files' : 'file', [totalScannedFiles]);
 
@@ -124,7 +125,7 @@ const ScanHistory = () => {
                     <strong className="history--scanned__files">{`${totalScannedFiles} ${filesPlacehoder} scanned`}</strong>
                 </Col>
                 <Col xs={6} className="text-right">
-                    <Button variant="outline-primary" className="small" onClick={clearScanHistory}>Clear Scan History</Button>
+                    <Button variant="outline-primary" className="small" onClick={() => (async() => await clearScanHistory())()}>Clear Scan History</Button>
                 </Col>
             </Row>
 

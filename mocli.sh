@@ -310,10 +310,10 @@ while [[ $# -gt 0 ]]; do
 
             if [[ `npm list -g -s | grep -c webextension-toolbox` -eq 0 ]]; then
                 echo "Installing webextension-toolbox globally"
-                sudo npm install -g webextension-toolbox
+                sudo npm install -g @webextension-toolbox/webextension-toolbox
             fi
 
-            webextension-toolbox build -s ./src --config ./webextension-toolbox-config.js ${VENDOR}
+            webextension-toolbox build -s ./src --config ./webextension-toolbox-config.js --no-manifest-validation ${VENDOR}
             exit 0
         ;;
         gen-cmp)

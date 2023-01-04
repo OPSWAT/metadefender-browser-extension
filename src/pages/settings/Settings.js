@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import Checkbox from '../../components/common/checkbox/Checkbox';
 import SidebarLayout from '../../components/common/sidebar-layout/SidebarLayout';
@@ -12,30 +12,18 @@ import { settings } from '../../services/common/persistent/settings';
 import CheckboxData from './CheckboxData';
 
 const Settings = () => {
-    const { gaTrackEvent } = useBackgroundContext();
-    const { currentSettings, coreSettings, onSettingsChanged, setCoreSettings } = useSettingsChange();
+    const { gaTrackEvent, apikeyData } = useBackgroundContext();
+    const { currentSettings, coreSettings, onSettingsChanged, setCoreSettings, validateCoreSettings } = useSettingsChange();
+    const [isAllowedFileSchemeAccess, setIsAllowedFileSchemeAccess] = useState(null);
 
     /** Load the current settings, push Google Analytics */
     const activate = async () => {
         gaTrackEvent(['_trackPageview', '/extension/settings']);
         await apikeyInfo.init();
-        await settings.init();
-
-        setCoreSettings({
-            ...coreSettings,
-            useCore: settings.useCore,
-            apikey: {
-                value: settings.coreUrl || ''
-            },
-            url: {
-                value: settings.coreUrl || ''
-            },
-            rule: {
-                value: settings.coreRule || ''
-            }
-        });
+        // await settings.init();
 
         const isAllowedFileSchemeAccess = await BrowserExtension.isAllowedFileSchemeAccess();
+        setIsAllowedFileSchemeAccess(isAllowedFileSchemeAccess);
 
         if (!isAllowedFileSchemeAccess) {
             await onSettingsChanged('scanDownloads');
@@ -77,7 +65,9 @@ const Settings = () => {
             return;
         }
 
-        return CheckboxData.map((item, key) => <Checkbox
+        const isPaidUser = apikeyData?.paidUser;
+        
+        return CheckboxData(isPaidUser, isAllowedFileSchemeAccess).map((item, key) => <Checkbox
             key={key}
             label={item.label}
             isDisabled={item?.isDisabled ?? false}
@@ -87,8 +77,11 @@ const Settings = () => {
             otherContent={item?.otherContent ?? null}
             hasForm={item?.hasForm ?? null}
             labelFor={item.labelFor}
+            coreApikey={currentSettings.coreApikey}
+            coreUrl={currentSettings.coreUrl}
+            coreV4={currentSettings.coreV4}
         />);
-    }, [currentSettings]);
+    }, [currentSettings, apikeyData, isAllowedFileSchemeAccess]);
 
     const content = <Form>
         {checkboxDom}

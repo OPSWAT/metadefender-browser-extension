@@ -33,7 +33,7 @@ const ScanHistoryTable = ({ data, filterBy, removeFile, getStatusIcon }) => {
 
             <tbody>
                 {processedData.map((item, key) => (
-                    <ScanHistoryTableRow
+                   <ScanHistoryTableRow
                         key={key}
                         fileName={item.fileName}
                         scanUrl={item.scanUrl}
@@ -43,6 +43,7 @@ const ScanHistoryTable = ({ data, filterBy, removeFile, getStatusIcon }) => {
                         status={item.status}
                         removeFile={(event) => removeFile(event, item.id)}
                         getStatusIcon={getStatusIcon}
+                        useCore={item.useCore}
                     />
                 ))}
             </tbody>

@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-const ScanHistoryTableRow = ({ fileName, scanUrl, hash, scanTime, results, removeFile, status, getStatusIcon }) => {
+const ScanHistoryTableRow = ({ fileName, scanUrl, hash, scanTime, results, removeFile, status, getStatusIcon, useCore }) => {
     const [isTrashDisplayed, setIsTrashDisplayed] = useState(false);
-
     const trashClassName = classNames({
         'invisible': !isTrashDisplayed
     }, 'mcl-icon icon-trash');
@@ -18,9 +17,9 @@ const ScanHistoryTableRow = ({ fileName, scanUrl, hash, scanTime, results, remov
         onMouseLeave={() => setIsTrashDisplayed(false)}
     >
         <td>
-            <span className="icon-cloud mr-2" />
+            <span className={`${useCore ? 'icon-server' : 'icon-cloud'} mr-2`} />
             <div>
-                <a className={cleanClassName} href={scanUrl} target='_blank' rel='noreferrer'>{fileName}</a>
+                <a className={`scanNameHash ${cleanClassName}`} href={scanUrl} target='_blank' rel='noreferrer'>{fileName}</a>
                 <small className="d-block">{hash}</small>
             </div>
         </td>
@@ -47,7 +46,8 @@ ScanHistoryTableRow.propTypes = {
     results: PropTypes.string,
     removeFile: PropTypes.func,
     status: PropTypes.number,
-    getStatusIcon: PropTypes.func
+    getStatusIcon: PropTypes.func,
+    useCore: PropTypes.bool
 };
 
 export default ScanHistoryTableRow;

@@ -64,7 +64,7 @@ function merge(newData) {
  */
 async function save() {
     const ids = this.files.map(({ id }) => id);
-
+    
     await BrowserStorage.set({
         [MCL.config.storageKey.scanHistory]: {
             files: this.files.reduce((acc, val, index) => (ids.indexOf(val.id) === index ? [...acc, val] : acc), [])
