@@ -77,7 +77,6 @@ const ScanHistory = () => {
         if (file.dataId) {
             return `${scanUrl}/results/file/${file.dataId}/regular/overview`;
         }
-
         return `${scanUrl}/results/file/${file.md5}/hash/overview`;
     };
 

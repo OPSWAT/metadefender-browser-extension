@@ -125,7 +125,12 @@ function getFileSize(url, filename) {
 }
 
 async function getFileData(url) {
-    return fetch(url).then(data => Promise.resolve(new Uint8Array(data.body)));
+    return fetch(url).then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error, status = ${response.status}`);
+        }
+        return Promise.resolve(response.arrayBuffer());
+    });
 }
 
 /**

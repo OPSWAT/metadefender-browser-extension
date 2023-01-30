@@ -47,11 +47,12 @@ class FileProcessor {
         if (file.isSanitizedFile(linkUrl)) {
             return;
         }
-
+         
         if (downloadItem) {
             file.fileName = downloadItem.filename.split('/').pop();
             file.size = downloadItem.fileSize;
         }
+
         else {
             file.fileName = linkUrl.split('/').pop();
             file.fileName = file.fileName.split('?')[0];
@@ -80,7 +81,7 @@ class FileProcessor {
         }
 
         file.statusLabel = file.getScanStatusLabel();
-
+        console.log('file', file);
         await scanHistory.addFile(file);
 
         let fileData = null;
@@ -107,6 +108,8 @@ class FileProcessor {
         }
 
         file.md5 = file.getMd5Hash(fileData);
+        console.log('md5', file.md5);
+        console.log('fileData', fileData);
 
         if (file.fileName === '') {
             file.fileName = file.md5;
