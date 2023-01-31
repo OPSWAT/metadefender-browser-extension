@@ -243,10 +243,10 @@ class FileProcessor {
             response = await MetascanClient.setAuth(getApikeyValue(apikeyInfo)).file.poolForResults(file.dataId, 3000);
         }
 
-        await scanHistory.save();
 
         if (response.error) {
-            return;
+            await scanHistory.save();
+            return; 
         }
 
         await this.handleFileScanResults(file, response, linkUrl, fileData, downloaded);
@@ -263,7 +263,7 @@ class FileProcessor {
     async scanFile(file, linkUrl, fileData, downloadItem, useCore) {
         try {
             file.useCore = useCore;
-            await scanHistory.save();
+            // await scanHistory.save();
 
             const response = useCore
                 ? await this.scanWithCore(file, fileData)
@@ -273,9 +273,9 @@ class FileProcessor {
                 throw response;
             }
 
-            file.dataId = response.data_id;
+            file.dataId = response?.data_id;
 
-            await scanHistory.save();
+            // await scanHistory.save();
             await this.startStatusPolling(file, linkUrl, fileData, !!downloadItem);
         } catch (error) {
             BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));

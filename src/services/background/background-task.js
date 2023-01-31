@@ -55,7 +55,7 @@ export default class BackgroundTask {
                 await settingsObj.init();
                 await apiKeyInfo.init();
                 await scanHistoryObj.init();
-                await scanHistoryObj.cleanPendingFiles();
+                // await scanHistoryObj.cleanPendingFiles();
                 await SafeUrl.init();
             } catch (error) {
                 console.log(error);
