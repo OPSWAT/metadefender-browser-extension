@@ -150,7 +150,7 @@ export default class BackgroundTask {
     }
 
     onInstallExtensionListener(details) {
-        this.setupContextMenu(this.settings.saveCleanFiles);
+        this.setupContextMenu(this.settings?.saveCleanFiles);
         if (details.reason === 'install') {
             chrome.tabs.create({
                 url: `${MCL.config.mclDomain}/extension/get-apikey`
@@ -251,7 +251,7 @@ export default class BackgroundTask {
         const apikeyInfoObj = this.apikeyInfo;
 
         if (Object.keys(message).includes('settings')) {
-            const saveCleanFiles = message.settings.newValue.saveCleanFiles;
+            const saveCleanFiles = message.settings.newValue?.saveCleanFiles;
             this.settings.saveCleanFiles = saveCleanFiles;
             const useCore = message.settings.newValue.useCore;
             this.settings.useCore = useCore;

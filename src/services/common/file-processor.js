@@ -58,7 +58,7 @@ class FileProcessor {
             file.fileName = file.fileName.split('?')[0];
 
             try {
-                file.size = await file.getFileSize(linkUrl, file.fileName);
+                file.size = file.getFileSize(linkUrl, file.fileName);
             }
             catch (errMsg) {
                 if (errMsg) {
@@ -81,7 +81,6 @@ class FileProcessor {
         }
 
         file.statusLabel = file.getScanStatusLabel();
-        console.log('file', file);
         await scanHistory.addFile(file);
 
         let fileData = null;
@@ -108,8 +107,6 @@ class FileProcessor {
         }
 
         file.md5 = file.getMd5Hash(fileData);
-        console.log('md5', file.md5);
-        console.log('fileData', fileData);
 
         if (file.fileName === '') {
             file.fileName = file.md5;

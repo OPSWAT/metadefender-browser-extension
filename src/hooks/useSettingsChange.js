@@ -37,7 +37,6 @@ export default (initialCoreSettings = defaultCoreSettings) => {
      * @param {object} coreSettingsParam 
      */
     const onSettingsChanged = async (key, coreSettingsParam) => {
-        console.log('coreSettingsParam', coreSettingsParam);
         if (key === 'coreSettings') {
             settings.coreApikey = coreSettingsParam.apikey;
             settings.coreUrl = coreSettingsParam.url;

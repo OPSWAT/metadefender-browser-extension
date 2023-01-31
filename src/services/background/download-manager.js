@@ -17,7 +17,7 @@ class DownloadManager {
         const settings = this.settings;
         const { status, downloaded, fileData, linkUrl, name } = payload;
 
-        if (settings.saveCleanFiles && status === ScanFile.STATUS.CLEAN && !downloaded) {
+        if (settings?.saveCleanFiles && status === ScanFile.STATUS.CLEAN && !downloaded) {
             const dlId = await ScanFile().download(linkUrl, fileData, name);
             this.ignoreDownloads.push(dlId);
         }
