@@ -1,14 +1,19 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import { Col, Row } from 'react-bootstrap';
+
 import openSettingsImg from '../../assets/images/how-to/open-settings.png';
 import scanWithOpswatImg from '../../assets/images/how-to/right-click.png';
+
 import SidebarLayout from '../../components/common/sidebar-layout/SidebarLayout';
-import { useBackgroundContext } from '../../providers/Background';
+import GAContext from '../../providers/GAProvider';
+import UserContext from '../../providers/UserProvider';
+
 import './About.scss';
 
 const LABELS = {
     apikey: 'API Key',
+    limitInterval: 'Limit Interval',
     reputationLimit: 'Reputation API Limit',
     preventionLimit: 'Prevention API Limit',
     feedLimit: 'Feed API Limit',
@@ -16,36 +21,15 @@ const LABELS = {
     paidUser: 'Paid User',
     maxUploadFileSize: 'Maximum File Size',
 };
-const About = () => {
-    const { gaTrackEvent, apikeyData } = useBackgroundContext();
-    const [user, setUser] = useState({});
 
-    useEffect(() => {
-        gaTrackEvent(['_trackPageview', '/extension/about']);
-    }, []);
+const About = () => {
+
+    const { gaTrackEvent } = useContext(GAContext);
+    const { apikeyData } = useContext(UserContext);
 
     useEffect(() => {
         (async () => {
-            if (!apikeyData) {
-                return;
-            }
-
-            if (apikeyData.organization) {
-                setUser({
-                    apikey: apikeyData.apikey,
-                    hasOrganization: true
-                });
-            } else {
-                setUser({
-                    apikey: apikeyData.apikey,
-                    reputationLimit: apikeyData.reputationLimit,
-                    preventionLimit: apikeyData.preventionLimit,
-                    feedLimit: apikeyData.feedLimit,
-                    sandboxLimit: apikeyData.sandboxLimit,
-                    paidUser: apikeyData.paidUser,
-                    maxUploadFileSize: apikeyData.maxUploadFileSize,
-                });
-            }
+            gaTrackEvent(['_trackPageview', '/extension/about']);
         })();
     }, [apikeyData]);
 
@@ -56,29 +40,37 @@ const About = () => {
         <p dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('chromeExtensionHelp') }} />
     </>;
 
-    const yourMetadefenderApiKeyInfoDom = useMemo(() => <>
-        <h4>{chrome.i18n.getMessage('aboutApiKeyInfo')}</h4>
-        <ul className="file-information info-group label-150">
-            {
-                !user.apikey
-                    ? <li><div className='spinner-border text-dark mb-4' role="status" /></li>
-                    : Object.keys(user).map((item, key) => {
-                        if (item === 'hasOrganization') {
-                            return;
-                        }
+    const yourMetadefenderApiKeyInfoDom = useMemo(() => {
+        if (!apikeyData) {
+            return;
+        }
 
-                        return <li key={key}>
-                            <label>{LABELS[item]}</label>
-                            <span>{user[item]}</span>
-                        </li>;
-                    })
-            }
-            {!user?.hasOrganization && <a href="https://www.opswat.com/contact" target="_blank" rel="noreferrer">{chrome.i18n.getMessage('contactOpswat')}</a>}
-            {user?.hasOrganization && <p>Your limits are controlled by the organization. <br /><a href="https://id-staging.opswat.com/organization/overview" target="_blank" rel="noreferrer">View organization details</a></p>}
-        </ul>
+        const hasOrganization = !!apikeyData.organization;
 
-        <p dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('aboutMoreAboutMCL') }} />
-    </>, [user]);
+        return <>
+            <h4>{chrome.i18n.getMessage('aboutApiKeyInfo')}</h4>
+            <ul className="file-information info-group label-150">
+                {
+                    !apikeyData.apikey
+                        ? <li><div className='spinner-border text-dark mb-4' role="status" /></li>
+                        : Object.keys(LABELS).map((item) => {
+                            if (!LABELS[item]) {
+                                return;
+                            }
+
+                            return <li key={item}>
+                                <label>{LABELS[item]}</label>
+                                <span>{apikeyData[item]}</span>
+                            </li>;
+                        })
+                }
+                {!hasOrganization && <a href="https://www.opswat.com/contact" target="_blank" rel="noreferrer">{chrome.i18n.getMessage('contactOpswat')}</a>}
+                {hasOrganization && <p>Your limits are controlled by the organization. <br /><a href="https://id-staging.opswat.com/organization/overview" target="_blank" rel="noreferrer">View organization details</a></p>}
+            </ul>
+
+            <p dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('aboutMoreAboutMCL') }} />
+        </>
+    }, [apikeyData]);
 
     const howToUseDom = <>
         <h4>{chrome.i18n.getMessage('aboutHowToUse')}</h4>
@@ -110,8 +102,8 @@ const About = () => {
 
     return <SidebarLayout
         className='about'
-        content={content}
         currentPage='about'
+        content={content}
     />;
 };
 

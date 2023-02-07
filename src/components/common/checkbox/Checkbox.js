@@ -4,50 +4,33 @@ import PropTypes from 'prop-types';
 
 import './Checkbox.scss';
 
-const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleCheckboxChange, labelFor, coreApikey, coreUrl, coreV4 }) => {
+const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleCheckboxChange, labelFor, getScanRules, coreApikey, coreUrl, coreRule, scanRules }) => {
     const checkboxRef = useRef(null);
     const [isInputChecked, setIsInputChecked] = useState(typeof isChecked === 'boolean' ? isChecked : false);
-    const [apikey, setApikey] = useState(coreApikey);
-    const [url, setUrl] = useState(coreUrl);
-    const [isCoreV4, setIsCoreV4] = useState(false);
-    useEffect(() => {
-        setApikey(coreApikey);
-    }, [coreApikey]);
+    const [apikey, setApikey] = useState();
+    const [url, setUrl] = useState();
+    const [rule, setCoreRule] = useState();
 
-    useEffect(() => {
-        setUrl(coreUrl);
-    }, [coreUrl]);
-
-    useEffect(() => {
-        setIsCoreV4(coreV4);
-    }, [coreV4]);
-
-
-
-    useEffect(() => {
-        if (typeof isChecked === 'boolean') {
-            setIsInputChecked(isChecked);
-        }
-    }, [isChecked]);
-
-    const handleClick = async (isCoreSettings) => {
-        if (isCoreSettings) {
-            const coreSettings = {
-                apikey,
-                url,
-                useCore: isInputChecked,
-                isCoreV4:isCoreV4
-            };
-
-            await handleCheckboxChange(isCoreSettings, coreSettings);
-            return;
-        }
-
+    const handleClick = async () => {
         if (!isDisabled) {
             setIsInputChecked(!isInputChecked);
             await handleCheckboxChange(labelFor);
         }
     };
+
+    const saveCoreSettings = async () => {
+        const coreSettings = {
+            coreApikey: apikey,
+            coreUrl: url,
+            coreRule: rule,
+        };
+    
+        await handleCheckboxChange('coreSettings', coreSettings);
+    }
+
+    const checkCoreSettings = async () => {
+        getScanRules(apikey, url);
+    }
 
     const handleApikeyChange = (e) => {
         setApikey(e.target.value);
@@ -57,53 +40,63 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
         setUrl(e.target.value);
     };
 
-    const handleCoreV4Change = () => {
-        setIsCoreV4(!isCoreV4);
-    };
+    const handleWorkflowChange = (e) => {
+        setCoreRule(e.target.value);
+    }
 
     const formDom = useMemo(() => {
         if (!hasForm) {
             return;
         }
 
-        return <fieldset className="form-with-inputs" disabled={isInputChecked ? false : true}>
+        return <fieldset className="form-with-inputs" disabled={!isInputChecked}>
             <Form.Group controlId="apiKey">
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
-                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={apikey || ''} onChange={handleApikeyChange} />
+                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={apikey || ''} onChange={handleApikeyChange} onBlur={checkCoreSettings}/>
             </Form.Group>
             <Form.Group controlId="url">
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">URL</Form.Label>
-                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} />
-            </Form.Group>
-            <Form.Group onClick={() => handleCoreV4Change()} className="coreV4" controlId="coreV4">
-                <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">CoreV4</Form.Label>
-                <Form.Control type="checkbox" checked={isCoreV4} onChange={() => handleCoreV4Change()} />
+                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings}/>
             </Form.Group>
             <Form.Group controlId="workflow">
                 <Form.Label className="col-sm-2 text-md-right text-left">Workflow</Form.Label>
 
-                <Form.Control as="select" disabled className="col-md-5">
-                    <option defaultValue>-- Default rule --</option>
+                <Form.Control as="select" disabled={!scanRules.length} value={rule} className="col-md-5" onChange={handleWorkflowChange}>
+                    <option defaultValue=''>-- Default rule --</option>
+                    {
+                        scanRules.map((rule) => <option key={rule} value={rule}>{rule}</option>)
+                    }
                 </Form.Control>
 
                 <div className="col-md-5 p-0">
-                    <Button variant="primary" type="button" disabled={apikey === '' && url === ''} onClick={() => handleClick('coreSettings')}>
+                    <Button variant="primary" type="button" onClick={saveCoreSettings}>
                         {chrome.i18n.getMessage('coreSettingsSave')}
                     </Button>
                 </div>
             </Form.Group>
         </fieldset>;
-    }, [hasForm, isInputChecked, apikey, url, isCoreV4]);
+    }, [hasForm, isInputChecked, apikey, url, rule, scanRules]);
 
-    return <div className="form-group-wrapper">
-        <Form.Group onClick={() => handleClick()} className={`${isDisabled ? 'disabled' : ''}`}>
-            <Form.Check type="checkbox" label={label} onChange={() => handleClick()} checked={isInputChecked} disabled={isDisabled} ref={checkboxRef} />
-        </Form.Group>
-        <div className='other-content'>
-            {otherContent && otherContent}
+    useEffect(() => {
+        if (typeof isChecked === 'boolean') {
+            setIsInputChecked(isChecked);
+        }
+        setApikey(coreApikey);
+        setUrl(coreUrl);
+        setCoreRule(coreRule);
+    }, [isChecked, coreApikey, coreUrl, coreRule]);
+
+    return (
+        <div className="form-group-wrapper">
+            <Form.Group onClick={handleClick} className={`${isDisabled ? 'disabled' : ''}`}>
+                <Form.Check type="checkbox" label={label} onChange={handleClick} checked={isInputChecked} disabled={isDisabled} ref={checkboxRef} />
+            </Form.Group>
+            <div className='other-content'>
+                {otherContent}
+            </div>
+            {formDom}
         </div>
-        {formDom}
-    </div>;
+    );
 };
 
 Checkbox.propTypes = {
@@ -113,9 +106,13 @@ Checkbox.propTypes = {
     otherContent: PropTypes.node,
     hasForm: PropTypes.bool,
     handleCheckboxChange: PropTypes.func,
+    validateCoreSettings: PropTypes.func,
     labelFor: PropTypes.string,
+    getScanRules: PropTypes.func,
     coreApikey: PropTypes.string,
-    coreUrl: PropTypes.string
+    coreUrl: PropTypes.string,
+    coreRule: PropTypes.string,
+    coreRules: PropTypes.array,
 };
 
 export default Checkbox;

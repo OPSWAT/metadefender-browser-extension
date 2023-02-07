@@ -13,11 +13,11 @@ CMDS_DESC=(
     [test]="Runns unit tests"
     [coverage]="Runns unit tests and generates code coverage reports"
     [release]="Create release versions using git-flow. Usage: mocli release [start|finish] <version>"
-    [release - p]="Create release version and increases patch number"
+    [release-p]="Create release version and increases patch number"
     [hotfix]="Create a qa release from current branch and uploads it to bitbucket"
     [docs]="Create a documentation for the components"
     [pack]="Zips the dist/<vendor> directory. Usage: mocli pack [--production] [--vendor=firefox] [--env=qa]"
-    [sonar - scan]="Running SonarQube Scanner from the Docker image. Usage: sonar-scan [<token>]"
+    [sonar-scan]="Running SonarQube Scanner from the Docker image. Usage: sonar-scan [<token>]"
     [help]="Show this message"
 )
 
@@ -125,6 +125,10 @@ function sonar_scan() {
         sonarsource/sonar-scanner-cli
 }
 
+function pack_extension() {
+    webextension-toolbox build -s ./src --config ./webextension-toolbox-config.js --no-manifest-validation ${VENDOR}
+}
+
 if [[ $# == 0 ]]; then
     printHelp
     exit 0
@@ -140,19 +144,17 @@ while [[ $# -gt 0 ]]; do
         echo "-> install webpack-cli"
         npm list -g --depth=0 webpack-cli >/dev/null 2>&1 || npm i -g webpack-cli >/dev/null
 
+        if [[ $(npm list -g -s | grep -c webextension-toolbox) -eq 0 ]]; then
+            echo "Installing webextension-toolbox globally"
+            npm install -g @webextension-toolbox/webextension-toolbox
+        fi
+
         echo "-> install packages"
         rm -rf ./node_modules/
-        rm -rf ./package-lock.json
-        npm install >/dev/null
+        npm ci --legacy-peer-deps
 
-        echo "-> install packages"
-        npm install --legacy-peer-deps >/dev/null
-
-        # echo "-> generate config: prod"
-        # gulp config --prod > /dev/null
-
-        echo "-> generate config: prod"
-        gulp config --prod >/dev/null
+        echo "-> copy git-flow hooks"
+        cp git_hooks/* .git/hooks/
 
         gen_cmp
 
@@ -230,7 +232,8 @@ while [[ $# -gt 0 ]]; do
             read_env
 
             export ENVIRONMENT=${2:-${ENV}}
-            gulp pack --production --env=${ENV}
+            VENDOR=${3:-'chrome'}
+            pack_extension
             ;;
         esac
 
@@ -266,7 +269,8 @@ while [[ $# -gt 0 ]]; do
             read_env
 
             export ENVIRONMENT=${2:-${ENV}}
-            gulp pack --production --env=${ENV}
+            VENDOR=${3:-'chrome'}
+            pack_extension
             ;;
         esac
         ;;
@@ -299,22 +303,20 @@ while [[ $# -gt 0 ]]; do
             read_env
 
             export ENVIRONMENT=${2:-${ENV}}
-            gulp pack --production --env=${ENV}
+            VENDOR=${3:-'chrome'}
+            pack_extension
             ;;
         esac
 
         exit 0
         ;;
     pack)
+        read_env
+
         export ENVIRONMENT=${2:-${ENV}}
         VENDOR=${3:-'chrome'}
 
-        if [[ $(npm list -g -s | grep -c webextension-toolbox) -eq 0 ]]; then
-            echo "Installing webextension-toolbox globally"
-            sudo npm install -g @webextension-toolbox/webextension-toolbox
-        fi
-
-        webextension-toolbox build -s ./src --config ./webextension-toolbox-config.js --no-manifest-validation ${VENDOR}
+        pack_extension
         exit 0
         ;;
     gen-cmp)
@@ -323,90 +325,6 @@ while [[ $# -gt 0 ]]; do
     sonar-scan)
         sonar_scan ${2}
         exit $?
-        ;;
-    help)
-        printHelp
-        exit 0
-        ;;
-    release-p)
-        if [[ $# -lt 2 ]]; then
-            echo "Invalid number of arguments"
-            echo "Usage: mocli patch <start|stop|publish> [version]"
-            exit 1
-        fi
-
-        C_VERSION=$(cat package.json | jq .version | sed 's/"//g')
-        VERSION=$(echo ${C_VERSION} | cut -d'.' -f3)
-        if [[ ${2} == "start" ]]; then
-            VERSION=$((VERSION + 1))
-        fi
-        VERSION=$(echo ${C_VERSION} | sed -r "s/.[0-9]+$/.${VERSION}/")
-        if [[ $# = 3 ]]; then
-            VERSION=${3}
-        fi
-
-        case "${2}" in
-        start)
-            git flow release start ${VERSION}
-            git flow release publish ${VERSION}
-            ;;
-        finish)
-            git flow release finish -Fp ${VERSION}
-            git checkout customer
-            ;;
-        publish)
-            read_env
-
-            gulp config --${ENV}
-            gulp pack --production --env=${ENV}
-            ;;
-        esac
-        ;;
-    hotfix)
-        if [[ $# -lt 2 ]]; then
-            echo "Invalid number of arguments"
-            echo "Usage: mocli hotfix <start|stop|publish> [version]"
-        fi
-
-        C_VERSION=$(cat package.json | jq .version | sed 's/"//g')
-        VERSION=$(echo ${C_VERSION} | cut -d'.' -f3)
-        if [[ ${2} == "start" ]]; then
-            VERSION=$((VERSION + 1))
-        fi
-        VERSION=$(echo ${C_VERSION} | sed -r "s/.[0-9]+$/.${VERSION}/")
-        if [[ $# = 3 ]]; then
-            VERSION=${3}
-        fi
-
-        case "${2}" in
-        start)
-            git flow hotfix start ${VERSION}
-            git flow hotfix publish ${VERSION}
-            ;;
-        finish)
-            git flow hotfix finish -Fp ${VERSION}
-            git checkout customer
-            ;;
-        publish)
-            read_env
-
-            gulp config --${ENV}
-            gulp pack --production --env=${ENV}
-            ;;
-        esac
-
-        exit 0
-        ;;
-    pack)
-        CMD='gulp'
-        while [[ $# -gt 0 ]]; do
-            CMD="${CMD} ${1}"
-            shift
-        done
-        ${CMD}
-        ;;
-    gen-cmp)
-        gen_cmp
         ;;
     help)
         printHelp

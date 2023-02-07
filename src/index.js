@@ -1,18 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.scss';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 import { HashRouter } from 'react-router-dom';
-import { BackgroundProvider } from './providers/Background';
+
+import reportWebVitals from './reportWebVitals';
+
+import App from './App';
+import { UserProvider } from './providers/UserProvider';
+
+import './index.scss';
+import { GAProvider } from './providers/GAProvider';
+import { ConfigProvider } from './providers/ConfigProvider';
 
 ReactDOM.render(
     <React.StrictMode>
-        <BackgroundProvider>
-            <HashRouter>
-                <App />
-            </HashRouter>
-        </BackgroundProvider>
+        <ConfigProvider>
+            <GAProvider>
+                <UserProvider>
+                    <HashRouter>
+                        <App />
+                    </HashRouter>
+                </UserProvider>
+            </GAProvider>
+        </ConfigProvider>
     </React.StrictMode>,
     document.getElementById('root')
 );

@@ -1,8 +1,10 @@
 
 import MCL from '../../config/config';
+
 import { settings } from '../common/persistent/settings';
 import { apikeyInfo } from '../common/persistent/apikey-info';
 import { scanHistory } from '../common/persistent/scan-history';
+
 import CoreClient from '../common/core-client';
 import MetascanClient from '../common/metascan-client';
 import FileProcessor from '../common/file-processor';
@@ -10,19 +12,51 @@ import cookieManager from './cookie-manager';
 import DownloadManager from './download-manager';
 import { goToTab } from './navigation';
 import SafeUrl from './safe-url';
-import browserNotification from '../common/browser/browser-notification';
-import browserStorage from '../common/browser/browser-storage';
+
+import BrowserNotification from '../common/browser/browser-notification';
+import BrowserStorage from '../common/browser/browser-storage';
+
 import '../common/ga-tracking';
 
 const MCL_CONFIG = MCL.config;
+
+const contextMenus = {};
 export default class BackgroundTask {
     constructor() {
+        this.id = Math.random();
         this.apikeyInfo = apikeyInfo;
         this.settings = settings;
         this.scanHistory = scanHistory;
         this.downloadsManager = new DownloadManager(FileProcessor);
-        
+
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
+    }
+    
+    async init() {
+        try {
+            await this.settings.init();
+            await this.apikeyInfo.init();
+            await this.scanHistory.init();
+            await this.scanHistory.cleanPendingFiles();
+            await SafeUrl.init();
+        } catch (error) {
+            console.warn(error);
+        }
+
+        MetascanClient
+            .configure({
+                pollingIncrementor: MCL_CONFIG.scanResults.incrementor,
+                pollingMaxInterval: MCL_CONFIG.scanResults.maxInterval
+            })
+            .setHost(MCL_CONFIG.metadefenderDomain)
+            .setVersion(MCL_CONFIG.metadefenderVersion);
+
+        CoreClient.configure({
+            apikey: this.settings.data.coreApikey,
+            endpoint: this.settings.data.coreUrl,
+            pollingIncrementor: MCL_CONFIG.scanResults.incrementor,
+            pollingMaxInterval: MCL_CONFIG.scanResults.maxInterval,
+        });
 
         cookieManager.onChange(({ cookie, removed }) => {
             if (!MCL_CONFIG.mclDomain.endsWith(cookie.domain) || MCL_CONFIG.authCookieName !== cookie.name || removed) {
@@ -31,51 +65,18 @@ export default class BackgroundTask {
 
             this.setApikey(cookie.value);
         });
-    }
+        
+        chrome.contextMenus.onClicked.addListener(this.handleContextMenuClicks.bind(this));
+        chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
+        chrome.notifications.onClosed.addListener(() => { });
+        
+        chrome.downloads.onCreated.addListener(this.downloadsManager.trackInProgressDownloads.bind(this.downloadsManager));
+        chrome.downloads.onChanged.addListener(this.downloadsManager.updateActiveDownloads.bind(this.downloadsManager));
+        chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
 
-    getApikeyInfo() {
-        return this.apikeyInfo;
-    }
+        BrowserStorage.addListener(this.browserStorageListener.bind(this));
 
-    getScanHistory() {
-        return this.scanHistory;
-    }
-
-    getSettings() {
-        return this.settings;
-    }
-
-    init() {
-        const apiKeyInfo = this.apikeyInfo;
-        const settingsObj = this.settings;
-        const scanHistoryObj = this.scanHistory;
-
-        (async () => {
-            try {
-                await settingsObj.init();
-                await apiKeyInfo.init();
-                await scanHistoryObj.init();
-                // await scanHistoryObj.cleanPendingFiles();
-                await SafeUrl.init();
-            } catch (error) {
-                console.log(error);
-            }
-
-        })();
-
-        MetascanClient.configure({
-            pollingIncrementor: MCL_CONFIG.scanResults.incrementor,
-            pollingMaxInterval: MCL_CONFIG.scanResults.maxInterval
-        })
-            .setHost(MCL_CONFIG.metadefenderDomain)
-            .setVersion(MCL_CONFIG.metadefenderVersion);
-
-        CoreClient.configure({
-            apikey: settingsObj.coreApikey,
-            endpoint: settingsObj.coreUrl,
-            pollingIncrementor: MCL_CONFIG.scanResults.incrementor,
-            pollingMaxInterval: MCL_CONFIG.scanResults.maxInterval,
-        });
+        this.setupContextMenu(this.settings.data.saveCleanFiles);
 
         async function getAuthCookie() {
             const cookie = await cookieManager.get();
@@ -86,12 +87,9 @@ export default class BackgroundTask {
                 setTimeout(getAuthCookie.bind(this), 300);
             }
         }
-
         getAuthCookie.call(this);
 
-        SafeUrl.toggle(settingsObj.safeUrl);
-
-
+        SafeUrl.toggle(this.settings.data.safeUrl);
     }
 
     /**
@@ -100,11 +98,14 @@ export default class BackgroundTask {
      */
     setupContextMenu(saveCleanFiles) {
         const title = (saveCleanFiles) ? 'contextMenuScanAndDownloadTitle' : 'contextMenuScanTitle';
-        return chrome.contextMenus.removeAll(() => chrome.contextMenus.create({
-            id: MCL.config.contextMenu.scanId,
-            title: chrome.i18n.getMessage(title),
-            contexts: ['link', 'image', 'video', 'audio']
-        }));
+        return chrome.contextMenus.removeAll(() => {
+            const menuId = chrome.contextMenus.create({
+                id: MCL_CONFIG.contextMenu.scanId,
+                title: chrome.i18n.getMessage(title),
+                contexts: ['link', 'image', 'video', 'audio']
+            });
+            contextMenus[menuId] = menuId;
+        });
     }
 
     /**
@@ -114,16 +115,15 @@ export default class BackgroundTask {
      */
     async setApikey(cookieValue) {
         let cookieData = decodeURIComponent(cookieValue);
-        const apikeyInfoObj = this.apikeyInfo;
 
         try {
             cookieData = JSON.parse(cookieData);
         } catch (error) {
-            browserNotification.create(error, 'info');
+            BrowserNotification.create(error, 'info');
             _gaq.push(['exception', { exDescription: 'background-task:setApikey' + JSON.stringify(error) }]);
         }
 
-        if (apikeyInfoObj.apikey === cookieData.apikey && apikeyInfoObj.loggedIn === cookieData.loggedIn) {
+        if (this.apikeyInfo.data.apikey === cookieData.apikey && this.apikeyInfo.data.loggedIn === cookieData.loggedIn) {
             return;
         }
 
@@ -131,53 +131,34 @@ export default class BackgroundTask {
             const response = await MetascanClient.apikey.info(cookieData.apikey);
 
             if (response?.error) {
-                browserNotification.create(response.error.messages.join(', '));
+                BrowserNotification.create(response.error.messages.join(', '));
                 return;
             }
 
-            this.apikeyInfo.apikey = cookieData.apikey;
-            this.apikeyInfo.loggedIn = cookieData.loggedIn;
+            this.apikeyInfo.data.apikey = cookieData.apikey;
+            this.apikeyInfo.data.loggedIn = cookieData.loggedIn;
             this.apikeyInfo.parseMclInfo(response);
+            await this.apikeyInfo.save();
 
-            await apikeyInfoObj.save();
-
-            this.settings.shareResults = this.settings.shareResults || !this.apikeyInfo.paidUser;
-
+            this.settings.data.shareResults = this.settings.data.shareResults || !this.apikeyInfo.data.paidUser;
             await this.settings.save();
         } catch (error) {
-            console.log(error);
+            console.warn(error);
         }
     }
 
     onInstallExtensionListener(details) {
-        this.setupContextMenu(this.settings?.saveCleanFiles);
         if (details.reason === 'install') {
             chrome.tabs.create({
-                url: `${MCL.config.mclDomain}/extension/get-apikey`
+                url: `${MCL_CONFIG.mclDomain}/extension/get-apikey`
             });
 
             chrome.tabs.create({
                 url: 'index.html#/about'
             });
             
-            chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
-
-            chrome.contextMenus.onClicked.addListener(this.handleContextMenuClicks.bind(this));
-                
-            chrome.downloads.onCreated.addListener(this.downloadsManager.trackInProgressDownloads.bind(this.downloadsManager));
-            chrome.downloads.onChanged.addListener(this.downloadsManager.updateActiveDownloads.bind(this.downloadsManager));
-            chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
-            browserStorage.addListener(this.messageListener.bind(this));
-
         } else if (details.reason === 'update') {
             this.updateExtensionFrom(details.previousVersion);
-            chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
-
-            chrome.contextMenus.onClicked.addListener(this.handleContextMenuClicks.bind(this));
-                
-            chrome.downloads.onCreated.addListener(this.downloadsManager.trackInProgressDownloads.bind(this.downloadsManager));
-            chrome.downloads.onChanged.addListener(this.downloadsManager.updateActiveDownloads.bind(this.downloadsManager));
-            chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
         }
     }
 
@@ -185,11 +166,9 @@ export default class BackgroundTask {
         if (info.menuItemId !== MCL_CONFIG.contextMenu.scanId) {
             return;
         }
-        if (!this.apikeyInfo.apikey) {
-            this.init();
-        }
-
+        
         const target = info.srcUrl || info.linkUrl || info.pageUrl;
+        
         await this.processTarget(target);        
     }
 
@@ -201,7 +180,7 @@ export default class BackgroundTask {
      * @returns {Promise.<void>}
      */
     async processTarget(linkUrl, downloadItem) {
-        await this?.downloadsManager?.processTarget?.(linkUrl, downloadItem);
+        await this.downloadsManager.processTarget(linkUrl, downloadItem);
     }
 
     /**
@@ -235,9 +214,11 @@ export default class BackgroundTask {
      */
     updateContextMenu(saveCleanFiles) {
         const title = (saveCleanFiles) ? 'contextMenuScanAndDownloadTitle' : 'contextMenuScanTitle';
-        chrome.contextMenus.update(MCL.config.contextMenu.scanId, {
-            title: chrome.i18n.getMessage(title)
-        }); 
+        if (contextMenus[MCL_CONFIG.contextMenu.scanId]) {
+            chrome.contextMenus.update(MCL_CONFIG.contextMenu.scanId, {
+                title: chrome.i18n.getMessage(title)
+            }); 
+        }
     }
 
     /**
@@ -246,35 +227,29 @@ export default class BackgroundTask {
      * @param message
      * @returns {Promise.<void>}
      */
-    async messageListener(message) {
-        const settingsObj = await this.settings.load();
-        const apikeyInfoObj = this.apikeyInfo;
+    async browserStorageListener(data) {
+        for (const key of Object.keys(data)) {
+            switch (key) {
+                case MCL_CONFIG.storageKey.apikeyInfo:
+                    await this.apikeyInfo.load();
+                    break;
+                case MCL_CONFIG.storageKey.settings:
+                    const settingsData = await this.settings.load();
 
-        if (Object.keys(message).includes('settings')) {
-            const saveCleanFiles = message.settings.newValue?.saveCleanFiles;
-            this.settings.saveCleanFiles = saveCleanFiles;
-            const useCore = message.settings.newValue.useCore;
-            this.settings.useCore = useCore;
-            const coreApikey = message.settings.newValue.coreApikey;
-            this.settings.coreApikey = coreApikey;
-            const coreUrl = message.settings.newValue.coreUrl;
-            this.settings.coreUrl = coreUrl;
-            const coreV4 = message.settings.newValue.coreV4;
-            this.settings.coreV4 = coreV4;
-
-            const apikey = await apikeyInfoObj.load();
-
-            CoreClient.configure({
-                apikey: coreApikey,
-                endpoint: coreUrl
-            });
-
-            this.updateContextMenu(saveCleanFiles);
-            if (message.settings?.oldValue?.safeUrl !== message.settings.newValue.safeUrl) {
-                SafeUrl.toggle(message.settings.newValue.safeUrl);
+                    this.updateContextMenu(settingsData.saveCleanFiles);
+                    SafeUrl.toggle(settingsData.safeUrl);
+                    CoreClient.configure({
+                        apikey: settingsData.coreApikey,
+                        endpoint: settingsData.coreUrl,
+                    });
+                    break;
+                case MCL_CONFIG.storageKey.scanHistory: {
+                    await this.scanHistory.load();
+                    break;
+                }
+                default:
+                    break;
             }
-
-            await this.settings.save();
         }
     }
 

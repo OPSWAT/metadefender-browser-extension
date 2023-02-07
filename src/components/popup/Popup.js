@@ -1,23 +1,26 @@
 
 import classNames from 'classnames';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useBackgroundContext } from '../../providers/Background';
+import React, { useEffect, useMemo, useContext } from 'react';
+import GAContext from '../../providers/GAProvider';
+import ConfigContext from '../../providers/ConfigProvider';
 import { goToTab } from '../../services/background/navigation';
-import browserStorage from '../../services/common/browser/browser-storage';
-import { scanHistory } from '../../services/common/persistent/scan-history';
 import ScanFile from '../../services/common/scan-file';
+import ScanHistoryContext from '../../providers/ScanHistoryProvider';
+
 import './Popup.scss';
 
 const Popup = () => {
-    const { gaTrackEvent, MCL } = useBackgroundContext();
-    const [files, setFiles] = useState([]);
-    const scanUrl = MCL.config.mclDomain;
+    
+    const config = useContext(ConfigContext);
+    const { gaTrackEvent } = useContext(GAContext);
+    const { files } = useContext(ScanHistoryContext);
+    const scanUrl = config.mclDomain;
 
     /**
      * Send google analytics data on click event
      */
     const handleGaTrack = () => {
-        gaTrackEvent(['_trackEvent', MCL.config.gaEventCategory.name, MCL.config.gaEventCategory.action.linkClicked, MCL.config.gaEventCategory.label.scanHistory, MCL.config.gaEventCategory.label.scanHistory]);
+        gaTrackEvent(['_trackEvent', config.gaEventCategory.name, config.gaEventCategory.action.linkClicked, config.gaEventCategory.label.scanHistory, config.gaEventCategory.label.scanHistory]);
     };
 
     /**  
@@ -55,25 +58,8 @@ const Popup = () => {
         window.close();
     };
 
-    const messageListener = (changes) => {
-        if (Object.keys(changes).includes('scanHistory')) {
-            setFiles(changes.scanHistory.newValue.files);
-        }
-    };
-
     useEffect(() => {
         gaTrackEvent(['_trackPageview', '/extension/popup']);
-
-        browserStorage.addListener(messageListener);
-
-        (async () => {
-            const data = await scanHistory.load();
-            setFiles(data.scanHistory?.files || []);
-        })();
-
-        return () => {
-            browserStorage.removeListener(messageListener);
-        };
     }, []);
 
     const viewScanHistoryClassName = classNames({ 'd-none': files.length === 0 }, 'popup--scan__footer text-right');

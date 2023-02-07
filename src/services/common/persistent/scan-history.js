@@ -4,10 +4,10 @@ import MCL from '../../../config/config';
 import { SCAN_STATUS } from '../../constants/file';
 import BrowserStorage from './../browser/browser-storage';
 
+const storageKey = MCL.config.storageKey.scanHistory;
+
 /**
  *
- * @param browserStorage
- * @param browserMessage
  * @returns {{files: Array, init: init, save: save, load: load, merge: merge, addFile: addFile, removeFile: removeFile, clear: clear}}
  * @constructor
  */
@@ -17,12 +17,13 @@ function ScanHistory() {
 
         // methods
         init,
-        save,
-        cleanPendingFiles,
         load,
+        save,
         merge,
-        addFile,
+        cleanPendingFiles,
+        updateFileById,
         updateFileByDataId,
+        addFile,
         removeFile,
         clear
     };
@@ -35,13 +36,24 @@ export const scanHistory = ScanHistory();
  * @returns {Promise.<*>}
  */
 async function init() {
-    const data = await BrowserStorage.get(MCL.config.storageKey.scanHistory);
 
-    if (Object.keys(data).length === 0) {
+    const { [storageKey]: historyData } = await BrowserStorage.get(storageKey);
+    if (!historyData) {
         return this.save();
     }
+    
+    this.merge(historyData);
+}
 
-    this.merge(data);
+/**
+ * Load scan history from browser storage
+ * @returns {Promise} { files: [] }
+ */
+async function load() {
+    const { [storageKey]: historyData } = await BrowserStorage.get(storageKey);
+    this.merge(historyData);
+
+    return historyData;
 }
 
 /**
@@ -49,11 +61,9 @@ async function init() {
  * @param newData
  */
 function merge(newData) {
-    const objectToIterate = newData.hasOwnProperty('scanHistory') ? newData.scanHistory : newData;
-
-    for (let key in objectToIterate) {
-        if (Object.prototype.hasOwnProperty.call(objectToIterate, key) === true) {
-            this[key] = objectToIterate[key];
+    for (let key in newData) {
+        if (Object.prototype.hasOwnProperty.call(newData, key)) {
+            this[key] = newData[key];
         }
     }
 }
@@ -63,50 +73,19 @@ function merge(newData) {
  * @returns {Promise.<void>}
  */
 async function save() {
-    const removedFiles = await BrowserStorage.get(MCL.config.storageKey.scanHistory)?.scanHistory?.removedFiles || [];
-    const ids = this.files.map(({ id }) => id)?.filter((id) => !removedFiles.includes(id));
-    console.log('this.files', this.files);
-    console.log('removedfiles', removedFiles);
-    
-    await BrowserStorage.set({
-        [MCL.config.storageKey.scanHistory]: {
-            files: this.files.reduce((acc, val, index) => (ids.indexOf(val.id) === index ? [...acc, val] : acc), []),
-            removedFiles: [...removedFiles]
-            
-        }
-    });
+    await BrowserStorage.set({[storageKey]: {
+        files: this.files
+    }});
 }
 
 async function cleanPendingFiles() {
-    const files = await BrowserStorage.get(MCL.config.storageKey.scanHistory);
-    const allFiles = files?.scanHistory?.files || [];
-    const nrOfTotalFiles = allFiles?.length;
-    const removedFiles = files?.scanHistory?.removedFiles || [];
-    const updatedFiles = allFiles?.filter(file => {
+    const nrOfTotalFiles = this.files.length;
+    this.files = this.files.filter(file => {
         return file.status !== SCAN_STATUS.VALUES.SCANNING;
     });
-    this.files = updatedFiles;
-    console.log('updatedFiles', updatedFiles);
-
-    if (nrOfTotalFiles > updatedFiles?.length) {
-        await BrowserStorage.set({
-            [MCL.config.storageKey.scanHistory]: {
-                files: updatedFiles,
-                removedFiles: [...removedFiles]
-            }
-        });
+    if (nrOfTotalFiles > this.files.length) {
+        this.save();
     }
-}
-
-/**
- * Load scan history from browser storage
- * @returns {Promise.<void>}
- */
-async function load() {
-    const data = await BrowserStorage.get(MCL.config.storageKey.scanHistory);
-    this.merge(data);
-
-    return data;
 }
 
 /**
@@ -115,40 +94,27 @@ async function load() {
  * @returns {Promise<void>}
  */
 async function addFile(file) {
-    const files = await BrowserStorage.get(MCL.config.storageKey.scanHistory);
-    const allFiles = files?.scanHistory?.files || [];
-    const removedFiles = files?.scanHistory?.removedFiles || [];
     
-    allFiles?.unshift(file);
-    this.files = allFiles
-    await BrowserStorage.set({
-        [MCL.config.storageKey.scanHistory]: {
-            files: allFiles,
-            removedFiles: [...removedFiles]
-        }
-    });
+    this.files.unshift(file);
+    this.save();
 }
 
-async function updateFileByDataId(dataId, data) {
-    const files = await BrowserStorage.get(MCL.config.storageKey.scanHistory);;
-    const scanHistoryFiles = files?.scanHistory?.files || [];
-    const removedFiles = files?.scanHistory?.removedFiles || [];
-    await this.load();
-    const fileIndex = scanHistoryFiles?.findIndex(file => file?.dataId === dataId);
-
+async function updateFileById(id, data) {
+    const fileIndex = this.files.findIndex(file => file?.id === id);
     if (fileIndex === -1) {
         return;
     }
+    this.files[fileIndex] = { ...this.files[fileIndex], ...data };
+    this.save();
+}
 
-    const updatedFile = { ...scanHistoryFiles[fileIndex], ...data };
-    scanHistoryFiles[fileIndex] = updatedFile;
-    await BrowserStorage.set({
-        [MCL.config.storageKey.scanHistory]: {
-            files: scanHistoryFiles,
-            removedFiles: [...removedFiles]
-            
-        }
-    });
+async function updateFileByDataId(dataId, data) {
+    const fileIndex = this.files.findIndex(file => file?.dataId === dataId);
+    if (fileIndex === -1) {
+        return;
+    }
+    this.files[fileIndex] = { ...this.files[fileIndex], ...data };
+    this.save();
 }
 
 /**
@@ -158,18 +124,7 @@ async function updateFileByDataId(dataId, data) {
  */
 
 async function removeFile(id) {
-    const files = await BrowserStorage.get(MCL.config.storageKey.scanHistory);
-    console.log('files', files);
-    const updatedFiles = files?.scanHistory?.files?.filter((file) => file.id !== id);
-    const removedFiles = files?.scanHistory?.removedFiles || [];
-    console.log('!!!removedFile', removedFiles);
-    await BrowserStorage.set({
-        [MCL.config.storageKey.scanHistory]: {
-            files: updatedFiles,
-            removedFiles: [...removedFiles, id]
-        }
-    });
-    this.files = updatedFiles;
+    this.files = this.files.filter((file) => file.id !== id);
     await this.save();
 }
 
@@ -178,9 +133,6 @@ async function removeFile(id) {
  * @returns {Promise<void>}
  */
 async function clear() {
-    await BrowserStorage.set({
-        [MCL.config.storageKey.scanHistory]: {
-            files: []
-        }
-    });    
+    this.files = [];
+    this.save();
 }

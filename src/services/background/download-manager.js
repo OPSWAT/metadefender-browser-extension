@@ -8,23 +8,20 @@ class DownloadManager {
         this.fileProcessor = fileProcessor;
         this.settings = settings;
 
-        settings.init();
-
         fileProcessor.addOnScanCompleteListener(this.onScanComplete.bind(this));
     }
 
     async onScanComplete(payload) {
-        const settings = this.settings;
         const { status, downloaded, fileData, linkUrl, name } = payload;
 
-        if (settings?.saveCleanFiles && status === ScanFile.STATUS.CLEAN && !downloaded) {
+        if (this.settings.data.saveCleanFiles && status === ScanFile.STATUS.CLEAN && !downloaded) {
             const dlId = await ScanFile().download(linkUrl, fileData, name);
             this.ignoreDownloads.push(dlId);
         }
     }
 
     trackInProgressDownloads(downloadItem) {
-        if (!settings.scanDownloads) {
+        if (!settings.data.scanDownloads) {
             return;
         }
 
@@ -43,7 +40,7 @@ class DownloadManager {
         const ignoreDownloads = this.ignoreDownloads;
         const activeDownloads = this.activeDownloads;
         
-        if (!this.settings.scanDownloads || typeof downloadItem.filename === 'undefined') {
+        if (!this.settings.data.scanDownloads || typeof downloadItem.filename === 'undefined') {
             return;
         }
 
@@ -77,7 +74,7 @@ class DownloadManager {
     async processCompleteDownloads(downloadItem) {
         const settings = this.settings;
         const activeDownloads = this.activeDownloads;
-        if (!settings?.scanDownloads) {
+        if (!settings.data?.scanDownloads) {
             return;
         }
 

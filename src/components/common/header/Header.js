@@ -1,22 +1,27 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
-import { useBackgroundContext } from '../../../providers/Background';
+
+import ConfigContext from '../../../providers/ConfigProvider';
+import UserContext from '../../../providers/UserProvider';
+
 import '../../../services/common/ga-tracking';
+
 import './Header.scss';
 
 
 const Header = () => {
-    const { apikeyData, MCL } = useBackgroundContext();
-    const [isUserLoggedIn, setIsUserLoggedin] = useState(apikeyData?.loggedIn || false);
+    const config = useContext(ConfigContext);
+    const { apikeyData } = useContext(UserContext);
+    const [ isUserLoggedIn, setIsUserLoggedin ] = useState(apikeyData?.loggedIn || false);
 
     useEffect(() => {
         setIsUserLoggedin(apikeyData?.loggedIn || false);
     }, [apikeyData]);
 
     const handleLogin = () => {
-        _gaq.push(['_trackEvent', MCL.config.gaEventCategory.name, MCL.config.gaEventCategory.action.buttonClickd, MCL.config.gaEventCategory.label.loginButton, MCL.config.gaEventCategory.value.loginButton]);
-        const url = `${MCL.config.mclDomain}/login?extension`;
+        _gaq.push(['_trackEvent', config.gaEventCategory.name, config.gaEventCategory.action.buttonClickd, config.gaEventCategory.label.loginButton, config.gaEventCategory.value.loginButton]);
+        const url = `${config.mclDomain}/login?extension`;
         const windowName = 'Login';
         const windowFeatures = 'menubar=no,location=no,resizable=no,scrollbars=yes,status=yes,width=960,height=550';
 

@@ -74,7 +74,7 @@ const isSafeUrl = (testUrl, urlValidator) => {
 const doSafeRedirect = async (tabId, changeInfo, tab) => {
     const tabUrl = tab.url;
 
-    if (changeInfo.status === 'complete' && !tabUrl.startsWith(safeRedirectEndpoint)) {
+    if (changeInfo.status === 'loading' && !tabUrl.startsWith(safeRedirectEndpoint)) {
         const shortUrl = tabUrl.split('?')[0];
 
         if (!activeRedirects.has(shortUrl)) {
@@ -104,8 +104,8 @@ class SafeUrl {
     }
 
     async init() {
-        const data = await settings.load();
-        this.enabled = data?.settings?.safeUrl || false;
+        const settingsData = await settings.load();
+        this.toggle(settingsData.safeUrl);
     }
 
     toggle(enable) {

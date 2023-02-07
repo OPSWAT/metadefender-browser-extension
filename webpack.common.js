@@ -9,7 +9,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = {
-    entry: { popup: './src/index.js', background: './src/services/background/background-task.js' },
+    entry: { 
+        popup: './src/index', 
+        background: './src/services/background/index',
+    },
     module: {
         rules: [
             {
@@ -95,9 +98,14 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin(),
-        new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
+        new CleanWebpackPlugin({ 
+            cleanStaleWebpackAssets: false 
+        }),
         new HtmlWebpackPlugin({
             template: 'src/components/popup/index.html',
+            excludeChunks: [
+                'background'
+            ]
         }),
         new CopyWebpackPlugin({
             patterns: [
@@ -116,5 +124,8 @@ module.exports = {
         }),
         new Dotenv()
     ],
-    output: { filename: '[name].js', path: path.resolve(__dirname, 'dist') }
+    output: { 
+        filename: '[name].js', 
+        path: path.resolve(__dirname, 'dist') 
+    }
 };
