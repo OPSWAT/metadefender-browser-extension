@@ -9,12 +9,12 @@ const configSettings = require('./config/config')();
 module.exports = {
     webpack: (config) => {
         config.entry = {
-            popup: './index.js', 
+            popup: './index.js',
             background: {
-                import: './services/background/background-task.js',
+                import: './services/background/index.js',
                 filename: 'background.js'
             }
-        },
+        };
 
         config.module.rules = [
             {
@@ -94,6 +94,9 @@ module.exports = {
             new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
             new HtmlWebpackPlugin({
                 template: 'components/popup/index.html',
+                excludeChunks: [
+                    'background'
+                ]
             }),
             new CopyWebpackPlugin({
                 patterns: [
@@ -114,12 +117,6 @@ module.exports = {
         ];
 
         config.resolve.fallback = { 'path': require.resolve('path-browserify') };
-
-        // config.resolve.performance = {
-        //     hints: false,
-        //     maxEntrypointSize: 512000,
-        //     maxAssetSize: 512000
-        // };
 
         return config;
     }

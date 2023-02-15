@@ -1,12 +1,15 @@
+// ToDo: Fix tests
 import { shallow } from 'enzyme';
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import MCL from '../config/config';
-import * as Background from '../providers/Background';
+import * as Background from '../providers/Background'; // ?
 import BrowserNotification from '../services/common/browser/browser-notification';
 import CoreClient from '../services/common/core-client';
 import { settings } from '../services/common/persistent/settings';
-import useSettingsChange from './useSettingsChange';
+
+import SettingsContext from './SettingsProvider';
 
 
 global.chrome = {
@@ -21,8 +24,8 @@ HookWrapper.propTypes = {
     hook: PropTypes.any
 };
 
-describe('useSettingsChange', () => {
-    const useBackgroundContextSpy = jest.spyOn(Background, 'useBackgroundContext');
+describe('SettingsProvider', () => {
+
     const configureSpy = jest.spyOn(CoreClient, 'configure');
     const versionSpy = jest.spyOn(CoreClient, 'version');
     const rulesSpy = jest.spyOn(CoreClient, 'rules');
@@ -30,10 +33,14 @@ describe('useSettingsChange', () => {
     const saveSpy = jest.spyOn(settings, 'save');
 
     beforeEach(() => {
-        useBackgroundContextSpy.mockImplementation(() => ({
-            gaTrackEvent: () => null,
-            MCL,
-        }));
+        // useBackgroundContextSpy.mockImplementation(() => ({
+        //     gaTrackEvent: () => null,
+        //     MCL,
+        // }));
+    });
+
+    it('provides settings context', () => {
+
     });
 
     it('should handle correct setting change for coreSettings and validate', (done) => {

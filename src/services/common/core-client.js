@@ -193,4 +193,3 @@ function getRules() {
 function checkSanitized(downloadUrl) {
     return fetch(downloadUrl).then(response => response.status === 200);
 }
-

@@ -15,7 +15,7 @@ const browserNotification = {
 
 export default browserNotification;
 
-var activeNotifications = {};
+const activeNotifications = {};
 
 /**
  *
@@ -29,8 +29,8 @@ async function create(message, id, fileInfected) {
         icon = (fileInfected) ? '/images/ext-notification-infected.png' : '/images/ext-notification-clean.png';
     }
 
-    const currentSettings = await settings.load();
-    if (!currentSettings.settings.showNotifications) {
+    const settingsData = await settings.load();
+    if (!settingsData.showNotifications) {
         return;
     }
 
@@ -51,7 +51,7 @@ async function create(message, id, fileInfected) {
         }
 
     } catch (error) {
-        console.log(error);
+        console.warn(error);
         global._gaq.push(['exception', { exDescription: 'browser-notification:create' + JSON.stringify(error) }]);
     }
 }

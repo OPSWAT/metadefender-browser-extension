@@ -48,7 +48,7 @@ describe('scan-file', () => {
 
                 expect(mockFetch).toHaveBeenCalledWith('http://mock url', { method: 'HEAD' });
             } catch (error) {
-                console.log('Testing error', error);
+                console.warn('Testing error', error);
             }
         });
     });

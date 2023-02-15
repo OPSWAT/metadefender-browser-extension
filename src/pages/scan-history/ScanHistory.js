@@ -1,55 +1,45 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
+
 import SidebarLayout from '../../components/common/sidebar-layout/SidebarLayout';
 import ScanHistoryTable from '../../components/scan-history-table/ScanHistoryTable';
-import { useBackgroundContext } from '../../providers/Background';
-import browserStorage from '../../services/common/browser/browser-storage';
-import { scanHistory } from '../../services/common/persistent/scan-history';
 import ScanFile from '../../services/common/scan-file';
+
+import ConfigContext from '../../providers/ConfigProvider';
+import GAContext from '../../providers/GAProvider';
+import ScanHistoryContext from '../../providers/ScanHistoryProvider';
+
 import './ScanHistory.scss';
 
 const ScanHistory = () => {
-    const { gaTrackEvent, MCL } = useBackgroundContext();
-    const [searchValue, setSearchValue] = useState('');
-    const [files, setFiles] = useState([]);
-    const totalScannedFiles = files.length;
-    const scanUrl = MCL.config.mclDomain;
+
+    const config = useContext(ConfigContext);
+    const { gaTrackEvent } = useContext(GAContext);
+    const { files, clearnScanHistory, removeScanHistoryFile } = useContext(ScanHistoryContext);
+    const [ searchValue, setSearchValue ] = useState('');
+    const [ totalScannedFiles, setTotalScannedFiles ] = useState(files.length) ;
+    const scanUrl = config.mclDomain;
 
     useEffect(() => {
-        gaTrackEvent(['_trackPageview', '/extension/history']);
-
         (async () => {
-            const data = await scanHistory.load();
-            setFiles(data.scanHistory?.files || []);
+            gaTrackEvent(['_trackPageview', '/extension/history']);
+            setTotalScannedFiles(files.length);
         })();
-
-        browserStorage.addListener(messageListener);
-
-        return () => {
-            browserStorage.removeListener(messageListener);
-        };
-    }, []);
-
-
-    const messageListener = (changes) => {
-        if (Object.keys(changes).includes('scanHistory')) {
-            setFiles(changes.scanHistory.newValue.files);
-        }
-    };
+    }, [files]);
 
     /** Delete all existing history */
     const clearScanHistory = async () => {
         if (confirm(chrome.i18n.getMessage('deleteHistoryConfirmation'))) {
-            gaTrackEvent(['_trackEvent', MCL.config.gaEventCategory.name, MCL.config.gaEventCategory.action.buttonClickd, MCL.config.gaEventCategory.label.clearHistoryButton, MCL.config.gaEventCategory.value.clearHistoryButton]);
-            await scanHistory.clear();
+            await clearnScanHistory();
+            gaTrackEvent(['_trackEvent', config.gaEventCategory.name, config.gaEventCategory.action.buttonClickd, config.gaEventCategory.label.clearHistoryButton, config.gaEventCategory.value.clearHistoryButton]);
         }
     };
 
     /** Delete a file from the history */
     const removeFile = async (event, file) => {
         event.preventDefault();
-        gaTrackEvent(['_trackEvent', MCL.config.gaEventCategory.name, MCL.config.gaEventCategory.action.buttonClickd, MCL.config.gaEventCategory.label.clearHistoryButton, MCL.config.gaEventCategory.value.deleteItemButton]);
-        await scanHistory.removeFile(file);
+        await removeScanHistoryFile(file);
+        gaTrackEvent(['_trackEvent', config.gaEventCategory.name, config.gaEventCategory.action.buttonClickd, config.gaEventCategory.label.clearHistoryButton, config.gaEventCategory.value.deleteItemButton]);
     };
 
     /**  
@@ -77,20 +67,21 @@ const ScanHistory = () => {
         if (file.dataId) {
             return `${scanUrl}/results/file/${file.dataId}/regular/overview`;
         }
-
         return `${scanUrl}/results/file/${file.md5}/hash/overview`;
     };
 
-    const scanHistoryTableData = files.map((item) => ({
-        fileName: item.fileName,
-        scanUrl: item.scanResults || getScanUrl(item),
-        hash: item.sha256,
-        scanTime: item.scanTime,
-        results: item.statusLabel,
-        status: item.status,
-        id: item.id, 
-        useCore: item?.useCore
-    }));
+    const scanHistoryTableData = useMemo(() => {
+        return files?.map((item) => ({
+            fileName: item.fileName,
+            scanUrl: item.scanResults || getScanUrl(item),
+            hash: item.sha256,
+            scanTime: item.scanTime,
+            results: item.statusLabel,
+            status: item.status,
+            id: item.id, 
+            useCore: item?.useCore
+        }));
+    }, [files]);
 
     const handleSearch = (e) => setSearchValue(e.target?.value);
 
@@ -134,8 +125,8 @@ const ScanHistory = () => {
 
     return <SidebarLayout
         className='history'
-        content={content}
         currentPage='history'
+        content={content}
     />;
 };
 

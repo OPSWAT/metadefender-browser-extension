@@ -12,19 +12,6 @@ import { settings } from '../common/persistent/settings';
 
 import '../common/ga-tracking';
 
-/**
- * Get the apikey value from apikeyInfo object
- * 
- * @param {*} apikeyInfo API Key info object
- * @returns {string} apikey info value
- */
-const getApikeyValue = (apikeyInfo) => {
-    if (typeof apikeyInfo.apikey === 'string') {
-        return apikeyInfo.apikey;
-    }
-    return apikeyInfo.apikey.apikey;
-};
-
 export const ON_SCAN_COMPLETE_LISTENERS = [];
 class FileProcessor {
     /**
@@ -35,29 +22,28 @@ class FileProcessor {
      */
     async processTarget(linkUrl, downloadItem) {
         await apikeyInfo.load();
-        await scanHistory.load();
-        if (!apikeyInfo.apikey) {
+        if (!apikeyInfo.data.apikey) {
             BrowserNotification.create(chrome.i18n.getMessage('undefinedApiKey'));
             return;
         }
         
-
         const file = new ScanFile();
 
         if (file.isSanitizedFile(linkUrl)) {
             return;
         }
-
+         
         if (downloadItem) {
             file.fileName = downloadItem.filename.split('/').pop();
             file.size = downloadItem.fileSize;
         }
+
         else {
             file.fileName = linkUrl.split('/').pop();
             file.fileName = file.fileName.split('?')[0];
 
             try {
-                file.size = await file.getFileSize(linkUrl, file.fileName);
+                file.size = file.getFileSize(linkUrl, file.fileName);
             }
             catch (errMsg) {
                 if (errMsg) {
@@ -80,8 +66,6 @@ class FileProcessor {
         }
 
         file.statusLabel = file.getScanStatusLabel();
-
-        await scanHistory.addFile(file);
 
         let fileData = null;
 
@@ -112,7 +96,9 @@ class FileProcessor {
             file.fileName = file.md5;
         }
 
-        await this.scanFile(file, linkUrl, fileData, downloadItem, settings.useCore);
+        await scanHistory.addFile(file);
+
+        await this.scanFile(file, linkUrl, fileData, downloadItem, settings.data.useCore);
     }
 
     /**
@@ -178,20 +164,19 @@ class FileProcessor {
         }
         file.sha256 = info.file_info.sha256;
         file.dataId = info.data_id;
-
+        
         if (file.useCore) {
-            if (settings.coreV4 ===true ){
-                file.scanResults = `${settings.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
-
+            if (settings.data.coreV4 === true){
+                file.scanResults = `${settings.data.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
             } else {
-                file.scanResults = `${settings.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
+                file.scanResults = `${settings.data.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
             }
             const postProcessing = info.process_info?.post_processing;
             const sanitizationSuccessfull = postProcessing?.sanitization_details?.description === 'Sanitized successfully.';
             const sanitized = postProcessing?.actions_ran.indexOf('Sanitized') !== -1;
 
             if (sanitizationSuccessfull || sanitized) {
-                const sanitizedFileURL = `${settings.coreUrl}/file/converted/${file.dataId}?apikey=${settings.coreApikey}`;
+                const sanitizedFileURL = `${settings.data.coreUrl}/file/converted/${file.dataId}?apikey=${settings.data.coreApikey}`;
                 // verify if the user has access
                 if (await CoreClient.file.checkSanitized(sanitizedFileURL)) {
                     file.sanitizedFileURL = sanitizedFileURL;
@@ -205,6 +190,7 @@ class FileProcessor {
             }
         }
         
+        await scanHistory.updateFileById(file.id, file);
         await scanHistory.save();
 
         let notificationMessage = file.fileName + chrome.i18n.getMessage('fileScanComplete');
@@ -230,23 +216,23 @@ class FileProcessor {
      */
     async startStatusPolling(file, linkUrl, fileData, downloaded) {
         let response;
-
+       
         if (file.useCore) {
-            if (settings.coreV4 === true){
-                file.scanResults = `${settings.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
+            if (settings.data.coreV4 === true){
+                file.scanResults = `${settings.data.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
             } else {
-                file.scanResults = `${settings.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
+                file.scanResults = `${settings.data.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
             }
+            await scanHistory.save();
             response = await CoreClient.file.poolForResults(file.dataId, 3000);
         } else {
             file.scanResults = `${MCL.config.mclDomain}/results/file/${file.dataId}/regular/overview`;
-            response = await MetascanClient.setAuth(getApikeyValue(apikeyInfo)).file.poolForResults(file.dataId, 3000);
+            await scanHistory.save();
+            response = await MetascanClient.setAuth(apikeyInfo.data.apikey).file.poolForResults(file.dataId, 3000);
         }
-
-        await scanHistory.save();
-
+        
         if (response.error) {
-            return;
+            return; 
         }
 
         await this.handleFileScanResults(file, response, linkUrl, fileData, downloaded);
@@ -263,7 +249,6 @@ class FileProcessor {
     async scanFile(file, linkUrl, fileData, downloadItem, useCore) {
         try {
             file.useCore = useCore;
-            await scanHistory.save();
 
             const response = useCore
                 ? await this.scanWithCore(file, fileData)
@@ -273,14 +258,20 @@ class FileProcessor {
                 throw response;
             }
 
-            file.dataId = response.data_id;
-
-            await scanHistory.save();
+            file.dataId = response?.data_id;
+            
             await this.startStatusPolling(file, linkUrl, fileData, !!downloadItem);
         } catch (error) {
+            file.scan_results = {
+                scan_all_result_i: 10
+            };
+            file.status = file.getScanStatus(file.scan_results.scan_all_result_i);
+            file.statusLabel = file.getScanStatusLabel(file.scan_results.scan_all_result_i);
             BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));
             global._gaq?.push(['exception', { exDescription: 'file-processor:scanFile' + JSON.stringify(error) }]);
         }
+
+        scanHistory.updateFileById(file.id, file);
     }
 
     /**
@@ -296,7 +287,7 @@ class FileProcessor {
             response = await CoreClient.file.upload({
                 fileData: fileData,
                 fileName: file.fileName,
-                rule: settings.coreRule
+                rule: settings.data.coreRule
             });
         }
 
@@ -310,15 +301,20 @@ class FileProcessor {
      * @param {*} fileData file content
      */
     async scanWithCloud(file, fileData) {
-        let response = await MetascanClient.setAuth(getApikeyValue(apikeyInfo)).hash.lookup(file.md5);
+        let response;
+        try {
+            response = await MetascanClient.setAuth(apikeyInfo.data.apikey).hash.lookup(file.md5);
 
-        if (response?.error?.code === MetascanClient.ERROR_CODE.HASH_NOT_FOUND) {
-            response = await MetascanClient.setAuth(getApikeyValue(apikeyInfo)).file.upload({
-                fileName: file.fileName,
-                fileData,
-                sampleSharing: settings.shareResults,
-                canBeSanitized: file.canBeSanitized
-            });
+            if (!response || !response.data_id || response.error) {
+                response = await MetascanClient.setAuth(apikeyInfo.data.apikey).file.upload({
+                    fileName: file.fileName,
+                    fileData,
+                    sampleSharing: settings.data.shareResults,
+                    canBeSanitized: file.canBeSanitized
+                });
+            }
+        } catch (error) {
+            console.warn(error);
         }
 
         return response;

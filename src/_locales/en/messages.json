@@ -48,7 +48,7 @@
       "description": ""
     },
     "aboutThankYou": {
-      "message": "Thank you for installing <strong>OPSWAT File Security for Chrome</strong>! This extension gives you the ability to scan downloads* for malware with 30+ anti-malware engines using OPSWAT's <a target='_blank' href='__mclDomain__/#!/?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud</a>.",
+      "message": "Thank you for installing <strong>OPSWAT File Security for Chrome</strong>! This extension gives you the ability to scan downloads* for malware with 30+ anti-malware engines using OPSWAT's <a target='_blank' href=https://metadefender.opswat.com/?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud</a>.",
       "description": ""
     },
     "aboutApiKeyInfo": {
@@ -60,7 +60,7 @@
       "description": ""
     },
     "aboutMoreAboutMCL": {
-      "message": "Read more about  <a target='_blank' href='__mclDomain__/licensing?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud Licensing</a> options",
+      "message": "Read more about  <a target='_blank' href='https://metadefender.opswat.com/licensing?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud Licensing</a> options",
       "description": ""
     },
     "aboutHowToUse": {
@@ -105,7 +105,7 @@
       "description": ""
     },
     "shareResultsSub": {
-      "message": "You must have a paid account to disable this option. <a target='_blank' href='__opswatDomain__/products/metadefender/enterprise?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>Learn more</a>",
+      "message": "You must have a paid account to disable this option. <a target='_blank' href='https://www.opswat.com/products/metadefender/enterprise?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>Learn more</a>",
       "description": ""
     },
     "showNotifications": {

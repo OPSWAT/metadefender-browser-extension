@@ -1,11 +1,15 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+
+import { SettingsProvider } from './providers/SettingsProvider';
+import { ScanHistoryProvider } from './providers/ScanHistoryProvider';
+
 import Popup from './components/popup/Popup';
 import About from './pages/about/About';
 import ScanHistory from './pages/scan-history/ScanHistory';
 import Settings from './pages/settings/Settings';
-import { useLocation } from 'react-router-dom';
+
 
 import './App.scss';
 
@@ -18,19 +22,33 @@ function App () {
         <Routes>
             <Route 
                 path='/settings'
-                element={<Settings />}
+                element={
+                    <SettingsProvider>
+                        <Settings />
+                    </SettingsProvider>
+                }
             />
             <Route 
                 path='/about'
-                element={<About />}
+                element={
+                    <About />
+                }
             />
             <Route 
                 path='/history'
-                element={<ScanHistory />}
+                element={
+                    <ScanHistoryProvider>
+                        <ScanHistory />
+                    </ScanHistoryProvider>
+                }
             />
             <Route 
                 path='/'
-                element={<Popup />}
+                element={
+                    <ScanHistoryProvider>
+                        <Popup />
+                    </ScanHistoryProvider>
+                }
             />
         </Routes>
     );

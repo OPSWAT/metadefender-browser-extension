@@ -119,8 +119,11 @@ function hashLookup(hash) {
     const options = {
         headers: authHeader
     };
-
-    return fetch(restEndpoint, options).then(data => data.json());
+    
+    return fetch(restEndpoint, options).then(response => response.json()).catch(error => {
+        console.warn(error);
+        return { error };
+    });
 }
 
 /**
@@ -159,7 +162,10 @@ function fileUpload({ fileName, fileData, sampleSharing, password, canBeSanitize
         body: fileData
     };
 
-    return fetch(restEndpoint, options).then(data => data.json());
+    return fetch(restEndpoint, options).then(response => response.json()).catch(error => {
+        console.warn(error);
+        return { error };
+    });
 }
 
 /**

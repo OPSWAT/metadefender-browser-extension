@@ -3,31 +3,34 @@
 import MCL from '../../../config/config';
 import BrowserStorage from '../../common/browser/browser-storage';
 
+const storageKey = MCL.config.storageKey.apikey;
+
 /**
  *
  * @returns {{apikey: null, reputationLimit: null, preventionLimit: null, feedLimit: null, paidUser: null, limitInterval: string, loggedIn: boolean, init: init, save: save, load: load, parseMclInfo: parseMclInfo, merge: merge}}
  * @constructor
  */
 function ApikeyInfo() {
-
     return {
-        apikey: null,
-        reputationLimit: null,
-        preventionLimit: null,
-        feedLimit: null,
-        paidUser: null,
-        limitInterval: 'Daily',
-        maxUploadFileSize: null,
-        sandboxLimit: null,
-        loggedIn: false,
-        organization: null,
+        data: {
+            apikey: null,
+            reputationLimit: null,
+            preventionLimit: null,
+            feedLimit: null,
+            paidUser: null,
+            limitInterval: 'Daily',
+            maxUploadFileSize: null,
+            sandboxLimit: null,
+            loggedIn: false,
+            organization: null,
+        },
 
         // methods
-        init: init,
-        save: save,
-        load: load,
-        parseMclInfo: parseMclInfo,
-        merge: merge
+        init,
+        save,
+        load,
+        parseMclInfo,
+        merge,
     };
 }
 
@@ -38,21 +41,18 @@ export const apikeyInfo = ApikeyInfo();
  * @returns {Promise.<*>}
  */
 async function init() {
-    const data = await BrowserStorage.get(MCL.config.storageKey.apikey);
-
-    if (typeof data === 'undefined') {
+    const { [storageKey]: apikeyData } = await BrowserStorage.get(storageKey);
+    if (!apikeyData) {
         return this.save();
     }
 
-    this.merge(data);
-
-    return data;
+    this.merge(apikeyData);
 }
 
 function merge(newData) {
     for (let key in newData) {
         if (Object.prototype.hasOwnProperty.call(newData, key) === true) {
-            this[key] = newData[key];
+            this.data[key] = newData[key];
         }
     }
 }
@@ -62,20 +62,7 @@ function merge(newData) {
  * @returns {Promise.<*>}
  */
 async function save() {
-    await BrowserStorage.set({
-        [MCL.config.storageKey.apikey]: {
-            apikey: this.apikey,
-            reputationLimit: this.reputationLimit,
-            preventionLimit: this.preventionLimit,
-            feedLimit: this.feedLimit,
-            paidUser: this.paidUser,
-            limitInterval: this.limitInterval,
-            maxUploadFileSize: this.maxUploadFileSize,
-            sandboxLimit: this.sandboxLimit,
-            loggedIn: this.loggedIn,
-            organization: this.organization || null
-        }
-    });
+    await BrowserStorage.set({[storageKey]: this.data});
 }
 
 /**
@@ -83,14 +70,14 @@ async function save() {
  * @param info
  */
 function parseMclInfo(info) {
-    this.reputationLimit = info.limit_reputation;
-    this.preventionLimit = info.limit_prevention;
-    this.feedLimit = info.limit_feed;
-    this.paidUser = info.paid_user;
-    this.limitInterval = info.time_interval;
-    this.maxUploadFileSize = info.max_upload_file_size;
-    this.sandboxLimit = info.limit_sandbox;
-    this.organization = info.organization || null;
+    this.data.reputationLimit = info.limit_reputation;
+    this.data.preventionLimit = info.limit_prevention;
+    this.data.feedLimit = info.limit_feed;
+    this.data.paidUser = info.paid_user;
+    this.data.limitInterval = info.time_interval;
+    this.data.maxUploadFileSize = info.max_upload_file_size;
+    this.data.sandboxLimit = info.limit_sandbox;
+    this.data.organization = info.organization || null;
 }
 
 /**
@@ -98,8 +85,8 @@ function parseMclInfo(info) {
  * @returns {Promise.<void>}
  */
 async function load() {
-    const data = await BrowserStorage.get(MCL.config.storageKey.apikey);
-    this.merge(data);
+    const { [storageKey]: apikeyData } = await BrowserStorage.get(storageKey);
+    this.merge(apikeyData);
 
-    return data;
+    return apikeyData;
 }
