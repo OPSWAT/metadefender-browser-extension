@@ -1,0 +1,285 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import 'bootstrap/scss/mixins/_breakpoints.scss';
+
+@import "./fonts";
+@import "./colors";
+/** overwrite bootstrap rules **/
+
+body {
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  overflow-y: scroll;
+
+  -webkit-font-smoothing: antialiased;
+  color: $colorBlack;
+  background-color: $colorWhite;
+  
+  .list-group {
+    margin-bottom: 0;
+  }
+
+  .has-error,
+  .help-block {
+    color: $dareDevil;
+  }
+
+  .has-error .form-control-feedback {
+    color: $dareDevil;
+  }
+
+  .has-error .form-control {
+    border-color: $dareDevil;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+  }
+
+  .list-group-item {
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid $colorGreyLight;
+    padding: $padding;
+  }
+
+  .table > :not(:first-child) {
+    border-top: none !important;
+  }
+
+  .list-group-item:first-child {
+    border-top: none;
+    border-radius: 0;
+  }
+
+  .list-group-item:last-child {
+    border-radius: 0;
+  }
+
+  .table-bordered {
+    border: 1px solid $colorGrey;
+  }
+
+  .table-bordered > tbody > tr > td {
+    border: none;
+  }
+
+  .table > thead > tr > th,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > tbody > tr > td,
+  .table > tfoot > tr > td {
+    padding: 18px 20px 17px;
+  }
+
+  .form-control {
+    border: 1px solid $colorGrey;
+    border-radius: 0;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  #coreV4 {
+    height: 20px !important;
+    width: 3% !important;
+  }
+
+
+  .input-group-addon {
+    border: 1px solid $colorGrey;
+    background-color: $colorWhite;
+    border-radius: 0;
+    color: $secondaryColor;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-group .form-control:last-child {
+    border-left: none;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+
+    &.ml-auto {
+      margin-left: auto !important;
+    }
+
+    &.align-items-start {
+      label {
+        margin-top: 10px;
+      }
+    }
+  }
+
+  label {
+    &.text-right {
+      text-align: right;
+    }
+
+    &.mr-2 {
+      margin-right: 10px;
+    }
+  }
+
+  .form-control:focus {
+    border-color: $colorGrey;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  a, button {
+    &.btn {
+      border: 1px solid;
+      border-radius: 0;
+      padding: 12px 20px 11px;
+      text-transform: uppercase;
+      font-weight: 500;
+
+      &.btn-blue {
+        background-color: $secondaryColor;
+        border-color: $secondaryColor;
+        color: $colorWhite;
+
+        &:hover {
+          background-color: #1f56bc;
+          border-color: #1f56bc;
+          color: $colorWhite;
+        }
+      }
+
+      &.btn-blue-outline {
+        background-color: $colorWhite;
+        border-color: $secondaryColor;
+        color: $secondaryColor;
+
+        &:hover {
+          border-color: $primaryColor;
+          color: $primaryColor;
+        }
+      }
+
+      &.btn-white {
+        background-color: $colorWhite;
+        border-color: $colorWhite;
+        color: $secondaryColor;
+
+        &:hover {
+          background-color: $colorGrey;
+          border-color: $primaryColor;
+          color: $secondaryColor;
+        }
+      }
+    }
+  }
+
+  .btn-black {
+    background-color: $colorBlack;
+    color: $colorWhite;
+  }
+
+  .btn-black:hover, .btn-black:focus, .btn-black:active {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak{
+    display: none !important;
+  }
+}
+
+/** common **/
+.text-11 {
+  font-size: 11px;
+}
+
+.text-12 {
+  font-size: 12px;
+}
+
+.text-13 {
+  font-size: 13px;
+}
+
+.text-14 {
+  font-size: 14px;
+}
+
+.text-15 {
+  font-size: 15px;
+}
+
+.text-16 {
+  font-size: 16px;
+}
+
+.font-regular {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 600;
+}
+
+a {
+  text-decoration: none;
+  color: $secondaryColor;
+
+  &:visited, &:focus, &:active {
+    text-decoration: none;
+    color: $secondaryColor;
+  }
+
+  &:hover {
+    text-decoration: none;
+    color: $primaryColor;
+  }
+}
+
+.header {
+  background-color: $primaryColor;
+  padding: 35px 0;
+  border-bottom: 1px solid $colorGrey;
+  min-height: 109px;
+
+  .metadefender-chrome-logo {
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: block;
+    width: 117px;
+    height: 53px;
+    margin-top: -5px;
+  }
+}
+
+.mcl-icon {
+  font-family: mcl-ext-icons;
+  width: 32px;
+  text-align: center;
+  display: inline-block;
+
+  &.icon-cancel, &.icon-help {
+    color: $red;
+  }
+
+  &.icon-ok {
+    color: $green;
+  }
+
+  &.icon-spin {
+    color: $blue;
+  }
+}
+
+.center {
+  text-align: center;
+}
+
+.no-scans {
+  text-align: center;
+  padding: $padding;
+}

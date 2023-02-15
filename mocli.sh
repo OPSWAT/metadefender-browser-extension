@@ -9,13 +9,15 @@ ENV="qa"
 declare -A CMDS_DESC
 CMDS_DESC=(
     [developer]="Setup your developer environment"
-    [config]="Overwrite common configuration file with specified environment. Usage: mocli config <local|dev|qa|prod>"
     [watch]="Starts a livereload server and watches all assets"
-    [test]="Runns unit tests and generates code coverage reports"
+    [test]="Runns unit tests"
+    [coverage]="Runns unit tests and generates code coverage reports"
     [release]="Create release versions using git-flow. Usage: mocli release [start|finish] <version>"
     [release-p]="Create release version and increases patch number"
     [hotfix]="Create a qa release from current branch and uploads it to bitbucket"
+    [docs]="Create a documentation for the components"
     [pack]="Zips the dist/<vendor> directory. Usage: mocli pack [--production] [--vendor=firefox] [--env=qa]"
+    [sonar-scan]="Running SonarQube Scanner from the Docker image. Usage: sonar-scan [<token>]"
     [help]="Show this message"
 )
 
@@ -84,7 +86,8 @@ function read_env() {
 
 function copy_secrets() {
     echo "-> copy secrets"
-    aws s3 cp s3://mcl-artifacts/mcl-browser-extension/secrets.json . >/dev/null 2>&1
+    aws s3 cp s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/secrets.json ./secrets.json >/dev/null 2>&1
+
     if [[ "$?" != "0" ]]; then
         echo -e "{\n\t\"googleAnalyticsId\": \"\"\n}" >./secrets.json
         echo -e "\nFailed to copy secrets from s3. Please update ./secrets.json manually.\n"
@@ -98,9 +101,32 @@ function copy_envs() {
         ENVS=(${1})
     fi
     for env in ${ENVS[@]}; do
-        echo s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json
-        aws s3 cp s3://mcl-artifacts/mcl-browser-extension/app/config/${env}.json ./app/config/ >/dev/null 2>&1
+        echo s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json
+        aws s3 cp s3://mcl-artifacts-frontend-${ENV}/mcl-browser-extension/app/config/${env}.json ./config/ >/dev/null 2>&1
     done
+}
+
+function sonar_scan() {
+    SONARQUBE_URL=https://sonar.opswat.com
+    SONARQUBE_CACHE_DIR=${CWD}/.sonar/cache
+    if [[ "${1}" != "" ]]; then
+        SONARQUBE_TOKEN=${1}
+    else
+        echo "Please pass 'SONARQUBE_TOKEN' as an argument and run the scanner again"
+        exit 1
+    fi
+
+    docker run \
+        --rm \
+        -e SONAR_HOST_URL="${SONARQUBE_URL}" \
+        -e SONAR_LOGIN="${SONARQUBE_TOKEN}" \
+        -v ${SONARQUBE_CACHE_DIR}:/opt/sonar-scanner/.sonar/cache \
+        -v "${CWD}:/usr/src" \
+        sonarsource/sonar-scanner-cli
+}
+
+function pack_extension() {
+    webextension-toolbox build -s ./src --config ./webextension-toolbox-config.js --no-manifest-validation ${VENDOR}
 }
 
 if [[ $# == 0 ]]; then
@@ -111,22 +137,24 @@ fi
 while [[ $# -gt 0 ]]; do
     case "${1}" in
     developer)
-        echo Nodejs version: $(node -v)
         # copy the google analytics ID. Create this file manually if you don't have access
         copy_secrets
         copy_envs
 
-        echo "-> install gulp-cli"
-        npm list -g --depth=0 gulp-cli >/dev/null 2>&1 || npm i -g gulp-cli >/dev/null
+        echo "-> install webpack-cli"
+        npm list -g --depth=0 webpack-cli >/dev/null 2>&1 || npm i -g webpack-cli >/dev/null
+
+        if [[ $(npm list -g -s | grep -c webextension-toolbox) -eq 0 ]]; then
+            echo "Installing webextension-toolbox globally"
+            npm install -g @webextension-toolbox/webextension-toolbox
+        fi
 
         echo "-> install packages"
-        npm install --legacy-peer-deps >/dev/null
+        rm -rf ./node_modules/
+        npm ci --legacy-peer-deps
 
         echo "-> copy git-flow hooks"
         cp git_hooks/* .git/hooks/
-
-        echo "-> generate config: prod"
-        gulp config --prod >/dev/null
 
         gen_cmp
 
@@ -141,22 +169,37 @@ while [[ $# -gt 0 ]]; do
         copy_envs ${2}
         exit 0
         ;;
-    config)
-        TOKEN_OK=$(in_array "${2}" "${ENVS[@]}")
-        if [[ ${TOKEN_OK} = 0 ]]; then
-            gulp config --${2}
-        else
-            echo "Invalid environment token!"
-            echo "Usage: mocli config <local|dev|qa|prod>"
-        fi
+    watch)
+        export ENVIRONMENT=${2:-${ENV}}
+        npm run start
         exit 0
         ;;
-    watch)
-        gulp --watch
+    build)
+        echo "Removing dist/ folder"
+        rm -rf dist
+
+        echo "Building Chrome Extensions for ${ENVIRONMENT}"
+        export ENVIRONMENT=${2:-${ENV}}
+        npm run build
         exit 0
         ;;
     test)
         npm run test
+        exit 0
+        ;;
+    coverage)
+        npm run test:coverage
+        exit 0
+        ;;
+    docs)
+        if [[ $(npm list -g -s | grep -c jsdoc) -eq 0 ]]; then
+            echo "Installing jsdoc globally"
+            npm install -g jsdoc
+        fi
+
+        echo "Generating documentation to docs/"
+        jsdoc -c jsdoc.conf.json
+
         exit 0
         ;;
     release)
@@ -188,8 +231,9 @@ while [[ $# -gt 0 ]]; do
         publish)
             read_env
 
-            gulp config --${ENV}
-            gulp pack --production --env=${ENV}
+            export ENVIRONMENT=${2:-${ENV}}
+            VENDOR=${3:-'chrome'}
+            pack_extension
             ;;
         esac
 
@@ -224,8 +268,9 @@ while [[ $# -gt 0 ]]; do
         publish)
             read_env
 
-            gulp config --${ENV}
-            gulp pack --production --env=${ENV}
+            export ENVIRONMENT=${2:-${ENV}}
+            VENDOR=${3:-'chrome'}
+            pack_extension
             ;;
         esac
         ;;
@@ -257,23 +302,29 @@ while [[ $# -gt 0 ]]; do
         publish)
             read_env
 
-            gulp config --${ENV}
-            gulp pack --production --env=${ENV}
+            export ENVIRONMENT=${2:-${ENV}}
+            VENDOR=${3:-'chrome'}
+            pack_extension
             ;;
         esac
 
         exit 0
         ;;
     pack)
-        CMD='gulp'
-        while [[ $# -gt 0 ]]; do
-            CMD="${CMD} ${1}"
-            shift
-        done
-        ${CMD}
+        read_env
+
+        export ENVIRONMENT=${2:-${ENV}}
+        VENDOR=${3:-'chrome'}
+
+        pack_extension
+        exit 0
         ;;
     gen-cmp)
         gen_cmp
+        ;;
+    sonar-scan)
+        sonar_scan ${2}
+        exit $?
         ;;
     help)
         printHelp

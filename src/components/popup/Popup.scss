@@ -1,0 +1,62 @@
+@import "../../assets/style/colors.scss";
+
+/** rules **/
+.popup {
+  &--wrapper {
+    width: 350px;
+    padding: $padding;
+  }
+
+  &--header {
+    min-height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  
+    &__logo {
+      background-image: url('../../assets/images/metadefender-chrome-black.svg');
+      position: relative;
+      margin-top: 0;
+      background-size: contain;
+      background-repeat: no-repeat;
+      display: block;
+      width: 117px;
+      height: 53px;
+    }
+  
+    &__btn {
+      background: $colorWhite;
+      border: 1px solid $colorGrey;
+      padding: 4px 5px 3px 5px;
+      display: block;
+    }
+  }
+
+  &--scan__history {
+    .list-group {
+      border-top: 1px solid $colorGreyLight;
+      border-bottom: 1px solid $colorGreyLight;
+      padding-bottom: 1px;
+      margin: $padding -20px;
+
+      .list-group-item {
+        &:not(:last-of-type) {
+          border-bottom: 2px solid $colorGreyLight;
+        }
+      }
+    }
+  }
+
+  &--footer {
+    background-color: $colorWhite;
+    border-top: 1px solid $colorGrey;
+    padding: $padding;
+    height: 60px;
+  }
+
+  .header, .footer{
+    padding: $padding;
+    background-color: $colorWhite;
+  }
+}

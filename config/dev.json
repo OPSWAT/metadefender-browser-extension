@@ -1,0 +1,5 @@
+{
+  "env": "dev",
+
+  "mclDomain": "https://mcl-dev.opswat.com"
+}

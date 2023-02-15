@@ -4,7 +4,8 @@ module.exports = function(config) {
         basePath: '',
         singleRun: true,
         frameworks: [
-            'jasmine'
+            'jasmine',
+            'webpack'
         ],
         client: {
             jasmine: {

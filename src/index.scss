@@ -1,0 +1,30 @@
+@import "./node_modules/bootstrap/scss/functions";
+@import "./node_modules/bootstrap/scss/variables";
+@import './node_modules/bootstrap/scss/mixins/_breakpoints.scss';
+
+@import './assets/fonts/fontello/css/animation.css';
+@import './assets/fonts/fontello/css/mcl-ext-icons.css';
+
+@import './assets/style/main.scss';
+@import './assets/style/fonts.scss';
+@import './assets/style/colors.scss';
+
+
+html, 
+body {
+  font-family: Roboto, sans-serif !important;
+  font-weight: 400;
+  font-size: 13px;
+
+  -webkit-font-smoothing: antialiased;
+  color: $colorBlack;
+  background-color: $colorWhite;
+
+  a {
+    &:link,
+    &:visited,
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
