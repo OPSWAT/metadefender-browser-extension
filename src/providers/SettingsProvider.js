@@ -16,6 +16,32 @@ import browserStorage from '../services/common/browser/browser-storage';
 const SettingsContext = createContext();
 export default SettingsContext;
 
+export const validateCoreSettings = async (newApikey, newUrl) => {
+    const apikey = newApikey || settings.coreApikey;
+    const endpoint = newUrl || settings.coreUrl;
+    
+    if (!apikey || !endpoint) {
+        return;
+    }
+
+    CoreClient.configure({apikey, endpoint});
+
+    try {
+        const versionResult = await CoreClient.version();
+        const coreV4 = (versionResult?.version.split('.')[0] === '4') || settings.coreV4;
+        const rulesResult = await CoreClient.rules('');
+        const rules = rulesResult.map(rule => rule.name);
+        return {
+            coreV4,
+            rules
+        };
+    } catch (error) {
+        console.warn(error);
+    }
+
+    return false;
+};
+
 export const SettingsProvider = ({ children }) => {
 
     const config = useContext(ConfigContext);
@@ -34,31 +60,6 @@ export const SettingsProvider = ({ children }) => {
         }
     }
 
-    const validateCoreSettings = async (newApikey, newUrl) => {
-        const apikey = newApikey || settings.coreApikey;
-        const endpoint = newUrl || settings.coreUrl;
-        
-        if (!apikey || !endpoint) {
-            return;
-        }
-
-        CoreClient.configure({apikey, endpoint});
-
-        try {
-            const versionResult = await CoreClient.version();
-            const coreV4 = (versionResult?.version.split('.')[0] === '4') || settings.coreV4;
-            const rulesResult = await CoreClient.rules('');
-            const rules = rulesResult.map(rule => rule.name);
-            return {
-                coreV4,
-                rules
-            };
-        } catch (error) {
-            console.warn(error);
-        }
-
-        return false;
-    };
 
     /**
      * Update settings

@@ -1,6 +1,9 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { validateCoreSettings } from '../../../providers/SettingsProvider';
+import BrowserTranslate from '../../../services/common/browser/browser-translate';
+
 
 import './Checkbox.scss';
 
@@ -10,6 +13,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
     const [apikey, setApikey] = useState();
     const [url, setUrl] = useState();
     const [rule, setCoreRule] = useState();
+    const [error, setError] = useState({});
 
     const handleClick = async () => {
         if (!isDisabled) {
@@ -19,6 +23,11 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
     };
 
     const saveCoreSettings = async () => {
+        const validCore = await validateCoreSettings(apikey, url);
+        if(!validCore)
+        {
+            setError({coreUrl: BrowserTranslate.getMessage('coreSettingsInvalidUrl')});
+        }
         const coreSettings = {
             coreApikey: apikey,
             coreUrl: url,
@@ -56,7 +65,11 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
             </Form.Group>
             <Form.Group controlId="url">
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">URL</Form.Label>
-                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings}/>
+                <div className="col-md-10 col-sm-12 p-0">
+                    <Form.Control className="w-100" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings}/>
+                    <p >{error?.coreUrl}</p>
+                </div>
+                
             </Form.Group>
             <Form.Group controlId="workflow">
                 <Form.Label className="col-sm-2 text-md-right text-left">Workflow</Form.Label>
@@ -75,7 +88,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
                 </div>
             </Form.Group>
         </fieldset>;
-    }, [hasForm, isInputChecked, apikey, url, rule, scanRules]);
+    }, [hasForm, isInputChecked, apikey, url, rule, scanRules, error]);
 
     useEffect(() => {
         if (typeof isChecked === 'boolean') {
