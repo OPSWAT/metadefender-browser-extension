@@ -67,7 +67,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">URL</Form.Label>
                 <div className="col-md-10 col-sm-12 p-0">
                     <Form.Control className="w-100" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings}/>
-                    <p >{error?.coreUrl}</p>
+                    <p className='red'>{error?.coreUrl}</p>
                 </div>
                 
             </Form.Group>
