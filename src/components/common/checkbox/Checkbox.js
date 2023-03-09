@@ -63,14 +63,18 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
                 <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={apikey || ''} onChange={handleApikeyChange} onBlur={checkCoreSettings}/>
             </Form.Group>
-            <Form.Group controlId="url">
+            <Form.Group controlId="url" className={error?.coreUrl?"m-0":""}>
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">URL</Form.Label>
                 <div className="col-md-10 col-sm-12 p-0">
                     <Form.Control className="w-100" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings}/>
-                    <p className='red'>{error?.coreUrl}</p>
+                    
                 </div>
                 
             </Form.Group>
+            <Form.Group>
+                <span className='col-md-2 col-sm-12'></span>  
+                <p className='red col-md-10 col-sm-12 p-0'>{error?.coreUrl}</p>
+            </Form.Group>         
             <Form.Group controlId="workflow">
                 <Form.Label className="col-sm-2 text-md-right text-left">Workflow</Form.Label>
 
