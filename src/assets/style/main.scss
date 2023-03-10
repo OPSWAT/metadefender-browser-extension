@@ -20,6 +20,10 @@ body {
     margin-bottom: 0;
   }
 
+  .red {
+    color: red !important;
+  }
+
   .has-error,
   .help-block {
     color: $dareDevil;
