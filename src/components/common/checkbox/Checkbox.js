@@ -23,6 +23,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
     };
 
     const saveCoreSettings = async () => {
+        setError(null);
         const validCore = await validateCoreSettings(apikey, url);
         if(!validCore)
         {
