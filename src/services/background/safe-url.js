@@ -44,7 +44,7 @@ const handleUrlValidatorResponse = (testUrl, err, res) => {
     }
 
     try {
-        if (res.headers.status === '400') {
+        if (res.status === 400) {
             infectedUrls.add(testUrl);
         }
         else {
