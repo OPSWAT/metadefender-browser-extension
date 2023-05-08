@@ -80,7 +80,7 @@
       "description": ""
     },
     "chromeExtensionHelp": {
-      "message": "Read more about OPSWAT File Security for Chrome extension settings on our <a target='blank' href='https://onlinehelp.opswat.com/mdcloud/OPSWAT_File_Security_for_Chrome.html'>online help</a> page."
+      "message": "Read more about OPSWAT File Security for Chrome extension settings on our <a target='blank' href='https://docs.opswat.com/mdcloud/integrations/opswat-file-security-for-chrome#settings'>documentation</a> page."
     },
     "githubInfo": {
       "message": "The chrome extension is an open-source tool developed by OPSWAT, the source code is published on github: <a target='blank' href='https://github.com/OPSWAT/metadefender-browser-extension'>metadefender-browser-extension</a>"
@@ -121,10 +121,10 @@
       "description": ""
     },
     "safeUrlSub": {
-      "message": "Read more about <a target='blank' href='https://onlinehelp.opswat.com/mdcloud/2.1_Safe_URL_redirect.html'>Safe URL Redirect</a>"
+      "message": "Read more about <a target='blank' href='https://docs.opswat.com/mdcloud/operation/safe-url-redirect#how-it-works'>Safe URL Redirect</a>"
     },
     "useCore": {
-      "message": "On-premise scanning using MetaDefender Core <div class='text-secondary text-14'>Send your files to a private <a target='blank' href='https://onlinehelp.opswat.com/corev4/8._MetaDefender_Core_Developer_Guide.html'>MetaDefender Core server</a></div>",
+      "message": "On-premise scanning using MetaDefender Core <div class='text-secondary text-14'>Send your files to a private <a target='blank' href='https://docs.opswat.com/mdcore/metadefender-core/ref'>MetaDefender Core server</a></div>",
       "description": ""
     },
     "useCoreSub": {
