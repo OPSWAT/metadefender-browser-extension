@@ -81,7 +81,7 @@
     "mini-css-extract-plugin": "^1.6.2",
     "node-sass": "^8.0.0",
     "path-browserify": "^1.0.1",
-    "postcss": "^8.4.21",
+    "postcss": "^8.4.31",
     "preprocess-loader": "^0.3.0",
     "rollup": "^2.79.1",
     "sass": "^1.58.1",
