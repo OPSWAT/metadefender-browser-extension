@@ -3,7 +3,7 @@ import React from 'react';
 import { act } from 'react-dom/test-utils';
 import Checkbox from '../../components/common/checkbox/Checkbox';
 import MCL from '../../config/config';
-import * as Background from '../../providers/Background';
+import * as Background from '../../providers/UserProvider';
 import browserExtension from '../../services/common/browser/browser-extension';
 import { apikeyInfo } from '../../services/common/persistent/apikey-info';
 import { settings } from '../../services/common/persistent/settings';

@@ -2,7 +2,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import ScanHistoryTable from '../../components/scan-history-table/ScanHistoryTable';
 import MCL from '../../config/config';
-import * as Background from '../../providers/Background';
+import * as Background from '../../providers/UserProvider';
 import ScanHistory from './ScanHistory';
 import { scanHistory } from '../../services/common/persistent/scan-history';
 import { act } from 'react-dom/test-utils';

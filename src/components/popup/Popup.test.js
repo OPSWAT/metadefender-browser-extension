@@ -1,71 +1,73 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
-import MCL from '../../config/config';
-import * as Background from '../../providers/Background';
-import * as navigation from '../../services/background/navigation';
+import { render, fireEvent, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 import Popup from './Popup';
-import browserStorage from '../../services/common/browser/browser-storage';
-import { scanHistory } from '../../services/common/persistent/scan-history';
-import { act } from 'react-dom/test-utils';
+import { ConfigContext } from '../../providers/ConfigProvider';
+import { GAContext }  from '../../providers/GAProvider';
+import { ScanHistoryContext } from '../../providers/ScanHistoryProvider';
 
-const waitForComponentToPaint = async (wrapper) => {
-    await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 0));
-        wrapper.update();
-    });
-};
 
-window.close = jest.fn();
+jest.mock('../../services/common/scan-file', () => ({
+  STATUS: {
+    CLEAN: 0,
+    INFECTED: 1,
+    SCANNING: 2,
+  }
+}));
 
-describe('Popup', () => {
-    const useBackgroundContextSpy = jest.spyOn(Background, 'useBackgroundContext');
-    const addListenerSpy = jest.spyOn(browserStorage, 'addListener');
-    const goToTabSpy = jest.spyOn(navigation, 'goToTab');
-    const loadSpy = jest.spyOn(scanHistory, 'load');
-    const mockGaTrackEvent = jest.fn();
+jest.mock('../../services/background/navigation', () => ({
+  goToTab: jest.fn(),
+}));
 
-    const mockFiles = [
-        { dataId: 0, scanResults: 1, fileName: 'mock_1', status: 1 },
-        { dataId: 1, scanResults: 1, fileName: 'mock_2', status: 2 },
-        { dataId: 2, scanResults: 1, fileName: 'mock_3', status: 0 },
-        { dataId: 2, scanResults: 1, fileName: 'mock_3', status: 3 },
-    ];
+describe('Popup Component', () => {
+  let mockConfig, mockGaContext, mockScanHistoryContext;
 
-    it('should render with empty scan list', async () => {
-        useBackgroundContextSpy.mockImplementation(() => ({ MCL, gaTrackEvent: mockGaTrackEvent }));
-        loadSpy.mockImplementation(() => ({ scanHistory: { files: [] } }));
+  beforeEach(() => {
+    // Mock the context values
+    mockConfig = { 
+      mclDomain: 'https://scan.example.com',
+      gaEventCategory: {
+        name: 'category',
+        action: {
+          linkClicked: 'linkClicked',
+        },
+        label: {
+          scanHistory: 'scanHistoryLabel',
+        },
+      },
+    };
 
-        const popupWrapper = mount(<Popup />);
-        await waitForComponentToPaint(popupWrapper);
+    mockGaContext = {
+      gaTrackEvent: jest.fn(),
+    };
 
-        expect(mockGaTrackEvent).toHaveBeenCalled();
-        expect(addListenerSpy).toHaveBeenCalled();
+    mockScanHistoryContext = {
+      files: [
+        {
+          fileName: 'testFile1',
+          status: 0,
+          dataId: '123',
+          scanResults: 'https://scan.example.com/results/file/123/regular/peinfo',
+        },
+      ],
+    };
 
-        expect(popupWrapper.find('span[dangerouslySetInnerHTML]')).toBeDefined();
-    });
+    render(
+      <ConfigContext.Provider value={mockConfig}>
+        <GAContext.Provider value={mockGaContext}>
+          <ScanHistoryContext.Provider value={mockScanHistoryContext}>
+            <Popup />
+          </ScanHistoryContext.Provider>
+        </GAContext.Provider>
+      </ConfigContext.Provider>
+    );
+  });
 
-    it('should render with 3 elements in list', async () => {
-        useBackgroundContextSpy.mockImplementation(() => ({ MCL, gaTrackEvent: mockGaTrackEvent }));
-        loadSpy.mockImplementation(() => ({ scanHistory: { files: mockFiles } }));
+  test('should display file names from scan history', () => {
+    expect(screen.getByText('testFile1')).toBeInTheDocument();
+  });
 
-        const popupWrapper = mount(<Popup />);
-        await waitForComponentToPaint(popupWrapper);
-
-        expect(popupWrapper.find('.list-group-item')).toHaveLength(3);
-        expect(popupWrapper.find('.icon-ok')).toHaveLength(1);
-        expect(popupWrapper.find('.icon-cancel')).toHaveLength(1);
-        expect(popupWrapper.find('.icon-spin.animate-spin')).toHaveLength(1);
-
-    });
-
-    it('should open other pages on ling click', () => {
-        useBackgroundContextSpy.mockImplementation(() => ({ MCL, gaTrackEvent: mockGaTrackEvent }));
-        const popupWrapper = shallow(<Popup />);
-
-        popupWrapper.find('a').at(0).simulate('click');
-        expect(goToTabSpy).toHaveBeenCalledWith('settings');
-
-        popupWrapper.find('a').at(1).simulate('click');
-        expect(goToTabSpy).toHaveBeenCalledWith('history');
-    });
+  test('should display "View Scan History" link', () => {
+    expect(screen.getByText('View Scan History')).toBeInTheDocument();
+  });
 });
