@@ -30,7 +30,7 @@ async function create(message, id, fileInfected) {
     }
 
     const settingsData = await settings.load();
-    if (!settingsData.showNotifications) {
+    if (!settingsData?.showNotifications) {
         return;
     }
 

@@ -3,7 +3,7 @@
 import MCL from '../../../config/config';
 import BrowserStorage from './../browser/browser-storage';
 
-const storageKey = MCL.config.storageKey.settings;
+const storageKey = MCL.config.storageKey?.settings;
 
 /**
  *
