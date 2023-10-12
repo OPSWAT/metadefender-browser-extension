@@ -56,10 +56,16 @@ async function init() {
  * @returns {Promise.<void>}
  */
 async function load() {
-    const { [storageKey]: settingsData } = await BrowserStorage.get(storageKey);
-    this.merge(settingsData);
+    const result = await BrowserStorage.get(storageKey);
 
-    return this.data;
+    if (!result || !(storageKey in result)) {
+        return null;
+    }
+
+    const { [storageKey]: apikeyData } = result;
+    this.merge(apikeyData);
+
+    return apikeyData;
 }
 
 function merge(newData) {

@@ -29,7 +29,7 @@ async function create(message, id, fileInfected) {
         icon = (fileInfected) ? '/images/ext-notification-infected.png' : '/images/ext-notification-clean.png';
     }
 
-    const settingsData = await settings.load();
+    const settingsData = await settings?.load();
     if (!settingsData?.showNotifications) {
         return;
     }

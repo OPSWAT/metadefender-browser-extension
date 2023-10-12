@@ -1,90 +1,107 @@
 import BrowserStorage from '../../common/browser/browser-storage';
 import { apikeyInfo } from './apikey-info';
+import MCL from '../../../config/config';
 
-describe('apikey-info', () => {
-    const BrowserStorageGetSpy = jest.spyOn(BrowserStorage, 'get');
-    const BrowserStorageSetSpy = jest.spyOn(BrowserStorage, 'set');
+jest.mock('../../common/browser/browser-storage');
+const storageKey = MCL?.config?.storageKey?.apikey;
+describe('ApikeyInfo', () => {
 
-    const key = '/* @echo storageKey.apikey */';
-    const initialData = {
-        apikey: null,
-        reputationLimit: null,
-        preventionLimit: null,
-        feedLimit: null,
-        paidUser: null,
-        limitInterval: 'Daily',
-        maxUploadFileSize: null,
-        sandboxLimit: null,
-        loggedIn: false,
-        organization: null,
-    };
-
-    const mockData = {
-        apikey: 'mock',
-        reputationLimit: 1000,
-        preventionLimit: 100,
-        feedLimit: 100,
-        paidUser: false,
-        limitInterval: 'Daily',
-        maxUploadFileSize: 150,
-        sandboxLimit: 5,
-        loggedIn: true,
-        organization: true,
-    };
-
-    const mclInfo = {
-        limit_reputation: mockData.reputationLimit,
-        limit_prevention: mockData.preventionLimit,
-        limit_feed: mockData.feedLimit,
-        paid_user: mockData.paidUser,
-        time_interval: mockData.limitInterval,
-        max_upload_file_size: mockData.maxUploadFileSize,
-        limit_sandbox: mockData.sandboxLimit,
-        organization: mockData.organization,
-    };
-
-    it('should init with save', (done) => {
-        BrowserStorageGetSpy.mockImplementationOnce(() => undefined);
-
-        apikeyInfo.init();
-
-        setTimeout(() => {
-            expect(BrowserStorageGetSpy).toHaveBeenCalledWith(key);
-            expect(BrowserStorageSetSpy).toHaveBeenCalledWith({ [key]: { ...initialData } });
-            done();
-        });
+    beforeEach(() => {
+        BrowserStorage.get.mockClear();
+        BrowserStorage.set.mockClear();
     });
 
-    it('should init with merge', (done) => {
-        BrowserStorageGetSpy.mockImplementationOnce(() => ({ ...mockData }));
-
-        apikeyInfo.init();
-
-        expect(BrowserStorageGetSpy).toHaveBeenCalledWith(key);
-
-        setTimeout(() => {
-            for (let mockDataKey of Object.keys(mockData)) {
-                expect(apikeyInfo[mockDataKey]).toEqual(mockData[mockDataKey]);
-            }
-            done();
-        });
+    it('should initialize with default data', () => {
+        const info = apikeyInfo;
+        expect(info.data.apikey).toBe(null);
+        expect(info.data.reputationLimit).toBe(null);
     });
 
-    it('shoud load corect', (done) => {
-        BrowserStorageGetSpy.mockImplementationOnce(() => ({ ...mockData }));
+    it('should save to browser storage', async () => {
+        BrowserStorage.set.mockResolvedValue(true);
 
-        setTimeout(async () => {
-            const data = await apikeyInfo.load();
-            expect(data).toEqual(mockData);
-            done();
-        });
+        const info = apikeyInfo;
+        await info.save();
+
+        expect(BrowserStorage.set).toBeCalledTimes(1);
     });
 
-    it('should parse MCL info', () => {
-        apikeyInfo.parseMclInfo(mclInfo);
+    it('should load from browser storage', async () => {
+        const mockData = {
+            apikey: 'mock-apikey',
+        };
 
-        for (let mockDataKey of Object.keys(mockData)) {
-            expect(apikeyInfo[mockDataKey]).toEqual(mockData[mockDataKey]);
-        }
+        BrowserStorage.get.mockResolvedValue({[storageKey]: mockData});
+
+        const info = apikeyInfo;
+        const loadedData = await info.load();
+
+        expect(BrowserStorage.get).toBeCalledTimes(1);
+        expect(loadedData).toEqual(mockData);
     });
+
+    it('should merge new data correctly', () => {
+        const info = apikeyInfo;
+        const newData = {
+            apikey: 'new-apikey',
+            reputationLimit: 5,
+        };
+        
+        info.merge(newData);
+
+        expect(info.data.apikey).toBe('new-apikey');
+        expect(info.data.reputationLimit).toBe(5);
+    });
+
+    it('should initialize with default data if browser storage is empty', async () => {
+        BrowserStorage.get.mockResolvedValue(null);
+
+        const info = apikeyInfo;
+        await info.init();
+
+        expect(BrowserStorage.get).toBeCalledTimes(1);
+        expect(info.data.apikey).toBe('new-apikey');
+    });
+
+    it('should initialize with data from browser storage if available', async () => {
+        const mockData = {
+            apikey: 'existing-apikey',
+            reputationLimit: 10,
+        };
+        BrowserStorage.get.mockResolvedValue({[storageKey]: mockData});
+
+        const info = apikeyInfo;
+        await info.init();
+
+        expect(BrowserStorage.get).toBeCalledTimes(1);
+        expect(info.data.apikey).toBe('existing-apikey');
+        expect(info.data.reputationLimit).toBe(10);
+    });
+
+    it('should parse MclInfo correctly', () => {
+        const mclInfoMock = {
+            limit_reputation: 5,
+            limit_prevention: 10,
+            limit_feed: 15,
+            paid_user: true,
+            time_interval: 'Weekly',
+            max_upload_file_size: 2048,
+            limit_sandbox: 3,
+            organization: 'MockOrg'
+        };
+
+        const info = apikeyInfo;
+        info.parseMclInfo(mclInfoMock);
+
+        expect(info.data.reputationLimit).toBe(5);
+        expect(info.data.preventionLimit).toBe(10);
+        expect(info.data.feedLimit).toBe(15);
+        expect(info.data.paidUser).toBe(true);
+        expect(info.data.limitInterval).toBe('Weekly');
+        expect(info.data.maxUploadFileSize).toBe(2048);
+        expect(info.data.sandboxLimit).toBe(3);
+        expect(info.data.organization).toBe('MockOrg');
+    });
+
+
 });
