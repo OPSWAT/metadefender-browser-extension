@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import BackgroundContext from '../../providers/Background';
+import BackgroundContext from '../../providers/UserProvider';
 import About from './About';
 
 describe('About', () => {
