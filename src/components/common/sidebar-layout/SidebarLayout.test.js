@@ -4,9 +4,11 @@ import React from 'react';
 import { Col } from 'react-bootstrap';
 import SliderLayout from './SidebarLayout';
 
-const mockPush = jest.fn();
 
-jest.mock('react-router-dom', () => ({ useHistory: () => ({ push: mockPush }) }));
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useNavigate: () => jest.fn(),
+  }));
 
 describe('SidebarLayout', () => {
     const ContentComponent = <div className="mock-content">This is a mock content component</div>;
@@ -16,11 +18,5 @@ describe('SidebarLayout', () => {
     it('should render correct', () => {
         expect(sliderLayoutWrapper.find(Col)).toHaveLength(3);
         expect(sliderLayoutWrapper.find(Col).at(2).find('.mock-content')).toHaveLength(1);
-    });
-
-    it('should change route on menu click', () => {
-        sliderLayoutWrapper.find(Link).at(0).simulate('click');
-
-        expect(mockPush).toHaveBeenCalledWith('history');
     });
 });

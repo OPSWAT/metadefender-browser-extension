@@ -30,7 +30,7 @@ const SidebarLayout = ({ className, content, currentPage }) => {
 
     const handleOnMenuClick = (page) => {
         if (page !== currentPage) {
-            navigate(`/${page}`);
+            navigate(`${page}`);
         }
     };
 
