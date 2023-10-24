@@ -34,7 +34,7 @@ function Settings() {
         load,
         get,
     };
-};
+}
 
 export const settings = Settings();
 
@@ -43,7 +43,12 @@ export const settings = Settings();
  * @returns {Promise.<*>}
  */
 async function init() {
-    const { [storageKey]: settingsData } = await BrowserStorage.get(storageKey);
+    const storageValue = await BrowserStorage.get(storageKey);
+    if (!storageValue) {
+        return;
+    }
+
+    const { [storageKey]: settingsData } = storageValue;
     if (!settingsData) {
         return await this.save();
     }
@@ -74,8 +79,7 @@ function merge(newData) {
         if (Object.prototype.hasOwnProperty.call(newData, key)) {
             if (settingKeys.includes(key)) {
                 this.data[key] = newData[key];
-            }
-            else {
+            } else {
                 console.warn(`Can't store ${key} in settings`);
             }
         }
