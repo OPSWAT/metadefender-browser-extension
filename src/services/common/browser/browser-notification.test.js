@@ -1,58 +1,77 @@
 import { settings } from './../persistent/settings';
 import browserNotification from './browser-notification';
 
-const mockClear = jest.fn();
-const mockCreate = jest.fn();
-
 global.chrome = {
-    notifications: {
-        create: mockCreate,
-        clear: mockClear
-    },
     i18n: {
-        getMessage: (str) => str
+        getMessage: jest.fn(),
+    },
+    notifications: {
+        create: jest.fn(),
+        clear: jest.fn(),
     }
 };
 
-jest.mock('../../../config/config', () => ({
-    config: { browserNotificationTimeout: 10 }
+// Mock the settings object
+jest.mock('./../persistent/settings', () => ({
+    settings: {
+        load: jest.fn(),
+    },
 }));
 
-describe('browser-notification', () => {
-    const loadSpy = jest.spyOn(settings, 'load');
 
-    it('should create notification', (done) => {
-        const message = 'mock message';
-
-        browserNotification.create(message);
-
-        setTimeout(() => {
-            expect(loadSpy).toHaveBeenCalled();
-            expect(mockCreate).toHaveBeenCalledWith(
-                {
-                    type: 'basic',
-                    iconUrl: '/images/ext-notification.png',
-                    title: 'appName',
-                    message,
-                    priority: 1,
-                    isClickable: false
-                },
-                expect.any(Function)
-            );
-
-            done();
-        }, 0);
+describe('browserNotification', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
-    it('should creat notifications', (done) => {
-        mockCreate.mockImplementation((obj, cb) => cb('mock'));
+    it('should create a notification with default icon', async () => {
+        settings.load.mockResolvedValue({ showNotifications: true });
+        chrome.i18n.getMessage.mockReturnValue('mocked_appName');
 
-        browserNotification.create();
+        await browserNotification.create('test message');
 
-        setTimeout(() => {
-            expect(mockClear).toHaveBeenCalledWith('mock');
+        expect(chrome.notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+            iconUrl: '/images/ext-notification.png',
+            message: 'test message'
+        }), expect.any(Function));
+    });
 
-            done();
-        }, 20);
+    it('should create a notification with clean icon when file is not infected', async () => {
+        settings.load.mockResolvedValue({ showNotifications: true });
+
+        await browserNotification.create('test message', undefined, false);
+
+        expect(chrome.notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+            iconUrl: '/images/ext-notification-clean.png',
+            message: 'test message'
+        }), expect.any(Function));
+    });
+
+    it('should create a notification with infected icon when file is infected', async () => {
+        settings.load.mockResolvedValue({ showNotifications: true });
+
+        await browserNotification.create('test message', undefined, true);
+
+        expect(chrome.notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+            iconUrl: '/images/ext-notification-infected.png',
+            message: 'test message'
+        }), expect.any(Function));
+    });
+
+    it('should not create a notification if showNotifications is false', async () => {
+        settings.load.mockResolvedValue({ showNotifications: false });
+
+        await browserNotification.create('test message');
+
+        expect(chrome.notifications.create).not.toHaveBeenCalled();
+    });
+
+    it('should handle error during notification creation', async () => {
+        settings.load.mockResolvedValue({ showNotifications: true });
+        chrome.notifications.create.mockImplementationOnce(() => {
+            throw new Error('mocked error');
+        });
+
+        await browserNotification.create('test message');
     });
 });

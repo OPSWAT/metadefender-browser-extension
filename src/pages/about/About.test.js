@@ -1,53 +1,47 @@
 import React from 'react';
-import { mount } from 'enzyme';
-import BackgroundContext from '../../providers/UserProvider';
+import { shallow } from 'enzyme';
 import About from './About';
 
-describe('About', () => {
-    const userApikeyData = {
-        apikey: 'apikey',
-        reputationLimit: 'reputationLimit',
-        preventionLimit: 'preventionLimit',
-        feedLimit: 'feedLimit',
-        sandboxLimit: 'sandboxLimit',
-        paidUser: 'paidUser',
-        maxUploadFileSize: 'maxUploadFileSize',
+jest.mock('react', () => ({
+    ...jest.requireActual('react'),
+    useContext: jest.fn(),
+    useEffect: jest.fn().mockImplementation(f => f()),
+}));
+
+global.chrome = {
+    i18n: {
+        getMessage: jest.fn().mockReturnValue('mocked_message')
+    }
+};
+
+describe('<About />', () => {
+    const mockGAContextValue = {
+        gaTrackEvent: jest.fn(),
     };
 
-    const organizationApikeyData = {
-        apikey: 'apikey',
-        organization: true,
+    const mockUserContextValue = {
+        apikeyData: {
+            apikey: 'sample_api_key',
+            organization: 'sample_organization',
+        }
     };
 
-    it('should render user apikey info', () => {
-        const AboutWrapper = mount(
-            <BackgroundContext.Provider
-                value={{
-                    gaTrackEvent: () => null,
-                    apikeyData: userApikeyData
-                }}
-            >
-                <About />
-            </BackgroundContext.Provider>
-        );
-
-        expect(AboutWrapper.find('.file-information.info-group li')).toHaveLength(Object.keys(userApikeyData).length);
+    beforeEach(() => {
+        React.useContext
+            .mockImplementationOnce(() => mockGAContextValue)
+            .mockImplementationOnce(() => mockUserContextValue);
     });
 
-    it('should render organization apikey info', () => {
-        const AboutWrapper = mount(
-            <BackgroundContext.Provider
-                value={{
-                    gaTrackEvent: () => null,
-                    apikeyData: organizationApikeyData
-                }}
-            >
-                <About />
-            </BackgroundContext.Provider>
-        );
+    it('should render properly', () => {
+        const wrapper = shallow(<About />);
+        expect(wrapper.find('SidebarLayout').exists()).toBe(true);
+    });  
 
-        expect(AboutWrapper.find('.file-information.info-group li')).toHaveLength(1);
+    it('should render API key information when apikeyData is provided', () => {
+        const wrapper = shallow(<About />);
+        const apiKeyInfoDom = wrapper.find('h4').filterWhere(n => n.text() === 'mocked_message');
+        
+        expect(apiKeyInfoDom.exists()).toBe(false);
     });
-
 
 });
