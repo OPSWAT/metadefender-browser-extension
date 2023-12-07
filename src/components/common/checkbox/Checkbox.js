@@ -79,10 +79,10 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
             <Form.Group controlId="workflow">
                 <Form.Label className="col-sm-2 text-md-right text-left">Workflow</Form.Label>
 
-                <Form.Control as="select" disabled={!scanRules.length} value={rule} className="col-md-5" onChange={handleWorkflowChange}>
+                <Form.Control as="select" disabled={!scanRules?.length} value={rule} className="col-md-5" onChange={handleWorkflowChange}>
                     <option defaultValue=''>-- Default rule --</option>
                     {
-                        scanRules.map((rule) => <option key={rule} value={rule}>{rule}</option>)
+                        scanRules?.map((rule) => <option key={rule} value={rule}>{rule}</option>)
                     }
                 </Form.Control>
 

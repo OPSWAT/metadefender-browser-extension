@@ -1,6 +1,6 @@
 import './common/ga-tracking';
 
 export const GaTrack = (event) => {
-    let _gaq = _gaq || [];
-    _gaq.push(event);
+    window._gaq = window._gaq || [];
+    window._gaq.push(event);
 };

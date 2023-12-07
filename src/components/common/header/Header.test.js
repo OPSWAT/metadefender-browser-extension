@@ -1,35 +1,79 @@
-import { mount } from 'enzyme';
 import React from 'react';
-import { Nav } from 'react-bootstrap';
-import BackgroundContext from '../../../providers/Background';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import { UserContext } from '../../../providers/UserProvider';
+import { ConfigContext} from '../../../providers/ConfigProvider'
 import Header from './Header';
-import MCL from '../../../config/config';
 
-describe('Header', () => {
-    const openSpy = jest.spyOn(window, 'open');
-    const headerLoggedInWrapper = mount(
-        <BackgroundContext.Provider value={{ MCL, apikeyData: { loggedIn: true } }}>
-            <Header />
-        </BackgroundContext.Provider>
-    );
+const mockConfigValue = {
+    gaEventCategory: {
+        name: 'testName',
+        action: { buttonClickd: 'testButtonClickd' },
+        label: { loginButton: 'testLoginButton' },
+        value: { loginButton: 'testLoginButtonValue' }
+    },
+    mclDomain: 'http://testDomain'
+};
 
-    const headerWrapper = mount(
-        <BackgroundContext.Provider value={{ MCL, apikeyData: { loggedIn: false } }}>
-            <Header />
-        </BackgroundContext.Provider>
-    );
+const mockUserValue = {
+    apikeyData: {
+        loggedIn: false
+    }
+};
 
-    it('should render without sign in button', () => {
-        expect(headerLoggedInWrapper.find(Nav.Link)).toHaveLength(0);
+describe('Header Component', () => {
+    afterEach(() => {
+        jest.resetAllMocks();
     });
 
-    it('should render with sign in button', () => {
-        expect(headerWrapper.find(Nav.Link)).toHaveLength(1);
+    test('renders sign in button when user is not logged in', () => {
+        render(
+            <ConfigContext.Provider value={mockConfigValue}>
+                <UserContext.Provider value={mockUserValue}>
+                    <Header />
+                </UserContext.Provider>
+            </ConfigContext.Provider>
+        );
+
+        expect(screen.getByText('Sign In')).toBeInTheDocument();
     });
 
-    it('should call handleLogin', () => {
-        headerWrapper.find(Nav.Link).simulate('click');
+    test('does not render sign in button when user is logged in', () => {
+        const loggedInUserValue = {
+            ...mockUserValue,
+            apikeyData: {
+                loggedIn: true
+            }
+        };
 
-        expect(openSpy).toHaveBeenCalledWith('/* @echo mclDomain *//login?extension', 'Login', 'menubar=no,location=no,resizable=no,scrollbars=yes,status=yes,width=960,height=550');
+        render(
+            <ConfigContext.Provider value={mockConfigValue}>
+                <UserContext.Provider value={loggedInUserValue}>
+                    <Header />
+                </UserContext.Provider>
+            </ConfigContext.Provider>
+        );
+
+        expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
+    });
+
+    test('calls window.open with correct arguments on login button click', () => {
+        const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
+
+        render(
+            <ConfigContext.Provider value={mockConfigValue}>
+                <UserContext.Provider value={mockUserValue}>
+                    <Header />
+                </UserContext.Provider>
+            </ConfigContext.Provider>
+        );
+
+        fireEvent.click(screen.getByText('Sign In'));
+
+        expect(windowOpenSpy).toHaveBeenCalledWith(
+            `${mockConfigValue.mclDomain}/login?extension`,
+            'Login',
+            'menubar=no,location=no,resizable=no,scrollbars=yes,status=yes,width=960,height=550'
+        );
     });
 });

@@ -9,7 +9,7 @@ describe('settings', () => {
     const key = '/* @echo storageKey.settings */';
 
     const initialData = {
-        scanDownloads: true,
+        scanDownloads: false,
         shareResults: true,
         showNotifications: true,
         saveCleanFiles: false,
@@ -18,6 +18,8 @@ describe('settings', () => {
         coreUrl: '',
         coreApikey: '',
         coreRule: '',
+        coreV4: false,
+        rules: []
     };
 
     it('should init with save', (done) => {
