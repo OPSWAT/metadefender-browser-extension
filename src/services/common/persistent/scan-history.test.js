@@ -48,18 +48,6 @@ describe('scan-history', () => {
         }, 0);
     });
 
-    // it('should clean pending files', (done) => {
-    //     scanHistory.cleanPendingFiles();
-
-    //     setTimeout(() => {
-    //         expect(BrowserStorageSetSpy).toHaveBeenCalledWith({
-    //             [key]: { files: mockData.files.filter(({ status }) => status !== 0) }
-    //         });
-
-    //         done();
-    //     }, 0);
-    // });
-
     it('should load data', (done) => {
         BrowserStorageGetSpy.mockImplementation(() => ({ files: [] }));
 

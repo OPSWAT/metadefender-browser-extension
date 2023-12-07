@@ -95,35 +95,5 @@ describe('file-processor', () => {
             }, 0);
         });
 
-        // it('should create browser notification with scan started', (done) => {
-        //     apikeyInfo.apikey = 'mock';
-        //     mockGetFileSize.mockImplementationOnce(() => 50);
-        //     setAuthSpy.mockImplementation(() => ({
-        //         hash: { lookup: () => ({ data_id: 'mock' }) },
-        //         file: { poolForResults: () => ({}) }
-        //     }));
-
-        //     fileProcessor.processTarget(linkUrl, { filename: 'mock', fileSize: 50 });
-
-        //     setTimeout(() => {
-        //         expect(createSpy).toHaveBeenCalledWith('scanStartedmock', undefined);
-
-        //         done();
-        //     }, 0);
-        // });
     });
-
-    // describe('handleFileScanResults', () => {
-    //     it('should do something', (done) => {
-    //         const info = { file_info: { sha256: 'mock sha256' } };
-    //         const file = { fileName: 'mock' };
-
-    //         fileProcessor.handleFileScanResults(file, info, 'mock', {}, true);
-
-    //         setTimeout(() => {
-    //             expect(createSpy).toHaveBeenCalledWith('mockfileScanCompletenoThreatDetected', undefined, false);
-    //             done();
-    //         }, 0);
-    //     });
-    // });
 });
