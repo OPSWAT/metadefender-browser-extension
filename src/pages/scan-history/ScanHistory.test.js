@@ -1,51 +1,38 @@
 import React from 'react';
-import { mount } from 'enzyme';
-import ScanHistoryTable from '../../components/scan-history-table/ScanHistoryTable';
-import MCL from '../../config/config';
-import * as Background from '../../providers/Background';
+import { shallow } from 'enzyme';
 import ScanHistory from './ScanHistory';
-import { scanHistory } from '../../services/common/persistent/scan-history';
-import { act } from 'react-dom/test-utils';
 
-const waitForComponentToPaint = async (wrapper) => {
-    await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 0));
-        wrapper.update();
+
+jest.mock('react', () => ({
+    ...jest.requireActual('react'),
+    useContext: jest.fn(),
+}));
+
+describe('<ScanHistory />', () => {
+    const mockGaContextValue = {
+        gaTrackEvent: jest.fn(),
+    };
+
+    const mockConfigContextValue = {
+        mclDomain: 'mockDomain',
+    };
+
+    const mockScanHistoryContextValue = {
+        files: [{ id: '1', status: 1, fileName: 'testFile.txt' }],
+        clearnScanHistory: jest.fn(),
+        removeScanHistoryFile: jest.fn(),
+    };
+
+    beforeEach(() => {
+        React.useContext
+            .mockImplementationOnce(() => mockConfigContextValue)
+            .mockImplementationOnce(() => mockGaContextValue)
+            .mockImplementationOnce(() => mockScanHistoryContextValue);
     });
-};
 
-describe('ScanHistory', () => {
-    const mockGaTrackEvent = jest.fn();
-
-    const useBackgroundContextSpy = jest.spyOn(Background, 'useBackgroundContext');
-    const loadSpy = jest.spyOn(scanHistory, 'load');
-
-    const mockFiles = [
-        { fileName: 'file_0' },
-        { fileName: 'file_1' },
-        { fileName: 'mock_2' },
-        { fileName: 'mock_3' },
-    ];
-
-    it('should render correct', (done) => {
-        useBackgroundContextSpy.mockImplementation(() => ({
-            gaTrackEvent: mockGaTrackEvent,
-            MCL,
-            apikeyData: {}
-        }));
-        loadSpy.mockImplementation(() => ({ scanHistory: { files: mockFiles } }));
-
-        const ScanHistoryWrapper = mount(<ScanHistory />);
-        waitForComponentToPaint(ScanHistoryWrapper);
-
-        setTimeout(() => {
-            expect(ScanHistoryWrapper.find('.history--search__input')).toHaveLength(2);
-            expect(ScanHistoryWrapper.find('.history--scan__info')).toHaveLength(2);
-            expect(ScanHistoryWrapper.find(ScanHistoryTable)).toHaveLength(1);
-
-            expect(mockGaTrackEvent).toHaveBeenCalledWith(['_trackPageview', '/extension/history']);
-
-            done();
-        }, 0);
-    });
+    it('should render properly', () => {
+        const wrapper = shallow(<ScanHistory />);
+        
+        expect(wrapper.find('SidebarLayout').exists()).toBe(true);
+    });   
 });

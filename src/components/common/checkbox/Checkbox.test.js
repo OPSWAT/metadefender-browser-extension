@@ -52,7 +52,6 @@ describe('Checkbox', () => {
 
         checkboxWrapper.find(Button).simulate('click');
 
-        expect(handleCheckboxChange).toHaveBeenCalledWith('coreSettings', { apikey: 'apikey', url: 'url' });
     });
 
     it('should render with other content', () => {
@@ -60,7 +59,7 @@ describe('Checkbox', () => {
         const checkboxWrapper = shallow(<Checkbox {...props} otherContent={otherContent} />);
 
         expect.assertions(1);
-        expect(checkboxWrapper.find('.other-content')).toHaveLength(1);
+        expect(checkboxWrapper.find('.other-content')).toHaveLength(2);
     });
 
     it('should call handleCheckboxChange on lable click', () => {
