@@ -3,7 +3,7 @@
 import MCL from '../../../config/config';
 import BrowserStorage from '../../common/browser/browser-storage';
 
-const storageKey = MCL.config.storageKey.apikey;
+const storageKey = MCL?.config?.storageKey?.apikey;
 
 /**
  *
@@ -41,11 +41,13 @@ export const apikeyInfo = ApikeyInfo();
  * @returns {Promise.<*>}
  */
 async function init() {
-    const { [storageKey]: apikeyData } = await BrowserStorage.get(storageKey);
-    if (!apikeyData) {
+    const result = await BrowserStorage.get(storageKey);
+
+    if (!result || !result[storageKey]) {
         return this.save();
     }
 
+    const { [storageKey]: apikeyData } = result;
     this.merge(apikeyData);
 }
 
@@ -85,7 +87,13 @@ function parseMclInfo(info) {
  * @returns {Promise.<void>}
  */
 async function load() {
-    const { [storageKey]: apikeyData } = await BrowserStorage.get(storageKey);
+    const result = await BrowserStorage.get(storageKey);
+
+    if (result === null) {
+        return null;
+    }
+
+    const { [storageKey]: apikeyData } = result;
     this.merge(apikeyData);
 
     return apikeyData;

@@ -125,7 +125,7 @@ export const SettingsProvider = ({ children }) => {
 
 
     function storageUpdateHandler(changes) {
-        const storageKey = config.storageKey.settings;
+        const storageKey = config.storageKey?.settings;
         if (Object.keys(changes).includes(storageKey)) {
             settings.merge(changes[storageKey].newValue);
         }

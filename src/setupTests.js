@@ -7,6 +7,6 @@ import chrome from 'sinon-chrome/extensions';
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-global.chrome = chrome;
-
 configure({ adapter: new Adapter() });
+
+global.chrome = chrome;

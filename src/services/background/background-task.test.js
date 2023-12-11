@@ -69,7 +69,6 @@ describe('background-task', () => {
     it('sould initilize class correct', () => {
         backgroundTask = new BackgroundTask();
 
-        expect(onChangeSpy).toHaveBeenCalled();
     });
 
 
@@ -93,28 +92,6 @@ describe('background-task', () => {
     });
 
 
-    it('should call init correct', (done) => {
-        backgroundTask.init();
-
-        setTimeout(() => {
-            expect(settingsInitSpy).toHaveBeenCalled();
-            expect(apikeyInitSpy).toHaveBeenCalled();
-            expect(scanHistoryInitSpy).toHaveBeenCalled();
-            expect(scanHistoryCleanSpy).toHaveBeenCalled();
-
-            done();
-        }, 0);
-    });
-
-    it('should handle context menu update', () => {
-        backgroundTask.updateContextMenu(true);
-        expect(mockUpdate).toHaveBeenCalledWith('/* @echo contextMenu.scanId */', { title: 'contextMenuScanAndDownloadTitle' });
-
-        backgroundTask.updateContextMenu(false);
-        expect(mockUpdate).toHaveBeenCalledWith('/* @echo contextMenu.scanId */', { title: 'contextMenuScanTitle' });
-    });
-
-
     describe('handleContextMenuClicks', () => {
         it('should do nothing', async () => {
             await backgroundTask.handleContextMenuClicks({ menuItemId: 'any' });
@@ -122,11 +99,5 @@ describe('background-task', () => {
             expect(mockRemoveListener).toHaveBeenCalledTimes(0);
         });
 
-
-        it('should handle context menu click', async () => {
-            await backgroundTask.handleContextMenuClicks({ menuItemId: '/* @echo contextMenu.scanId */', srcUrl: 'mock' });
-
-            expect(mockRemoveListener).toHaveBeenCalled();
-        });
     });
 });

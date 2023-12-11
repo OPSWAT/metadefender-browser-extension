@@ -3,7 +3,7 @@
 import MCL from '../../../config/config';
 import BrowserStorage from './../browser/browser-storage';
 
-const storageKey = MCL.config.storageKey.settings;
+const storageKey = MCL.config.storageKey?.settings;
 
 /**
  *
@@ -34,7 +34,7 @@ function Settings() {
         load,
         get,
     };
-};
+}
 
 export const settings = Settings();
 
@@ -43,7 +43,12 @@ export const settings = Settings();
  * @returns {Promise.<*>}
  */
 async function init() {
-    const { [storageKey]: settingsData } = await BrowserStorage.get(storageKey);
+    const storageValue = await BrowserStorage.get(storageKey);
+    if (!storageValue) {
+        return;
+    }
+
+    const { [storageKey]: settingsData } = storageValue;
     if (!settingsData) {
         return await this.save();
     }
@@ -56,10 +61,16 @@ async function init() {
  * @returns {Promise.<void>}
  */
 async function load() {
-    const { [storageKey]: settingsData } = await BrowserStorage.get(storageKey);
-    this.merge(settingsData);
+    const result = await BrowserStorage.get(storageKey);
 
-    return this.data;
+    if (!result || !(storageKey in result)) {
+        return null;
+    }
+
+    const { [storageKey]: apikeyData } = result;
+    this.merge(apikeyData);
+
+    return apikeyData;
 }
 
 function merge(newData) {
@@ -68,8 +79,7 @@ function merge(newData) {
         if (Object.prototype.hasOwnProperty.call(newData, key)) {
             if (settingKeys.includes(key)) {
                 this.data[key] = newData[key];
-            }
-            else {
+            } else {
                 console.warn(`Can't store ${key} in settings`);
             }
         }
