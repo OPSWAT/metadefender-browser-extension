@@ -4,7 +4,7 @@
   "name": "__MSG_appName__",
   "short_name": "__MSG_appShortName__",
   "description": "__MSG_appDescription__",
-  "version": "4.0.6",
+  "version": "4.0.7",
 
   "action": {
     "default_popup": "index.html",
