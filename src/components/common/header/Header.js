@@ -5,7 +5,6 @@ import { Container, Nav, Navbar } from 'react-bootstrap';
 import ConfigContext from '../../../providers/ConfigProvider';
 import UserContext from '../../../providers/UserProvider';
 
-import '../../../services/common/ga-tracking';
 
 import './Header.scss';
 

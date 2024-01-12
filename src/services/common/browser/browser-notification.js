@@ -2,7 +2,6 @@
 
 import { settings } from './../persistent/settings';
 import MCL from '../../../config/config';
-import '../ga-tracking';
 
 /**
  * browser.notifications extension

@@ -1,6 +1,6 @@
 {
   "name": "opswat-file-security-chrome",
-  "version": "4.0.7",
+  "version": "4.0.8",
   "description": "Scan files and downloads with OPSWAT File Security for Chrome",
   "repository": {
     "type": "git",
