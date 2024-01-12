@@ -10,14 +10,13 @@ import { apikeyInfo } from '../common/persistent/apikey-info';
 import { scanHistory } from '../common/persistent/scan-history';
 import { settings } from '../common/persistent/settings';
 
-import '../common/ga-tracking';
 
 export const ON_SCAN_COMPLETE_LISTENERS = [];
 class FileProcessor {
     /**
      * Proccess a link to a file or a downloaded file.
-     * 
-     * @param {string} linkUrl file url 
+     *
+     * @param {string} linkUrl file url
      * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
      */
     async processTarget(linkUrl, downloadItem) {
@@ -26,13 +25,13 @@ class FileProcessor {
             BrowserNotification.create(chrome.i18n.getMessage('undefinedApiKey'));
             return;
         }
-        
+
         const file = new ScanFile();
 
         if (file.isSanitizedFile(linkUrl)) {
             return;
         }
-         
+
         if (downloadItem) {
             file.fileName = downloadItem.filename.split('/').pop();
             file.size = downloadItem.fileSize;
@@ -103,7 +102,7 @@ class FileProcessor {
 
     /**
      * Load a local file content.
-     * 
+     *
      * @param {string} localPath local file path
      * @returns {Promise}
      */
@@ -113,8 +112,8 @@ class FileProcessor {
 
     /**
      * Register callback that will run on scan complete with file data.
-     * 
-     * @param {*} callback 
+     *
+     * @param {*} callback
      */
     addOnScanCompleteListener(callback) {
         ON_SCAN_COMPLETE_LISTENERS.push(callback);
@@ -122,8 +121,8 @@ class FileProcessor {
 
     /**
      * Remove registered callback.
-     * 
-     * @param {*} callback 
+     *
+     * @param {*} callback
      */
     removeOnScanCompleteListener(callback) {
         const index = ON_SCAN_COMPLETE_LISTENERS.indexOf(callback);
@@ -135,8 +134,8 @@ class FileProcessor {
 
     /**
      * Call all registered listeners and pass the payload.
-     * 
-     * @param {*} payload 
+     *
+     * @param {*} payload
      */
     callOnScanCompleteListeners(payload) {
         if (!ON_SCAN_COMPLETE_LISTENERS.length) {
@@ -149,7 +148,7 @@ class FileProcessor {
     }
 
     /**
-     * 
+     *
      * @param {*} file file info
      * @param {*} info file scan result
      * @param {string} linkUrl file file url
@@ -164,7 +163,7 @@ class FileProcessor {
         }
         file.sha256 = info.file_info.sha256;
         file.dataId = info.data_id;
-        
+
         if (file.useCore) {
             if (settings.data.coreV4 === true){
                 file.scanResults = `${settings.data.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
@@ -189,7 +188,7 @@ class FileProcessor {
                 file.sanitizedFileURL = info.sanitized.file_path;
             }
         }
-        
+
         await scanHistory.updateFileById(file.id, file);
         await scanHistory.save();
 
@@ -216,7 +215,7 @@ class FileProcessor {
      */
     async startStatusPolling(file, linkUrl, fileData, downloaded) {
         let response;
-       
+
         if (file.useCore) {
             if (settings.data.coreV4 === true){
                 file.scanResults = `${settings.data.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
@@ -230,17 +229,17 @@ class FileProcessor {
             await scanHistory.save();
             response = await MetascanClient.setAuth(apikeyInfo.data.apikey).file.poolForResults(file.dataId, 3000);
         }
-        
+
         if (response.error) {
-            return; 
+            return;
         }
 
         await this.handleFileScanResults(file, response, linkUrl, fileData, downloaded);
     }
 
     /**
-     * 
-     * @param {*} file file information 
+     *
+     * @param {*} file file information
      * @param {string} linkUrl file url
      * @param {*} fileData file content
      * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
@@ -259,7 +258,7 @@ class FileProcessor {
             }
 
             file.dataId = response?.data_id;
-            
+
             await this.startStatusPolling(file, linkUrl, fileData, !!downloadItem);
         } catch (error) {
             file.scan_results = {
@@ -276,8 +275,8 @@ class FileProcessor {
 
     /**
      * Scan a file using Metadefender Core
-     * 
-     * @param {*} file file information 
+     *
+     * @param {*} file file information
      * @param {*} fileData file content
      */
     async scanWithCore(file, fileData) {
@@ -296,8 +295,8 @@ class FileProcessor {
 
     /**
      * Scan a file using Metadefender Cloud
-     * 
-     * @param {*} file file information 
+     *
+     * @param {*} file file information
      * @param {*} fileData file content
      */
     async scanWithCloud(file, fileData) {

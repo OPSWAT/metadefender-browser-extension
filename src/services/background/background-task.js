@@ -16,7 +16,6 @@ import SafeUrl from './safe-url';
 import BrowserNotification from '../common/browser/browser-notification';
 import BrowserStorage from '../common/browser/browser-storage';
 
-import '../common/ga-tracking';
 
 const MCL_CONFIG = MCL.config;
 
@@ -31,7 +30,7 @@ export default class BackgroundTask {
 
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
     }
-    
+
     async init() {
         try {
             await this.settings.init();
@@ -65,11 +64,11 @@ export default class BackgroundTask {
 
             this.setApikey(cookie.value);
         });
-        
+
         chrome.contextMenus.onClicked.addListener(this.handleContextMenuClicks.bind(this));
         chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
         chrome.notifications.onClosed.addListener(() => { });
-        
+
         chrome.downloads.onCreated.addListener(this.downloadsManager.trackInProgressDownloads.bind(this.downloadsManager));
         chrome.downloads.onChanged.addListener(this.downloadsManager.updateActiveDownloads.bind(this.downloadsManager));
         chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
@@ -110,7 +109,7 @@ export default class BackgroundTask {
 
     /**
      * Updates extension authentication info
-     *  
+     *
      * @param {string} cookieValue
      */
     async setApikey(cookieValue) {
@@ -156,7 +155,7 @@ export default class BackgroundTask {
             chrome.tabs.create({
                 url: 'index.html#/about'
             });
-            
+
         } else if (details.reason === 'update') {
             this.updateExtensionFrom(details.previousVersion);
         }
@@ -166,15 +165,15 @@ export default class BackgroundTask {
         if (info.menuItemId !== MCL_CONFIG.contextMenu.scanId) {
             return;
         }
-        
+
         const target = info.srcUrl || info.linkUrl || info.pageUrl;
-        
-        await this.processTarget(target);        
+
+        await this.processTarget(target);
     }
 
     /**
      * Process context menu event targets.
-     * 
+     *
      * @param linkUrl
      * @param downloadItem
      * @returns {Promise.<void>}
@@ -185,7 +184,7 @@ export default class BackgroundTask {
 
     /**
      * Extension updates handler.
-     * 
+     *
      * @param previousVersion
      * @returns {Promise<void>}
      */
@@ -217,13 +216,13 @@ export default class BackgroundTask {
         if (contextMenus[MCL_CONFIG.contextMenu.scanId]) {
             chrome.contextMenus.update(MCL_CONFIG.contextMenu.scanId, {
                 title: chrome.i18n.getMessage(title)
-            }); 
+            });
         }
     }
 
     /**
      * Handle browser messages.
-     * 
+     *
      * @param message
      * @returns {Promise.<void>}
      */
