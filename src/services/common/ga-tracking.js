@@ -14,7 +14,6 @@
         const ga = document.createElement('script');
         ga.type = 'text/javascript';
         ga.async = true;
-        ga.src = require('./ga');
         const s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(ga, s);
     }
