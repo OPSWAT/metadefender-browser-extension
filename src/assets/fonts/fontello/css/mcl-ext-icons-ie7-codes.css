@@ -7,5 +7,6 @@
 .icon-ok { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe808;&nbsp;'); }
 .icon-spin { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe839;&nbsp;'); }
 .icon-help { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf128;&nbsp;'); }
+.icon-history { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf1da;&nbsp;'); }
 .icon-trash { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf1f8;&nbsp;'); }
 .icon-server { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf233;&nbsp;'); }

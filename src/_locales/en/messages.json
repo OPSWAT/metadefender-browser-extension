@@ -27,6 +27,22 @@
       "message": "No files scanned so far.<br />Scan files using the context menu or enable automatic scans from settings page!",
       "description": "The message displayed when no files have been scanned"
     },
+    "fileNameTable": {
+      "message": "FILE NAME",
+      "description": "The message displayed on header of the table for file name."
+    },
+    "scanTimeTable": {
+      "message": "SCAN TIME",
+      "description": "The message displayed on header of the table for scan time."
+    },
+    "resultTable": {
+      "message": "RESULT",
+      "description": "The message displayed on header of the table for result."
+    },
+    "dropFile": {
+      "message": "DROP FILE",
+      "description": "This message is displayed for the drop file option"
+    },
     "noFilesFound": {
       "message": "There were no results matching your query",
       "description": "The message displayed when no files match the search criteria"

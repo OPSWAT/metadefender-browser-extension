@@ -3,8 +3,9 @@
 /** rules **/
 .popup {
   &--wrapper {
-    width: 350px;
+    width: 500px;
     padding: $padding;
+    background: $colorBlack;
   }
 
   &--header {
@@ -15,7 +16,7 @@
     justify-content: space-between;
   
     &__logo {
-      background-image: url('../../assets/images/metadefender-chrome-black.svg');
+      background-image: url('../../assets/images/metadefender-chrome.svg');
       position: relative;
       margin-top: 0;
       background-size: contain;
@@ -24,32 +25,89 @@
       width: 117px;
       height: 53px;
     }
+
+    &__buttons {
+      display: flex;
+      justify-content: center;
+      flex-direction: row;
+      gap: 10px;
+    }
   
     &__btn {
-      background: $colorWhite;
-      border: 1px solid $colorGrey;
+      background: $secondaryColor;
+      border: 1px solid $secondaryColor;
       padding: 4px 5px 3px 5px;
       display: block;
+      border-radius: 4px;
+
+      .icon-history {
+        &:before {
+          color: $colorWhite;
+        }
+      }
+
+      .icon-cog {
+        &:before {
+          color: $colorWhite;
+        }
+      }
     }
   }
 
   &--scan__history {
     .list-group {
-      border-top: 1px solid $colorGreyLight;
-      border-bottom: 1px solid $colorGreyLight;
       padding-bottom: 1px;
       margin: $padding -20px;
-
+      
       .list-group-item {
+        padding: 10px 20px;
+        background: $colorBlack;
+        border-bottom: 1px solid $colorGrayFDark;
+        color: $colorWhite;
         &:not(:last-of-type) {
-          border-bottom: 2px solid $colorGreyLight;
+          border-bottom: 2px solid $colorGrayFDark;
+        }
+
+        a {
+          color: $colorBlueLighter;
+        }
+
+        td:first-child {
+          width: 285px;
+          display: flex;
+          flex-direction: column;
+          span {
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+        }
+
+      }
+
+      thead {
+        tr {
+          color: $colorWhite;
+          font-weight: 800;
+          display: flex;
+          justify-content: space-around ;
+
+          td:first-child {
+            width: 300px;
+            padding: 0px 10px;
+          }
+        }
+      }
+
+      tbody {
+        tr:first-child {
+          border-top: 1px solid $colorGrayFDark;
         }
       }
     }
   }
 
   &--footer {
-    background-color: $colorWhite;
+    background-color: $colorBlack;
     border-top: 1px solid $colorGrey;
     padding: $padding;
     height: 60px;
@@ -57,6 +115,53 @@
 
   .header, .footer{
     padding: $padding;
-    background-color: $colorWhite;
+    background-color: $colorBlack;
   }
-}
+
+  &--drop__file {
+
+    .icon-drop {
+      &:before {
+        background-color: $colorGrayFDark;
+        color: transparent;
+        content: "";
+        height: 120px;
+        margin: 0;
+        mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cmVjdCB3aWR0aD0iMjAiIGhlaWdodD0iMjAiLz48ZyBzdHJva2UtbGluZWNhcD0icm91bmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE5IDkpIj48cGF0aCBzdHJva2U9IiM5QzlDOUMiIHN0cm9rZS1kYXNoYXJyYXk9IjMuODg2IDMuODg2IiBkPSJNNTAuNTYgNzcuNTYxYzAgMTMuODA2LTExLjE5MyAyNS0yNSAyNS0xMy44MDggMC0yNS0xMS4xOTQtMjUtMjUgMC0xMy44MDcgMTEuMTkyLTI1IDI1LTI1IDEzLjgwNyAwIDI1IDExLjE5MyAyNSAyNVoiLz48cG9seWdvbiBzdHJva2U9IiM2NTY1NjUiIHBvaW50cz0iODIuMTYzIDQwLjUgNTIuMTYzIDQwLjUgNTIuMTYzIC41IDc2LjE2MyAuNSA4Mi4xNjMgNi41Ii8+PHBvbHlsaW5lIHN0cm9rZT0iIzY1NjU2NSIgcG9pbnRzPSI4Mi4xNjMgNi41IDc2LjE2MyA2LjUgNzYuMTYzIC41Ii8+PGxpbmUgeDE9IjYyLjE2MyIgeDI9IjY0LjE2MyIgeTE9IjMwLjUiIHkyPSIzMC41IiBzdHJva2U9IiM2NTY1NjUiLz48bGluZSB4MT0iNjYuMTYzIiB4Mj0iNjguMTYzIiB5MT0iMzAuNSIgeTI9IjMwLjUiIHN0cm9rZT0iIzY1NjU2NSIvPjxsaW5lIHgxPSI3MC4xNjMiIHgyPSI3Mi4xNjMiIHkxPSIzMC41IiB5Mj0iMzAuNSIgc3Ryb2tlPSIjNjU2NTY1Ii8+PHBvbHlsaW5lIHN0cm9rZT0iIzY1NjU2NSIgcG9pbnRzPSI3OC4xNjMgOS41IDc4LjE2MyAzNi41IDU2LjE2MyAzNi41IDU2LjE2MyA0LjUgNzMuMTYzIDQuNSIvPjxwb2x5bGluZSBzdHJva2U9IiM2NTY1NjUiIHBvaW50cz0iMjkuMDIyIDQyLjMzOSAyNS4wMjIgNDYuMzM5IDIxLjAyMiA0Mi4zMzkiLz48cGF0aCBzdHJva2U9IiM2NTY1NjUiIGQ9Ik0yNS4wMjIgNDYuMzM5YzAtMTQuOTEyIDEyLjA4OC0yNyAyNy0yNyIvPjwvZz48L2c+PC9zdmc+");
+        -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cmVjdCB3aWR0aD0iMjAiIGhlaWdodD0iMjAiLz48ZyBzdHJva2UtbGluZWNhcD0icm91bmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE5IDkpIj48cGF0aCBzdHJva2U9IiM5QzlDOUMiIHN0cm9rZS1kYXNoYXJyYXk9IjMuODg2IDMuODg2IiBkPSJNNTAuNTYgNzcuNTYxYzAgMTMuODA2LTExLjE5MyAyNS0yNSAyNS0xMy44MDggMC0yNS0xMS4xOTQtMjUtMjUgMC0xMy44MDcgMTEuMTkyLTI1IDI1LTI1IDEzLjgwNyAwIDI1IDExLjE5MyAyNSAyNVoiLz48cG9seWdvbiBzdHJva2U9IiM2NTY1NjUiIHBvaW50cz0iODIuMTYzIDQwLjUgNTIuMTYzIDQwLjUgNTIuMTYzIC41IDc2LjE2MyAuNSA4Mi4xNjMgNi41Ii8+PHBvbHlsaW5lIHN0cm9rZT0iIzY1NjU2NSIgcG9pbnRzPSI4Mi4xNjMgNi41IDc2LjE2MyA2LjUgNzYuMTYzIC41Ii8+PGxpbmUgeDE9IjYyLjE2MyIgeDI9IjY0LjE2MyIgeTE9IjMwLjUiIHkyPSIzMC41IiBzdHJva2U9IiM2NTY1NjUiLz48bGluZSB4MT0iNjYuMTYzIiB4Mj0iNjguMTYzIiB5MT0iMzAuNSIgeTI9IjMwLjUiIHN0cm9rZT0iIzY1NjU2NSIvPjxsaW5lIHgxPSI3MC4xNjMiIHgyPSI3Mi4xNjMiIHkxPSIzMC41IiB5Mj0iMzAuNSIgc3Ryb2tlPSIjNjU2NTY1Ii8+PHBvbHlsaW5lIHN0cm9rZT0iIzY1NjU2NSIgcG9pbnRzPSI3OC4xNjMgOS41IDc4LjE2MyAzNi41IDU2LjE2MyAzNi41IDU2LjE2MyA0LjUgNzMuMTYzIDQuNSIvPjxwb2x5bGluZSBzdHJva2U9IiM2NTY1NjUiIHBvaW50cz0iMjkuMDIyIDQyLjMzOSAyNS4wMjIgNDYuMzM5IDIxLjAyMiA0Mi4zMzkiLz48cGF0aCBzdHJva2U9IiM2NTY1NjUiIGQ9Ik0yNS4wMjIgNDYuMzM5YzAtMTQuOTEyIDEyLjA4OC0yNyAyNy0yNyIvPjwvZz48L2c+PC9zdmc+");
+        mask-position: center;
+        width: 100px;
+      }      
+    }
+    
+    .text {
+      position: fixed;
+      bottom: 42px;
+      color: $colorWhite;
+      display: block;
+      font-size: 10px;
+      position: fixed;
+      right: 70px;
+      text-align: center;
+      width: 30px;
+      }
+
+    }
+    
+  }
+  .drop-overlay {
+    background-color: rgba(40, 40, 40, .8);
+    display: none;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    overflow: auto;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+
+  .drop-overlay.active {
+    display: flex;
+  }
