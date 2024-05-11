@@ -127,5 +127,12 @@ module.exports = {
     output: { 
         filename: '[name].js', 
         path: path.resolve(__dirname, 'dist') 
+    },
+
+    watchOptions: {
+        aggregateTimeout: 300,
+        poll: 1000, // added to check for changes every second
+        ignored: /node_modules/
     }
+    
 };

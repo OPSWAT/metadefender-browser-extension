@@ -1,0 +1,35 @@
+@import "../../assets/style/colors.scss";
+
+.stats {
+    background-color: $colorWhite;
+    color: $colorBlack;
+    width: 100%;
+
+    h2 {
+      font-family: Roboto, sans-serif !important;
+      font-weight: 400;
+      font-size: 24px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid $colorGrey;
+      margin-bottom: 14px;
+    }
+
+    .chart-container {
+        width: 100%;
+        max-width: 800px;
+        background-color: $colorGreyLighter;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin: 0 auto;
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    }
+
+    p {
+        color: $colorGreyDark;
+        font-size: 13px;
+    }
+}

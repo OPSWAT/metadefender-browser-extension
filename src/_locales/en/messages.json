@@ -59,6 +59,10 @@
       "message": "About",
       "description": ""
     },
+    "menuStats":{
+      "message": "Stats",
+      "description": ""
+    },
     "aboutTitle": {
       "message": "About OPSWAT File Security for Chrome",
       "description": ""

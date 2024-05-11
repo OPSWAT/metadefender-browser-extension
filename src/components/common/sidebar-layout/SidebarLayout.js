@@ -22,8 +22,14 @@ const MENU_ITEMS = [
         label: chrome.i18n.getMessage('menuAbout'),
         path: 'index.html#/about',
         page: 'about'
+    },
+    {
+        label: chrome.i18n.getMessage('menuStats'), // message in messages.json
+        path: 'index.html#/stats',
+        page: 'stats'
     }
 ];
+
 
 const SidebarLayout = ({ className, content, currentPage }) => {
     const navigate = useNavigate();
