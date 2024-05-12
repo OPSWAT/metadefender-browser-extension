@@ -1,6 +1,6 @@
 'use strict';
 
-import { SANITIZATION, UNARCHIVE } from '../constants/workflow';
+import { SANITIZATION, UNARCHIVE, DLP } from '../constants/workflow';
 import MCL from '../../config/config';
 
 /**
@@ -134,9 +134,10 @@ function hashLookup(hash) {
  * @param {boolean} sampleSharing
  * @param {string} password
  * @param {boolean} canBeSanitized
+ * @param {boolean} useDLP
  * @returns {Promise}
  */
-function fileUpload({ fileName, fileData, sampleSharing, password, canBeSanitized }) {
+function fileUpload({ fileName, fileData, sampleSharing, password, canBeSanitized, useDLP }) {
     sampleSharing = (sampleSharing === true) ? 1 : 0;
 
     const restEndpoint = `${MCL.config.metadefenderDomain}/${MCL.config.metadefenderVersion}/file`;
@@ -154,6 +155,10 @@ function fileUpload({ fileName, fileData, sampleSharing, password, canBeSanitize
 
     if (canBeSanitized) {
         additionalHeaders.rule += ',' + SANITIZATION;
+    }
+
+    if (useDLP) {
+        additionalHeaders.rule += ',' + DLP;
     }
 
     const options = {

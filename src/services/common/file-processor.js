@@ -19,8 +19,9 @@ class FileProcessor {
      * 
      * @param {string} linkUrl file url 
      * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
+     * @param {boolean} useDLP scan using DLP
      */
-    async processTarget(linkUrl, downloadItem) {
+    async processTarget(linkUrl, downloadItem, useDLP) {
         await apikeyInfo.load();
         if (!apikeyInfo.data.apikey) {
             BrowserNotification.create(chrome.i18n.getMessage('undefinedApiKey'));
@@ -95,6 +96,8 @@ class FileProcessor {
         if (file.fileName === '') {
             file.fileName = file.md5;
         }
+
+        file.useDLP = useDLP ? useDLP : false;
 
         await scanHistory.addFile(file);
 
@@ -310,7 +313,8 @@ class FileProcessor {
                     fileName: file.fileName,
                     fileData,
                     sampleSharing: settings.data.shareResults,
-                    canBeSanitized: file.canBeSanitized
+                    canBeSanitized: file.canBeSanitized,
+                    useDLP: file.useDLP,
                 });
             }
         } catch (error) {
