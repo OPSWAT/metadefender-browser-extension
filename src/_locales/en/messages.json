@@ -113,7 +113,11 @@
       "message": "Scan downloads<div class='text-secondary text-14'>Automatically scan all downloaded files. Files are scanned only after the file is downloaded on the computer. A notification* will inform you when the scan is complete.</div>",
       "description": ""
     },
-    "scanDownloadsSub": {
+    "scanUploads": {
+      "message": "Scan uploading files<div class='text-secondary text-14'>Automatically scan uploading files to the internet with DLP (Data loss prevention). Files are scanned only after the file is put inside an \"input\" tag. A notification* will inform you when the scan is complete.</div>",
+      "description": ""
+    },
+    "scanSub": {
       "message": "* Chrome Notifications must be enabled"
     },
     "shareResults": {
