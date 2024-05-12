@@ -6,6 +6,7 @@ import ConfigContext from '../../providers/ConfigProvider';
 import { goToTab } from '../../services/background/navigation';
 import ScanFile from '../../services/common/scan-file';
 import ScanHistoryContext from '../../providers/ScanHistoryProvider';
+import { SCAN_STATUS } from '../../services/constants/file';
 
 import './Popup.scss';
 
@@ -17,6 +18,20 @@ const Popup = () => {
     const scanUrl = config.mclDomain;
     const [dropOverlayActive, setDropOverlayActive] = useState(false);
 
+    const countFilesScannedToday = () => {
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        return files.filter(file => new Date(file.scanTime * 1000) >= startOfToday).length;
+    }
+
+    const countFilesBlockedToday = () => {
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        return files.filter(file => new Date(file.scanTime * 1000) >= startOfToday && file.status === SCAN_STATUS.VALUES.INFECTED).length;
+    }
+
+    const filesScannedToday = useMemo(countFilesScannedToday, [files]);
+    const filesBlockedToday = useMemo(countFilesBlockedToday, [files]);
 
     /**
      * Send google analytics data on click event
@@ -181,28 +196,36 @@ const Popup = () => {
             </div>;
     })
 
-    return <div className="popup--wrapper" onDrop={handleDragAndDrop} onDragOver={handleDragAndDrop}>
-    <div className={`drop-overlay ${dropOverlayActive ? 'active' : ''}`}></div>
-        <div className="popup--header">
-            <div className="popup--header__logo"></div>
-                <div className="popup--header__buttons">
+    return (
+    <div className="popup--wrapper" onDrop={handleDragAndDrop} onDragOver={handleDragAndDrop}>
+        <div className={`drop-overlay ${dropOverlayActive ? 'active' : ''}`}></div>
+            <div className="popup--header">
+                <div className="popup--header__logo"></div>
+                    <div className="popup--header__buttons">
                     <a href='#' className={classNames("popup--header__btn", viewScanHistoryClassName)} onClick={goToHistory}>
                         <span className="icon-history text-14"></span>
                     </a>
                     <a href='#' className="popup--header__btn" onClick={goToSettings}>
                         <span className="icon-cog text-14"></span>
                     </a>
+                    </div>
                 </div>
-        </div>
-
-        <div className="popup--scan__history">
+            <div className= "popup--scan__history">
             {scanResults}
-        </div>
-
-        <div className="popup--drop__file text-right">
+            <div className = "todays-stats-container">
+                <div className="today-scans">
+                    Files scanned today: {filesScannedToday}
+                </div>
+                <div className='today-blocks'>
+                    Files blocked today: {filesBlockedToday}
+                </div>
+            </div>
+            </div>
+            <div className="popup--drop__file text-right">
             {dropFile}
         </div>
-    </div>;
+    </div>
+    );
 };
 
 export default Popup;

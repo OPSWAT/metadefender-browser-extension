@@ -64,9 +64,6 @@
         background: $colorBlack;
         border-bottom: 1px solid $colorGrayFDark;
         color: $colorWhite;
-        &:not(:last-of-type) {
-          border-bottom: 2px solid $colorGrayFDark;
-        }
 
         a {
           color: $colorBlueLighter;
@@ -133,7 +130,7 @@
         width: 100px;
       }      
     }
-    
+  
     .text {
       position: fixed;
       bottom: 42px;
@@ -165,3 +162,21 @@
   .drop-overlay.active {
     display: flex;
   }
+
+  .todays-stats-container {
+    display: flex;
+    justify-content: space-between; // space between children equally
+    align-items: center;
+    padding: 10px;
+    border-bottom: 2px solid $colorGrayFDark;
+  }
+  
+  .today-scans, .today-blocks {
+    color: $colorWhite;
+    font-family: Roboto, sans-serif !important;
+    flex: 1; // each child takes equal space
+    display: flex;
+    justify-content: space-between; // space elements
+    align-items: center;
+  }
+  
