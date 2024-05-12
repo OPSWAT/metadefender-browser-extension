@@ -111,6 +111,10 @@ export const SettingsProvider = ({ children }) => {
                 newSettings.scanDownloads = !newSettings.scanDownloads && isAllowedFileSchemeAccess;
                 break;
             }
+            case 'scanUploads': {
+                newSettings.scanUploads = !newSettings.scanUploads && isAllowedFileSchemeAccess;
+                break;
+            }
             default:
                 newSettings[key] = !newSettings[key];
                 break;

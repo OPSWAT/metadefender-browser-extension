@@ -7,7 +7,7 @@ const storageKey = MCL.config.storageKey.settings;
 
 /**
  *
- * @returns {{scanDownloads: boolean, shareResults: boolean, showNotifications: boolean, saveCleanFiles: boolean, init: init, merge: merge, save: save, load: load}}
+ * @returns {{scanDownloads: boolean, scanUploads: boolean, shareResults: boolean, showNotifications: boolean, saveCleanFiles: boolean, init: init, merge: merge, save: save, load: load}}
  * @constructor
  */
 function Settings() {
@@ -15,6 +15,7 @@ function Settings() {
         id: Math.random(),
         data: {
             scanDownloads: false,
+            scanUploads: false,
             shareResults: true,
             showNotifications: true,
             saveCleanFiles: false,
