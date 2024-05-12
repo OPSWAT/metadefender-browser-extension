@@ -34,7 +34,8 @@ export default {
         'storageKey': {
             'settings': '/* @echo storageKey.settings */',
             'scanHistory': '/* @echo storageKey.scanHistory */',
-            'apikey': '/* @echo storageKey.apikey */'
+            'apikey': '/* @echo storageKey.apikey */',
+            'domainHistory': '/* @echo storageKey.domainHistory */'
         },
 
         'contextMenu': {

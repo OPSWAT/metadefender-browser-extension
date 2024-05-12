@@ -20,6 +20,9 @@ const CoreClient = {
     hash: {
         lookup: hashLookup
     },
+    domain: {
+        lookup: domainLookup,
+    },
     version: getVersion,
     rules: getRules
 };
@@ -192,4 +195,13 @@ function getRules() {
  */
 function checkSanitized(downloadUrl) {
     return fetch(downloadUrl).then(response => response.status === 200);
+}
+
+function domainLookup(observableDomain) {
+    const restEndpoint = `${config.endpoint}/domain/${observableDomain}`;
+    const options = {
+        headers: authHeader
+    };
+
+    return callAPI(restEndpoint, options);
 }

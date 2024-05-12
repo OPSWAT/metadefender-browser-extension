@@ -22,6 +22,9 @@ const MetascanClient = {
         lookup: fileLookup,
         poolForResults: poolForResults
     },
+    domain: {
+        lookup: domainLookup
+    },
     apikey: {
         info: apikeyInfo
     }
@@ -218,3 +221,4 @@ async function recursiveLookup(dataId, pollingInterval, resolve) {
         resolve(response);
     }
 }
+
