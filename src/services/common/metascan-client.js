@@ -222,3 +222,6 @@ async function recursiveLookup(dataId, pollingInterval, resolve) {
     }
 }
 
+async function domainLookup() {
+    
+}
