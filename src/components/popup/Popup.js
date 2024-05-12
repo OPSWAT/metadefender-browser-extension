@@ -119,6 +119,10 @@ const Popup = () => {
                 <span className="mcl-icon icon-right"></span>
             </a>
         </div>
+
+        <div className={viewScanHistoryClassName}>
+            Website Reputation: 
+        </div>
     </div>;
 };
 
