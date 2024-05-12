@@ -22,6 +22,11 @@ const MENU_ITEMS = [
         label: chrome.i18n.getMessage('menuAbout'),
         path: 'index.html#/about',
         page: 'about'
+    },
+    {
+        label: chrome.i18n.getMessage('menuDomain'),
+        path: 'index.html#/domain',
+        page: 'domain'
     }
 ];
 

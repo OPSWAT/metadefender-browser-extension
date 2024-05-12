@@ -22,7 +22,7 @@
     "contextMenuScanAndDownloadTitle": {
       "message": "Scan and download with OPSWAT",
       "description": ""
-    },
+    }, 
     "noScansNotification": {
       "message": "No files scanned so far.<br />Scan files using the context menu or enable automatic scans from settings page!",
       "description": "The message displayed when no files have been scanned"
@@ -41,6 +41,10 @@
     },
     "menuAbout": {
       "message": "About",
+      "description": ""
+    },
+    "menuDomain": {
+      "message": "Domain Reputation",
       "description": ""
     },
     "aboutTitle": {
