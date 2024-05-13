@@ -1,4 +1,3 @@
-
 import MCL from '../../config/config';
 
 import { settings } from '../common/persistent/settings';
@@ -30,6 +29,7 @@ export default class BackgroundTask {
         this.downloadsManager = new DownloadManager(FileProcessor);
 
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
+        this.findTabAndRunDropTask();
     }
     
     async init() {
@@ -73,6 +73,9 @@ export default class BackgroundTask {
         chrome.downloads.onCreated.addListener(this.downloadsManager.trackInProgressDownloads.bind(this.downloadsManager));
         chrome.downloads.onChanged.addListener(this.downloadsManager.updateActiveDownloads.bind(this.downloadsManager));
         chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
+        chrome.runtime.onMessage.addListener(this.handleMessage.bind(this));
+        
+
 
         BrowserStorage.addListener(this.browserStorageListener.bind(this));
 
@@ -92,6 +95,61 @@ export default class BackgroundTask {
         SafeUrl.toggle(this.settings.data.safeUrl);
     }
 
+    handleMessage(message, sender, sendResponse) {
+        if (message.type === 'fileUploaded') {
+            console.log('File uploaded:', message.fileInfo);
+        }
+    }
+    
+
+    /**
+     * Get the tab id and execute script on it 
+     * 
+     * @param tabId
+     */
+
+    async runDropTaskScript(tabId) {
+        try {
+            const tab = await chrome.tabs.get(tabId);
+            // if (tab && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://'))) {
+            //     return;
+            // }
+            console.log('Tab name:', tab.title, ', Tab id:', tab.id);
+            await chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                func: drop_task
+            });
+        } catch (error) {
+            console.error('Error executing script', error);
+        }
+    }
+    
+
+
+    
+    async findTabAndRunDropTask() {
+        const tabs = await chrome.tabs.query({ url: '*://*/*' });
+
+        if (tabs.length === 0) {
+            const newTab = await chrome.tabs.create({});
+            await this.runDropTaskScript(newTab.id);
+            return;
+        }
+    
+        for (const { id: tabId } of tabs) {
+            try {
+                await this.runDropTaskScript(tabId); 
+            } catch (error) {
+                console.error('Error executing script:', tabId, error);
+            }
+        }
+    
+        chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+            if (changeInfo.status === 'complete') {
+                await this.runDropTaskScript(tabId);
+            }
+        });
+    }
     /**
      * contexts: ['all', 'page', 'frame', 'selection', 'link', 'editable', 'image', 'video', 'audio', 'launcher', 'browser_action', 'page_action']
      * @param saveCleanFiles
@@ -256,3 +314,43 @@ export default class BackgroundTask {
 }
 
 export const Task = new BackgroundTask();
+
+function drop_task() {
+    
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        try {
+        input.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const fileInfo = {
+                name: file.name,
+                size: file.size,
+                type: file.type
+            };
+            chrome.runtime.sendMessage({ type: 'fileUploaded', fileInfo: fileInfo });
+        });
+        } catch (error) {
+            console.error('Error processing file inputs normal:', error);
+        }
+    });
+
+    document.querySelectorAll('iframe').forEach(frame => {
+        try {
+            const frameDocument = frame.contentDocument || frame.contentWindow.document;
+            frameDocument.querySelectorAll('input[type="file"]').forEach(input => {
+                input.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    const fileInfo = {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type
+                    };
+                    chrome.runtime.sendMessage({ type: 'fileUploaded', fileInfo: fileInfo });
+                });
+            });
+        } catch (error) {
+            console.error('Error processing file inputs in frame:', error);
+        }
+    });
+}
+
+

@@ -16,7 +16,6 @@ const ScanHistoryTable = ({ data, filterBy, removeFile, getStatusIcon }) => {
             return item.fileName.includes(filterBy);
         });
     }, [data, filterBy]);
-
     const tableDom = useMemo(() => {
         if (!processedData?.length) {
             return <p className="mt-5 text-center" dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('noFilesFound') }} />;
@@ -28,6 +27,7 @@ const ScanHistoryTable = ({ data, filterBy, removeFile, getStatusIcon }) => {
                     <th>Filename</th>
                     <th>Scan Time</th>
                     <th colSpan={3}>Results</th>
+                    <th>DLP</th>
                 </tr>
             </thead>
 
@@ -44,6 +44,7 @@ const ScanHistoryTable = ({ data, filterBy, removeFile, getStatusIcon }) => {
                         removeFile={(event) => removeFile(event, item.id)}
                         getStatusIcon={getStatusIcon}
                         useCore={item.useCore}
+                        useDLP={item.useDLP}
                     />
                 ))}
             </tbody>

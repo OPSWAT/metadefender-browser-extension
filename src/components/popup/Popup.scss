@@ -76,7 +76,7 @@
           width: 285px;
           display: flex;
           flex-direction: column;
-          span {
+          span, a {
             text-overflow: ellipsis;
             overflow: hidden;
           }

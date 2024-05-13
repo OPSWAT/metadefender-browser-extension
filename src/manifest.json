@@ -37,7 +37,8 @@
     "notifications",
     "scripting",
     "storage",
-    "tabs"
+    "tabs",
+    "activeTab"
   ],
 
   "host_permissions": [
