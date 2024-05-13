@@ -8,6 +8,7 @@ import ScanFile from '../../services/common/scan-file';
 import ScanHistoryContext from '../../providers/ScanHistoryProvider';
 
 import './Popup.scss';
+import { sendDomainToApi } from './utils/popup_domain';
 
 const Popup = () => {
     
@@ -100,6 +101,11 @@ const Popup = () => {
             {scanResultsDom}
         </ul>;
     }, [files, scanResultsDom]);
+
+    useEffect(() => {
+        gaTrackEvent(['_trackPageview', '/extension/popup']);
+        sendDomainToApi();
+    }, []);
 
     return <div className="popup--wrapper">
         <div className="popup--header">
