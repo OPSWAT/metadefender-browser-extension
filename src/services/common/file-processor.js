@@ -55,7 +55,8 @@ class FileProcessor {
         }
 
         file.extension = file.fileName.split('.').pop();
-        file.canBeSanitized = file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
+        file.useDLP = useDLP ? useDLP : false;
+        file.canBeSanitized = useDLP || file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
 
         if (file.size === null) {
             BrowserNotification.create(chrome.i18n.getMessage('fileEmpty'));
@@ -96,8 +97,6 @@ class FileProcessor {
         if (file.fileName === '') {
             file.fileName = file.md5;
         }
-
-        file.useDLP = useDLP ? useDLP : false;
 
         await scanHistory.addFile(file);
 
@@ -161,6 +160,9 @@ class FileProcessor {
      * @returns {Promise.<void>}
      */
     async handleFileScanResults(file, info, linkUrl, fileData, downloaded) {
+
+        console.log('file-processor handleFileScanResults info', info);
+
         if (info.scan_results) {
             file.status = new ScanFile().getScanStatus(info.scan_results.scan_all_result_i);
             file.statusLabel = new ScanFile().getScanStatusLabel(info.scan_results.scan_all_result_i);
@@ -199,6 +201,8 @@ class FileProcessor {
         let notificationMessage = file.fileName + chrome.i18n.getMessage('fileScanComplete');
         notificationMessage += (file.status === ScanFile.STATUS.INFECTED) ? chrome.i18n.getMessage('threatDetected') : chrome.i18n.getMessage('noThreatDetected');
         await BrowserNotification.create(notificationMessage, file.id, file.status === ScanFile.STATUS.INFECTED);
+
+        console.log('file-processor handleFileScanResults file', file);
 
         this.callOnScanCompleteListeners({
             status: file.status,
@@ -256,6 +260,8 @@ class FileProcessor {
             const response = useCore
                 ? await this.scanWithCore(file, fileData)
                 : await this.scanWithCloud(file, fileData);
+
+            console.log('file-processor scanFile response', response);
 
             if (!response.data_id) {
                 throw response;
