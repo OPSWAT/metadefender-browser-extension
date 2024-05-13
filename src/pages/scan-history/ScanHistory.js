@@ -79,9 +79,12 @@ const ScanHistory = () => {
             results: item.statusLabel,
             status: item.status,
             id: item.id, 
-            useCore: item?.useCore
+            useCore: item?.useCore,
+            useDLP: item?.useDLP
         }));
     }, [files]);
+
+    console.log(files);
 
     const handleSearch = (e) => setSearchValue(e.target?.value);
 

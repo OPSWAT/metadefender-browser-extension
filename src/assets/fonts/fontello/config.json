@@ -71,6 +71,12 @@
       "css": "history",
       "code": 61914,
       "src": "fontawesome"
+    },
+    {
+      "uid": "f5999a012fc3752386635ec02a858447",
+      "css": "download-cloud",
+      "code": 61677,
+      "src": "fontawesome"
     }
   ]
 }

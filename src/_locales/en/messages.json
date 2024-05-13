@@ -253,6 +253,10 @@
       "message": "Remove file from scan history",
       "description": ""
     },
+    "downloadTooltip": {
+      "message": "Download sanitized file",
+      "description": ""
+    },
     "scanResult0": {
       "message": "No threats found",
       "description": ""
