@@ -1,6 +1,6 @@
 
 import classNames from 'classnames';
-import React, { useEffect, useMemo, useContext } from 'react';
+import React, { useEffect, useMemo, useContext, useState } from 'react';
 import GAContext from '../../providers/GAProvider';
 import ConfigContext from '../../providers/ConfigProvider';
 import { goToTab } from '../../services/background/navigation';
@@ -12,6 +12,7 @@ import { sendDomainToApi } from './utils/popup_domain';
 
 const Popup = () => {
     
+    const [apiResponse, setApiResponse] = useState('')
     const config = useContext(ConfigContext);
     const { gaTrackEvent } = useContext(GAContext);
     const { files } = useContext(ScanHistoryContext);
@@ -104,7 +105,17 @@ const Popup = () => {
 
     useEffect(() => {
         gaTrackEvent(['_trackPageview', '/extension/popup']);
-        sendDomainToApi();
+        const fetchData = async () => {
+            try {
+                const response = await sendDomainToApi();
+                setApiResponse(response);
+            } catch (error) {
+                console.error("Error fetching data from API:", error);
+            }
+        };
+
+        fetchData();
+    
     }, []);
 
     return <div className="popup--wrapper">
@@ -126,9 +137,14 @@ const Popup = () => {
             </a>
         </div>
 
-        <div className={viewScanHistoryClassName}>
-            Website Reputation: 
+        {/* TODO:::: PARSE THE RESPONSE BODY IN ORDER TO SHOW IN POPUP ONLY tHE RESULT: TRUSTWORTHY ETC. */}
+
+        <div className='popup--scan__history'>
+            Website Reputation: {apiResponse ? JSON.stringify(apiResponse.lookup_results.sources[0]) : "Loading..."}
         </div>
+
+        {/* TODO:::: SAVE THE DOMAINS IN LOCALSTORAGE */}
+
     </div>;
 };
 
