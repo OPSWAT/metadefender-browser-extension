@@ -1,5 +1,6 @@
 import MetascanClient from "../../../services/common/metascan-client";
 import { apikeyInfo } from "../../../services/common/persistent/apikey-info";
+import { domainHistory } from "../../../services/common/persistent/domain-history";
 
 export const sendDomainToApi = async () => {
     function getTrustworthySources(apiResponse) {
@@ -25,6 +26,8 @@ export const sendDomainToApi = async () => {
             try {
                 const response = await MetascanClient.setAuth(apikeyInfo.data.apikey)?.domain?.lookup(domain);
                 console.log(response.lookup_results.sources);
+                await domainHistory.addDomain(domain);
+                console.log(domainHistory.domains);
                 const trustworthySources = getTrustworthySources(response);
                 console.log(trustworthySources)
                 resolve(trustworthySources);

@@ -4,6 +4,7 @@ import MCL from '../../config/config';
 import { settings } from '../common/persistent/settings';
 import { apikeyInfo } from '../common/persistent/apikey-info';
 import { scanHistory } from '../common/persistent/scan-history';
+import { domainHistory } from '../common/persistent/domain-history';
 
 import CoreClient from '../common/core-client';
 import MetascanClient from '../common/metascan-client';
@@ -27,6 +28,7 @@ export default class BackgroundTask {
         this.apikeyInfo = apikeyInfo;
         this.settings = settings;
         this.scanHistory = scanHistory;
+        this.domainHistory = domainHistory;
         this.downloadsManager = new DownloadManager(FileProcessor);
 
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
@@ -37,6 +39,7 @@ export default class BackgroundTask {
             await this.settings.init();
             await this.apikeyInfo.init();
             await this.scanHistory.init();
+            await this.domainHistory.init();
             await this.scanHistory.cleanPendingFiles();
             await SafeUrl.init();
         } catch (error) {
@@ -245,6 +248,10 @@ export default class BackgroundTask {
                     break;
                 case MCL_CONFIG.storageKey.scanHistory: {
                     await this.scanHistory.load();
+                    break;
+                }
+                case MCL_CONFIG.storageKey.domainHistory: {
+                    await this.domainHistory.load();
                     break;
                 }
                 default:
