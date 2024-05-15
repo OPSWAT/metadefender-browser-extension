@@ -139,10 +139,8 @@ const Popup = () => {
             </a>
         </div>
 
-        {/* TODO:::: PARSE THE RESPONSE BODY IN ORDER TO SHOW IN POPUP ONLY tHE RESULT: TRUSTWORTHY ETC. */}
-
         <div className='popup--scan__history'>
-            Website Reputation: {apiResponse ? JSON.stringify(apiResponse[0].assessment) : "Loading..."}
+            Website Reputation: {apiResponse ? apiResponse[0].assessment.charAt(0).toUpperCase() + apiResponse[0].assessment.slice(1) : "Loading..."}
 
         </div>
 
