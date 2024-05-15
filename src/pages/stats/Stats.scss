@@ -14,19 +14,37 @@
       margin-bottom: 14px;
     }
 
-    .chart-container {
+    h3 {
+        font-family: Roboto, sans-serif !important;
+        font-weight: 400;
+        font-size: 20px;
+        padding-bottom: 5px;
+        text-align: center;
+      }
+
+    .chart1 {
         width: 100%;
-        max-width: 800px;
+        max-width: 700px;
         background-color: $colorGreyLighter;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
+        border-radius: 5px;
         margin: 0 auto;
+        margin-bottom: 30px;
+        }
+
+    .chart2 {
+        width: 100%;
+        max-width: 700px;
+        background-color: $colorGreyLighter;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        margin: 0 auto;
+        }
 
         canvas {
             width: 100% !important;
             height: auto !important;
         }
-    }
 
     p {
         color: $colorGreyDark;

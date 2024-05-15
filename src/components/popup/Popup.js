@@ -9,29 +9,17 @@ import ScanHistoryContext from '../../providers/ScanHistoryProvider';
 import { SCAN_STATUS } from '../../services/constants/file';
 
 import './Popup.scss';
+import useTodayFileStats from '../../hooks/useTodayFileStats';
+
 
 const Popup = () => {
-    
+
+    const { filesScannedToday, filesBlockedToday, filesUnknownToday } = useTodayFileStats();
     const config = useContext(ConfigContext);
     const { gaTrackEvent } = useContext(GAContext);
     const { files } = useContext(ScanHistoryContext);
     const scanUrl = config.mclDomain;
     const [dropOverlayActive, setDropOverlayActive] = useState(false);
-
-    const countFilesScannedToday = () => {
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-        return files.filter(file => new Date(file.scanTime * 1000) >= startOfToday).length;
-    }
-
-    const countFilesBlockedToday = () => {
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-        return files.filter(file => new Date(file.scanTime * 1000) >= startOfToday && file.status === SCAN_STATUS.VALUES.INFECTED).length;
-    }
-
-    const filesScannedToday = useMemo(countFilesScannedToday, [files]);
-    const filesBlockedToday = useMemo(countFilesBlockedToday, [files]);
 
     /**
      * Send google analytics data on click event
@@ -65,17 +53,17 @@ const Popup = () => {
         const timeDifference = (Math.floor(Date.now() / 1000) - timestamp);
 
         const intervals = [
-            {label: 'year', seconds: 31536000 },
-            {label: 'month', seconds: 2592000},
-            {label: 'day', seconds: 86400},
-            {label: 'hour', seconds: 3600},
-            {label: 'minute', seconds: 60},
-            {label: 'second', seconds: 1}
+            { label: 'year', seconds: 31536000 },
+            { label: 'month', seconds: 2592000 },
+            { label: 'day', seconds: 86400 },
+            { label: 'hour', seconds: 3600 },
+            { label: 'minute', seconds: 60 },
+            { label: 'second', seconds: 1 }
         ]
 
         for (let i = 0; i < intervals.length; i++) {
             const count = Math.floor(timeDifference / intervals[i].seconds);
-            if(count >= 1) {
+            if (count >= 1) {
                 return `${count} ${intervals[i].label}${count !== 1 ? 's' : ''} ago`;
 
             }
@@ -104,7 +92,7 @@ const Popup = () => {
 
     const handleDragAndDrop = (event) => {
         event.preventDefault();
-        event.stopPropagation(); 
+        event.stopPropagation();
         console.log(event.type);
         if (event.type === 'dragover') {
             setDropOverlayActive(true);
@@ -115,7 +103,7 @@ const Popup = () => {
         }
     };
 
-    
+
 
     useEffect(() => {
         gaTrackEvent(['_trackPageview', '/extension/popup']);
@@ -135,27 +123,27 @@ const Popup = () => {
         if (files.length === 0) {
             return;
         }
-        
-        
+
+
         const tableRows = files.slice(0, 3).map((scannedFile, index) => {
             console.log(scannedFile);
             return (
-            <tr key={index} className="list-group-item d-flex align-items-center justify-content-between">
-                <td>
+                <tr key={index} className="list-group-item d-flex align-items-center justify-content-between">
+                    <td>
                         <a href={scannedFile.scanResults || getScanUrl(scannedFile)} target="_blank" rel="noreferrer noopener">
                             {scannedFile.fileName}
                         </a>
                         <span>
                             {scannedFile.dataId}
                         </span>
-                </td>
-                <td>
-                    {getRelativeScanTime(scannedFile.scanTime)}
-                </td>
-                <td>
-                    <span className={`mcl-icon ${getStatusIcon(scannedFile.status)}`}></span>
-                </td>
-            </tr>
+                    </td>
+                    <td>
+                        {getRelativeScanTime(scannedFile.scanTime)}
+                    </td>
+                    <td>
+                        <span className={`mcl-icon ${getStatusIcon(scannedFile.status)}`}></span>
+                    </td>
+                </tr>
             );
         });
 
@@ -176,55 +164,55 @@ const Popup = () => {
         }
 
         return <table className="list-group row">
-                    <thead>
-                        <tr>
-                            <td>FILE NAME</td>
-                            <td>SCAN TIME</td>
-                            <td>RESULT</td>
-                        </tr>
-                    </thead>
-                    
+            <thead>
+                <tr>
+                    <td>FILE NAME</td>
+                    <td>SCAN TIME</td>
+                    <td>RESULT</td>
+                </tr>
+            </thead>
+
             {scanResultsDom}
-            
+
         </table>;
     }, [files, scanResultsDom]);
 
     const dropFile = useMemo(() => {
         return <div className="dnd-bar" >
-                    <i className="icon-drop"></i>
-                    <span className="text" dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('dropFile') }} />
-            </div>;
+            <i className="icon-drop"></i>
+            <span className="text" dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('dropFile') }} />
+        </div>;
     })
 
     return (
-    <div className="popup--wrapper" onDrop={handleDragAndDrop} onDragOver={handleDragAndDrop}>
-        <div className={`drop-overlay ${dropOverlayActive ? 'active' : ''}`}></div>
+        <div className="popup--wrapper" onDrop={handleDragAndDrop} onDragOver={handleDragAndDrop}>
+            <div className={`drop-overlay ${dropOverlayActive ? 'active' : ''}`}></div>
             <div className="popup--header">
                 <div className="popup--header__logo"></div>
-                    <div className="popup--header__buttons">
+                <div className="popup--header__buttons">
                     <a href='#' className={classNames("popup--header__btn", viewScanHistoryClassName)} onClick={goToHistory}>
                         <span className="icon-history text-14"></span>
                     </a>
                     <a href='#' className="popup--header__btn" onClick={goToSettings}>
                         <span className="icon-cog text-14"></span>
                     </a>
+                </div>
+            </div>
+            <div className="popup--scan__history">
+                {scanResults}
+                <div className="todays-stats-container">
+                    <div className="today-scans">
+                        Files scanned today: {filesScannedToday}
+                    </div>
+                    <div className='today-blocks'>
+                        Files blocked today: {filesBlockedToday}
                     </div>
                 </div>
-            <div className= "popup--scan__history">
-            {scanResults}
-            <div className = "todays-stats-container">
-                <div className="today-scans">
-                    Files scanned today: {filesScannedToday}
-                </div>
-                <div className='today-blocks'>
-                    Files blocked today: {filesBlockedToday}
-                </div>
-            </div>
             </div>
             <div className="popup--drop__file text-right">
-            {dropFile}
+                {dropFile}
+            </div>
         </div>
-    </div>
     );
 };
 
