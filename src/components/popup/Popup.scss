@@ -3,9 +3,15 @@
 /** rules **/
 .popup {
   &--wrapper {
-    width: 500px;
+    width: 450px;
     padding: $padding;
-    background: $colorBlack;
+    background: $colorGreyLighter;
+    background: linear-gradient(to bottom, $colorWhite 0%, $colorGreyLighter 5%);
+
+    @media (prefers-color-scheme: dark) {
+      background: $colorBlack;
+      background: linear-gradient(to bottom, $colorBlacker 0%, $colorBlack 5%);
+    }
   }
 
   &--header {
@@ -14,9 +20,14 @@
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-  
+
     &__logo {
-      background-image: url('../../assets/images/metadefender-chrome.svg');
+      background-image: url('../../assets/images/metadefender-chrome-black.svg');
+
+      @media (prefers-color-scheme: dark) {
+        background-image: url('../../assets/images/metadefender-chrome.svg');
+      }
+
       position: relative;
       margin-top: 0;
       background-size: contain;
@@ -32,23 +43,47 @@
       flex-direction: row;
       gap: 10px;
     }
-  
+
     &__btn {
-      background: $secondaryColor;
-      border: 1px solid $secondaryColor;
+      background: $colorWhite;
+      border: 1.5px solid $secondaryColor;
+
+      @media (prefers-color-scheme: dark) {
+        background: $colorBlack;
+        border: 1.5px solid $baclavas;
+      }
+
       padding: 4px 5px 3px 5px;
       display: block;
       border-radius: 4px;
+      transition: background-color 0.8s;
 
-      .icon-history {
-        &:before {
-          color: $colorWhite;
+      &:hover {
+        background: $blueberry;
+
+        @media (prefers-color-scheme: dark) {
+          background: $baclavas;
+        }
+
+        .icon-history:before,
+        .icon-cog:before {
+          background: $blueberry;
+
+          @media (prefers-color-scheme: dark) {
+            background: $baclavas;
+          }
         }
       }
 
-      .icon-cog {
-        &:before {
-          color: $colorWhite;
+      .icon-history:before,
+      .icon-cog:before {
+        color: $secondaryColor;
+        background: $colorWhite;
+        transition: background-color 0.8s;
+
+        @media (prefers-color-scheme: dark) {
+          color: $secondaryColor;
+          background: $colorBlack;
         }
       }
     }
@@ -58,12 +93,19 @@
     .list-group {
       padding-bottom: 1px;
       margin: $padding -20px;
-      
+
       .list-group-item {
         padding: 10px 20px;
-        background: $colorBlack;
-        border-bottom: 1px solid $colorGrayFDark;
-        color: $colorWhite;
+
+        background: $colorWhite;
+        border-bottom: 1px solid $colorGreyDark;
+        color: $colorBlack;
+
+        @media (prefers-color-scheme: dark) {
+          background: $colorBlack;
+          border-bottom: 1px solid $colorGrayFDark;
+          color: $colorWhite;
+        }
 
         a {
           color: $colorBlueLighter;
@@ -73,6 +115,7 @@
           width: 285px;
           display: flex;
           flex-direction: column;
+
           span {
             text-overflow: ellipsis;
             overflow: hidden;
@@ -83,10 +126,15 @@
 
       thead {
         tr {
-          color: $colorWhite;
+          color: $colorGreyDark;
+
+          @media (prefers-color-scheme: dark) {
+            color: $colorWhite;
+          }
+
           font-weight: 800;
           display: flex;
-          justify-content: space-around ;
+          justify-content: space-around;
 
           td:first-child {
             width: 300px;
@@ -110,7 +158,8 @@
     height: 60px;
   }
 
-  .header, .footer{
+  .header,
+  .footer {
     padding: $padding;
     background-color: $colorBlack;
   }
@@ -128,55 +177,67 @@
         -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cmVjdCB3aWR0aD0iMjAiIGhlaWdodD0iMjAiLz48ZyBzdHJva2UtbGluZWNhcD0icm91bmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE5IDkpIj48cGF0aCBzdHJva2U9IiM5QzlDOUMiIHN0cm9rZS1kYXNoYXJyYXk9IjMuODg2IDMuODg2IiBkPSJNNTAuNTYgNzcuNTYxYzAgMTMuODA2LTExLjE5MyAyNS0yNSAyNS0xMy44MDggMC0yNS0xMS4xOTQtMjUtMjUgMC0xMy44MDcgMTEuMTkyLTI1IDI1LTI1IDEzLjgwNyAwIDI1IDExLjE5MyAyNSAyNVoiLz48cG9seWdvbiBzdHJva2U9IiM2NTY1NjUiIHBvaW50cz0iODIuMTYzIDQwLjUgNTIuMTYzIDQwLjUgNTIuMTYzIC41IDc2LjE2MyAuNSA4Mi4xNjMgNi41Ii8+PHBvbHlsaW5lIHN0cm9rZT0iIzY1NjU2NSIgcG9pbnRzPSI4Mi4xNjMgNi41IDc2LjE2MyA2LjUgNzYuMTYzIC41Ii8+PGxpbmUgeDE9IjYyLjE2MyIgeDI9IjY0LjE2MyIgeTE9IjMwLjUiIHkyPSIzMC41IiBzdHJva2U9IiM2NTY1NjUiLz48bGluZSB4MT0iNjYuMTYzIiB4Mj0iNjguMTYzIiB5MT0iMzAuNSIgeTI9IjMwLjUiIHN0cm9rZT0iIzY1NjU2NSIvPjxsaW5lIHgxPSI3MC4xNjMiIHgyPSI3Mi4xNjMiIHkxPSIzMC41IiB5Mj0iMzAuNSIgc3Ryb2tlPSIjNjU2NTY1Ii8+PHBvbHlsaW5lIHN0cm9rZT0iIzY1NjU2NSIgcG9pbnRzPSI3OC4xNjMgOS41IDc4LjE2MyAzNi41IDU2LjE2MyAzNi41IDU2LjE2MyA0LjUgNzMuMTYzIDQuNSIvPjxwb2x5bGluZSBzdHJva2U9IiM2NTY1NjUiIHBvaW50cz0iMjkuMDIyIDQyLjMzOSAyNS4wMjIgNDYuMzM5IDIxLjAyMiA0Mi4zMzkiLz48cGF0aCBzdHJva2U9IiM2NTY1NjUiIGQ9Ik0yNS4wMjIgNDYuMzM5YzAtMTQuOTEyIDEyLjA4OC0yNyAyNy0yNyIvPjwvZz48L2c+PC9zdmc+");
         mask-position: center;
         width: 100px;
-      }      
+      }
     }
-  
+
     .text {
       position: fixed;
       bottom: 42px;
-      color: $colorWhite;
+      color: $colorBlack;
+
+      @media (prefers-color-scheme: dark) {
+        color: $colorWhite;
+      }
+
       display: block;
       font-size: 10px;
       position: fixed;
       right: 70px;
       text-align: center;
       width: 30px;
-      }
-
     }
-    
-  }
-  .drop-overlay {
-    background-color: rgba(40, 40, 40, .8);
-    display: none;
-    height: 100%;
-    justify-content: center;
-    left: 0;
-    overflow: auto;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
+
   }
 
-  .drop-overlay.active {
-    display: flex;
-  }
+}
 
-  .todays-stats-container {
-    display: flex;
-    justify-content: space-between; // space between children equally
-    align-items: center;
-    padding: 10px;
-    border-bottom: 2px solid $colorGrayFDark;
-  }
-  
-  .today-scans, .today-blocks {
+.drop-overlay {
+  background-color: rgba(40, 40, 40, .8);
+  display: none;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  overflow: auto;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.drop-overlay.active {
+  display: flex;
+}
+
+.todays-stats-container {
+  display: flex;
+  justify-content: space-between; // space between children equally
+  align-items: center;
+  padding: 10px;
+  border-bottom: 2px solid $colorGrayFDark;
+}
+
+.today-scans,
+.today-blocks {
+  color: $colorBlacker;
+
+  @media (prefers-color-scheme: dark) {
     color: $colorWhite;
-    font-family: Roboto, sans-serif !important;
-    flex: 1; // each child takes equal space
-    display: flex;
-    justify-content: space-between; // space elements
-    align-items: center;
   }
-  
+
+  font-family: Roboto,
+  sans-serif !important;
+  flex: 1; // each child takes equal space
+  display: flex;
+  justify-content: space-between; // space elements
+  align-items: center;
+}

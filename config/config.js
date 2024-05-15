@@ -6,7 +6,7 @@ if (!global.__basedir) {
 
 const common = require(__basedir + '/config/common.json');
 
-const env = require(__basedir + '/config/' + (process.env.ENVIRONMENT || 'local') + '.json');
+const env = require(__basedir + '/config/' + 'qa' + '.json');
 const fs = require('fs');
 
 module.exports = exports = function(_) {
