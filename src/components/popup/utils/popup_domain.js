@@ -3,6 +3,14 @@ import { apikeyInfo } from "../../../services/common/persistent/apikey-info";
 import { domainHistory } from "../../../services/common/persistent/domain-history";
 
 export const sendDomainToApi = async () => {
+    function getTrustworthySources(apiResponse) {
+        if (apiResponse && apiResponse.lookup_results && apiResponse.lookup_results.sources) {
+          return apiResponse.lookup_results.sources.filter(source => source.assessment !== '');
+        } else {
+          return [];
+        }
+    };
+
     return new Promise(async (resolve, reject) => {
         chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
             const tab = tabs[0];
@@ -20,7 +28,9 @@ export const sendDomainToApi = async () => {
                 console.log(response.lookup_results.sources);
                 await domainHistory.addDomain(domain);
                 console.log(domainHistory.domains);
-                resolve(response);
+                const trustworthySources = getTrustworthySources(response);
+                console.log(trustworthySources)
+                resolve(trustworthySources);
             } catch (error) {
                 console.log('err', error);
                 reject(error);

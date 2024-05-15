@@ -118,6 +118,8 @@ const Popup = () => {
     
     }, []);
 
+    
+
     return <div className="popup--wrapper">
         <div className="popup--header">
             <div className="popup--header__logo"></div>
@@ -140,7 +142,8 @@ const Popup = () => {
         {/* TODO:::: PARSE THE RESPONSE BODY IN ORDER TO SHOW IN POPUP ONLY tHE RESULT: TRUSTWORTHY ETC. */}
 
         <div className='popup--scan__history'>
-            Website Reputation: {apiResponse ? JSON.stringify(apiResponse.lookup_results.sources[0]) : "Loading..."}
+            Website Reputation: {apiResponse ? JSON.stringify(apiResponse[0].assessment) : "Loading..."}
+
         </div>
 
         {/* TODO:::: SAVE THE DOMAINS IN LOCALSTORAGE */}
