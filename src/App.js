@@ -14,6 +14,7 @@ import DomainRepupation from './pages/domain-reputation/DomainReputation'
 
 import './App.scss';
 import DomainReputation from './pages/domain-reputation/DomainReputation';
+import { DomainHistoryProvider } from './providers/DomainHistoryProvider';
 
 /**
  * Returns a Switch with defined routes for each component/page. 
@@ -55,7 +56,9 @@ function App () {
             <Route
                 path='/domain'
                 element={
-                    <DomainReputation />
+                    <DomainHistoryProvider>
+                        <DomainReputation />
+                    </DomainHistoryProvider>
                 }
             />
         </Routes>
