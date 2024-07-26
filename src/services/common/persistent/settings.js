@@ -20,6 +20,7 @@ function Settings() {
             saveCleanFiles: false,
             safeUrl: false,
             useCore: false,
+            useCustomApiKey: false,
             coreV4: false,
             coreUrl: '',
             coreApikey: '',

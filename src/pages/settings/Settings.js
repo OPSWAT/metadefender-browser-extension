@@ -14,12 +14,12 @@ const Settings = () => {
 
     const { apikeyData } = useContext(UserContext);
     const { gaTrackEvent } = useContext(GAContext);
-    const {  
+    const {
         settingsData,
         updateSettings,
-        isAllowedFileSchemeAccess, 
+        isAllowedFileSchemeAccess,
         getScanRules,
-    } = useContext(SettingsContext); 
+    } = useContext(SettingsContext);
 
     const handleCheckboxChange = async (labelFor, options = null) => {
         await updateSettings(labelFor, options);
@@ -42,10 +42,12 @@ const Settings = () => {
             otherContent={item?.otherContent ?? null}
             labelFor={item.labelFor}
             hasForm={item?.hasForm ?? null}
+            hasFormApikey={item?.hasFormApikey ?? null}
             coreApikey={(item.labelFor === 'useCore') ? settingsData.coreApikey : null}
             coreUrl={(item.labelFor === 'useCore') ? settingsData.coreUrl : null}
             coreRule={(item.labelFor === 'useCore') ? settingsData.coreRule : null}
             scanRules={(item.labelFor === 'useCore') ? settingsData.rules : null}
+            customApikey={(item.labelFor === 'useCustomApiKey') ? settingsData.rules : null}
             getScanRules={getScanRules}
         />);
     }, [settingsData, apikeyData, isAllowedFileSchemeAccess]);
