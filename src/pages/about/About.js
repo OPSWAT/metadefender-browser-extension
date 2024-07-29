@@ -25,9 +25,9 @@ const LABELS = {
 const About = () => {
 
     const context = useContext(GAContext);
-    const gaTrackEvent = context?.gaTrackEvent || (() => {});
+    const gaTrackEvent = context?.gaTrackEvent || (() => { });
     const userContext = useContext(UserContext);
-    const apikeyData = userContext?.apikeyData || (() => {})
+    const apikeyData = userContext?.apikeyData || (() => { })
 
     useEffect(() => {
         (async () => {

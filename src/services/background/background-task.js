@@ -112,8 +112,38 @@ export default class BackgroundTask {
      *
      * @param {string} cookieValue
      */
+
+    async updateApikeyInfo(apikey) {
+        try {
+            const response = await MetascanClient.apikey.info(apikey);
+            console.log('response', response);
+
+            if (response?.error) {
+                BrowserNotification.create(response.error.messages.join(', '));
+                return;
+            }
+
+            this.apikeyInfo.data.apikey = apikey;
+            this.apikeyInfo.data.loggedIn = apikey;
+            this.apikeyInfo.parseMclInfo(response);
+            await this.apikeyInfo.save();
+
+            this.settings.data.shareResults = this.settings.data.shareResults || !this.apikeyInfo.data.paidUser;
+            await this.settings.save();
+        } catch (error) {
+            console.warn(error);
+        }
+    }
+
     async setApikey(cookieValue) {
         let cookieData = decodeURIComponent(cookieValue);
+        const settingsData = await this.settings.load();
+        console.log('settingsData', settingsData)
+
+        if (settingsData?.apikeyCustom && settingsData.apikeyCustom !== "") {
+            await this.updateApikeyInfo(settingsData?.apikeyCustom);
+            return
+        }
 
         try {
             cookieData = JSON.parse(cookieData);
@@ -126,24 +156,7 @@ export default class BackgroundTask {
             return;
         }
 
-        try {
-            const response = await MetascanClient.apikey.info(cookieData.apikey);
-
-            if (response?.error) {
-                BrowserNotification.create(response.error.messages.join(', '));
-                return;
-            }
-
-            this.apikeyInfo.data.apikey = cookieData.apikey;
-            this.apikeyInfo.data.loggedIn = cookieData.loggedIn;
-            this.apikeyInfo.parseMclInfo(response);
-            await this.apikeyInfo.save();
-
-            this.settings.data.shareResults = this.settings.data.shareResults || !this.apikeyInfo.data.paidUser;
-            await this.settings.save();
-        } catch (error) {
-            console.warn(error);
-        }
+        await this.updateApikeyInfo(cookieData?.apikey);
     }
 
     onInstallExtensionListener(details) {

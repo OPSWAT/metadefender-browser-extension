@@ -45,6 +45,7 @@ export const SettingsProvider = ({ children }) => {
 
     const config = useContext(ConfigContext);
     const [settingsData, setSettingsData] = useState(settings.data);
+    console.log('settingsData', settingsData)
     const [isAllowedFileSchemeAccess, setIsAllowedFileSchemeAccess] = useState(true); // ToDo: move to BrowserProvider
 
     const getScanRules = async (newApikey, newUrl) => {
@@ -101,7 +102,6 @@ export const SettingsProvider = ({ children }) => {
                 }
                 break;
             }
-
             case 'useCore': {
                 const useCore = !newSettings.useCore;
 
