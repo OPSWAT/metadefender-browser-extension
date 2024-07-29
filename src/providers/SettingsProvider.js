@@ -19,13 +19,12 @@ export default SettingsContext;
 export const validateCoreSettings = async (newApikey, newUrl) => {
     const apikey = newApikey || settings.coreApikey;
     const endpoint = newUrl || settings.coreUrl;
-    
+
     if (!apikey || !endpoint) {
         return;
     }
 
-    CoreClient.configure({apikey, endpoint});
-
+    CoreClient.configure({ apikey, endpoint });
     try {
         const versionResult = await CoreClient.version();
         const coreV4 = (versionResult?.version.split('.')[0] === '4') || settings.coreV4;
@@ -54,9 +53,9 @@ export const SettingsProvider = ({ children }) => {
 
         if (validCore) {
             const { coreV4, rules } = validCore;
-            settings.merge({coreV4, rules});
+            settings.merge({ coreV4, rules });
             await settings.save();
-            setSettingsData({...settings.data});
+            setSettingsData({ ...settings.data });
         }
     }
 
@@ -64,10 +63,11 @@ export const SettingsProvider = ({ children }) => {
     /**
      * Update settings
      * @param {string} key 
-     * @param {object} coreSettingsParam 
+     * @param {object} coreSettingsParam
      */
     const updateSettings = async (key, coreSettingsParam) => {
-        const newSettings = {...settings.data};
+        const newSettings = { ...settings.data };
+        console.log('newSettings', newSettings)
         switch (key) {
             case 'coreSettings': {
                 newSettings.coreApikey = coreSettingsParam.coreApikey;
@@ -92,6 +92,16 @@ export const SettingsProvider = ({ children }) => {
                 }
                 break;
             }
+            case 'useCustomApiKey': {
+                const isApiKeyValid = newSettings.apikeyCustom !== undefined && newSettings.apikeyCustom !== null && newSettings.apikeyCustom !== '';
+                if (isApiKeyValid) {
+                    newSettings.useCustomApiKey = true;
+                } else {
+                    newSettings.useCustomApiKey = false;
+                }
+                break;
+            }
+
             case 'useCore': {
                 const useCore = !newSettings.useCore;
 
@@ -111,14 +121,18 @@ export const SettingsProvider = ({ children }) => {
                 newSettings.scanDownloads = !newSettings.scanDownloads && isAllowedFileSchemeAccess;
                 break;
             }
+            case 'customSettings': {
+                newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
+                break;
+            }
             default:
                 newSettings[key] = !newSettings[key];
                 break;
         }
-        
+
         settings.merge(newSettings);
         await settings.save();
-        setSettingsData({...settings.data});
+        setSettingsData({ ...settings.data });
 
         GaTrack(['_trackEvent', config.gaEventCategory.name, config.gaEventCategory.action.settingsChanged, key, (newSettings[key] ? 'enabled' : 'disabled')]);
     };
@@ -136,7 +150,7 @@ export const SettingsProvider = ({ children }) => {
         (async () => {
             await settings.init();
             setIsAllowedFileSchemeAccess(await BrowserExtension.isAllowedFileSchemeAccess());
-            setSettingsData({...settings.data});
+            setSettingsData({ ...settings.data });
         })();
 
         browserStorage.addListener(storageUpdateHandler);
@@ -148,8 +162,8 @@ export const SettingsProvider = ({ children }) => {
 
     return (
         <SettingsContext.Provider value={{
-            settings, 
-            settingsData, 
+            settings,
+            settingsData,
             updateSettings,
             isAllowedFileSchemeAccess,
             getScanRules,

@@ -24,6 +24,7 @@ function Settings() {
             coreV4: false,
             coreUrl: '',
             coreApikey: '',
+            apikeyCustom: '',
             coreRule: '',
             rules: [],
         },

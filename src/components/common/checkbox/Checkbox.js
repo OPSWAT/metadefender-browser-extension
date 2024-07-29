@@ -7,7 +7,7 @@ import BrowserTranslate from '../../../services/common/browser/browser-translate
 
 import './Checkbox.scss';
 
-const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, handleCheckboxChange, labelFor, getScanRules, coreApikey, coreUrl, coreRule, scanRules }) => {
+const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, handleCheckboxChange, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules }) => {
     const checkboxRef = useRef(null);
     const [isInputChecked, setIsInputChecked] = useState(typeof isChecked === 'boolean' ? isChecked : false);
     const [apikey, setApikey] = useState();
@@ -37,6 +37,20 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
         await handleCheckboxChange('coreSettings', coreSettings);
     }
+
+    const saveCustomSettings = async () => {
+        setError(null);
+
+        if (customApikey.length !== 32) {
+            return;
+        }
+
+        const customSettings = {
+            apikeyCustom: customApikey,
+        };
+
+        await handleCheckboxChange('customSettings', customSettings);
+    };
 
     const checkCoreSettings = async () => {
         getScanRules(apikey, url);
@@ -111,7 +125,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
             </Form.Group>
 
             <div className="col-md-5 p-0">
-                <Button variant="primary" type="button">
+                <Button variant="primary" type="button" onClick={saveCustomSettings}>
                     {chrome.i18n.getMessage('coreSettingsSave')}
                 </Button>
             </div>
@@ -125,7 +139,8 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         setApikey(coreApikey);
         setUrl(coreUrl);
         setCoreRule(coreRule);
-    }, [isChecked, coreApikey, coreUrl, coreRule]);
+        setCustomApikey(apikeyCustom)
+    }, [isChecked, coreApikey, coreUrl, coreRule, apikeyCustom]);
 
     return (
         <>
@@ -158,7 +173,7 @@ Checkbox.propTypes = {
     coreUrl: PropTypes.string,
     coreRule: PropTypes.string,
     coreRules: PropTypes.array,
-    customApikey: PropTypes.array
+    apikeyCustom: PropTypes.string,
 };
 
 export default Checkbox;

@@ -47,7 +47,7 @@ const Settings = () => {
             coreUrl={(item.labelFor === 'useCore') ? settingsData.coreUrl : null}
             coreRule={(item.labelFor === 'useCore') ? settingsData.coreRule : null}
             scanRules={(item.labelFor === 'useCore') ? settingsData.rules : null}
-            customApikey={(item.labelFor === 'useCustomApiKey') ? settingsData.rules : null}
+            apikeyCustom={(item.labelFor === 'useCustomApiKey') ? settingsData.apikeyCustom : null}
             getScanRules={getScanRules}
         />);
     }, [settingsData, apikeyData, isAllowedFileSchemeAccess]);

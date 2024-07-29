@@ -119,7 +119,7 @@ function hashLookup(hash) {
     const options = {
         headers: authHeader
     };
-    
+
     return fetch(restEndpoint, options).then(response => response.json()).catch(error => {
         console.warn(error);
         return { error };
