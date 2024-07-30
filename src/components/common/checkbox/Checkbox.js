@@ -16,6 +16,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     const [rule, setCoreRule] = useState();
     const [error, setError] = useState({});
     const [customApikey, setCustomApikey] = useState();
+    const backgroundTask = new BackgroundTask();
 
     const handleClick = async () => {
         if (!isDisabled) {
@@ -53,7 +54,6 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         };
 
         await handleCheckboxChange('customSettings', customSettings);
-        const backgroundTask = new BackgroundTask();
         await backgroundTask.init();
     };
 
@@ -76,6 +76,25 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     const handleCustomApikeyChange = (e) => {
         setCustomApikey(e.target.value);
     };
+
+    const formDomApikey = useMemo(() => {
+        if (!hasFormApikey) {
+            return;
+        }
+
+        return <fieldset className="form-with-inputs" disabled={!isInputChecked}>
+            <Form.Group controlId="apiKey">
+                <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
+                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={customApikey || ''} onChange={handleCustomApikeyChange} />
+            </Form.Group>
+
+            <div className="col-md-12 d-flex justify-content-end p-0">
+                <Button variant="primary" type="button" onClick={saveCustomSettings}>
+                    {chrome.i18n.getMessage('coreSettingsSave')}
+                </Button>
+            </div>
+        </fieldset>;
+    }, [hasFormApikey, isInputChecked, customApikey]);
 
     const formDom = useMemo(() => {
         if (!hasForm) {
@@ -118,25 +137,6 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         </fieldset>;
     }, [hasForm, isInputChecked, apikey, url, rule, scanRules, error]);
 
-    const formDomApikey = useMemo(() => {
-        if (!hasFormApikey) {
-            return;
-        }
-
-        return <fieldset className="form-with-inputs" disabled={!isInputChecked}>
-            <Form.Group controlId="apiKey">
-                <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
-                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={customApikey || ''} onChange={handleCustomApikeyChange} />
-            </Form.Group>
-
-            <div className="col-md-12 d-flex justify-content-end p-0">
-                <Button variant="primary" type="button" onClick={saveCustomSettings}>
-                    {chrome.i18n.getMessage('coreSettingsSave')}
-                </Button>
-            </div>
-        </fieldset>;
-    }, [hasFormApikey, isInputChecked, customApikey]);
-
     useEffect(() => {
         if (typeof isChecked === 'boolean') {
             setIsInputChecked(isChecked);
@@ -156,8 +156,8 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                 <div className='other-content'>
                     {otherContent}
                 </div>
-                {formDom}
                 {formDomApikey}
+                {formDom}
             </div>
         </>
     );

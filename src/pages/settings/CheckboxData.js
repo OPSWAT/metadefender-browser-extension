@@ -47,14 +47,14 @@ const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess) => {
             labelFor: 'safeUrl'
         },
         {
-            label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useCore') }} />,
-            hasForm: true,
-            labelFor: 'useCore'
-        },
-        {
             label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useCustomApiKey') }} />,
             hasFormApikey: true,
             labelFor: 'useCustomApiKey'
+        },
+        {
+            label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useCore') }} />,
+            hasForm: true,
+            labelFor: 'useCore'
         },
     ];
 };

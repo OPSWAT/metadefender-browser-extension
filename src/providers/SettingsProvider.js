@@ -12,6 +12,7 @@ import CoreClient from '../services/common/core-client';
 import { GaTrack } from '../services/ga-track';
 import ConfigContext from './ConfigProvider';
 import browserStorage from '../services/common/browser/browser-storage';
+import BackgroundTask from '../services/background/background-task';
 
 const SettingsContext = createContext();
 export default SettingsContext;
@@ -46,7 +47,7 @@ export const validateCustomApikey = async (newCustomApikey) => {
         const apikeyCustom = newCustomApikey || settings.apikeyCustom;
 
         if (apikeyCustom && apikeyCustom.length !== 32) {
-            throw new Error('API key invalid');
+            settings.apikeyCustom = ''
         }
 
         return true;
@@ -93,6 +94,7 @@ export const SettingsProvider = ({ children }) => {
      */
     const updateSettings = async (key, coreSettingsParam) => {
         const newSettings = { ...settings.data };
+        const backgroundTask = new BackgroundTask();
         switch (key) {
             case 'coreSettings': {
                 newSettings.coreApikey = coreSettingsParam.coreApikey;
@@ -120,6 +122,7 @@ export const SettingsProvider = ({ children }) => {
             case 'customSettings': {
                 newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
                 if (!coreSettingsParam.apikeyCustom) {
+                    newSettings.apikeyCustom = ''
                     newSettings.useCustomApiKey = false;
                     break;
                 }
@@ -159,7 +162,9 @@ export const SettingsProvider = ({ children }) => {
                         newSettings.useCustomApiKey = true
                     }
                 } else {
+                    newSettings.apikeyCustom = ''
                     newSettings.useCustomApiKey = false
+                    await backgroundTask.init();
                 }
             }
             case 'scanDownloads': {
