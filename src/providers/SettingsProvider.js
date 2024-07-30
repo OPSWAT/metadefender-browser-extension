@@ -44,7 +44,6 @@ export const validateCoreSettings = async (newApikey, newUrl) => {
 export const validateCustomApikey = async (newCustomApikey) => {
     try {
         const apikeyCustom = newCustomApikey || settings.apikeyCustom;
-        console.log('apikeyCustom', apikeyCustom)
 
         if (apikeyCustom && apikeyCustom.length !== 32) {
             throw new Error('API key invalid');
@@ -114,7 +113,6 @@ export const SettingsProvider = ({ children }) => {
                     break;
                 }
                 const validApikey = await validateCustomApikey(coreSettingsParam?.apikeyCustom)
-                console.log('validApikey11', validApikey)
                 if (validApikey) {
                     newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
                     await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
@@ -128,7 +126,6 @@ export const SettingsProvider = ({ children }) => {
             }
             case 'useCore': {
                 const useCore = !newSettings.useCore;
-                console.log('useCore', useCore)
 
                 if (useCore) {
                     const validCore = await validateCoreSettings();
@@ -144,7 +141,6 @@ export const SettingsProvider = ({ children }) => {
             }
             case 'useCustomApiKey': {
                 const useCustomApiKey = !newSettings.useCustomApiKey
-                console.log('useCustomApiKey', useCustomApiKey)
                 if (useCustomApiKey) {
                     const validApikey = await validateCustomApikey();
                     if (validApikey) {
