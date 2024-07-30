@@ -120,7 +120,7 @@ export const SettingsProvider = ({ children }) => {
             case 'customSettings': {
                 newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
                 if (!coreSettingsParam.apikeyCustom) {
-                    newSettings.apikeyCustom = ''
+                    newSettings.apikeyCustom = '';
                     newSettings.useCustomApiKey = false;
                     break;
                 }
@@ -128,9 +128,9 @@ export const SettingsProvider = ({ children }) => {
                 if (validApikey) {
                     newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
                     await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
-                    newSettings.useCustomApiKey = true
+                    newSettings.useCustomApiKey = true;
                 } else {
-                    newSettings.apikeyCustom = ''
+                    newSettings.apikeyCustom = '';
                     newSettings.useCustomApiKey = false;
                     await BrowserNotification.create(BrowserTranslate.getMessage('apikeyInvalidNotification'), 'info');
                 }
@@ -157,11 +157,11 @@ export const SettingsProvider = ({ children }) => {
                     const validApikey = await validateCustomApikey();
                     if (validApikey) {
                         newSettings.apikeyCustom = validApikey.apikeyCustom
-                        newSettings.useCustomApiKey = true
+                        newSettings.useCustomApiKey = true;
                     }
                 } else {
                     newSettings.apikeyCustom = ''
-                    newSettings.useCustomApiKey = false
+                    newSettings.useCustomApiKey = false;
                     await backgroundTask.init();
                 }
             }
