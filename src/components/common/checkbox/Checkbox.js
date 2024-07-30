@@ -127,7 +127,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                 <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={customApikey || ''} onChange={handleCustomApikeyChange} />
             </Form.Group>
 
-            <div className="col-md-5 p-0">
+            <div className="col-md-12 d-flex justify-content-end p-0">
                 <Button variant="primary" type="button" onClick={saveCustomSettings}>
                     {chrome.i18n.getMessage('coreSettingsSave')}
                 </Button>
