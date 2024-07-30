@@ -113,10 +113,9 @@ export default class BackgroundTask {
      * @param {string} cookieValue
      */
 
-    async updateApikeyInfo(apikey) {
+    async updateApikeyInfo(apikey, loggedIn) {
         try {
             const response = await MetascanClient.apikey.info(apikey);
-            console.log('response', response);
 
             if (response?.error) {
                 BrowserNotification.create(response.error.messages.join(', '));
@@ -124,7 +123,7 @@ export default class BackgroundTask {
             }
 
             this.apikeyInfo.data.apikey = apikey;
-            this.apikeyInfo.data.loggedIn = apikey;
+            this.apikeyInfo.data.loggedIn = loggedIn;
             this.apikeyInfo.parseMclInfo(response);
             await this.apikeyInfo.save();
 
@@ -138,10 +137,9 @@ export default class BackgroundTask {
     async setApikey(cookieValue) {
         let cookieData = decodeURIComponent(cookieValue);
         const settingsData = await this.settings.load();
-        console.log('settingsData', settingsData)
 
         if (settingsData?.apikeyCustom && settingsData.apikeyCustom !== "") {
-            await this.updateApikeyInfo(settingsData?.apikeyCustom);
+            await this.updateApikeyInfo(settingsData?.apikeyCustom, true);
             return
         }
 
@@ -156,7 +154,7 @@ export default class BackgroundTask {
             return;
         }
 
-        await this.updateApikeyInfo(cookieData?.apikey);
+        await this.updateApikeyInfo(cookieData?.apikey, cookieData?.loggedIn);
     }
 
     onInstallExtensionListener(details) {

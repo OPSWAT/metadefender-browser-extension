@@ -43,7 +43,6 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     const saveCustomSettings = async () => {
         setError(null);
         const validApikey = await validateCustomApikey(customApikey);
-        console.log('validApikey', validApikey)
 
         if (!validApikey) {
             setError({ coreUrl: BrowserTranslate.getMessage('coreSettingsInvalidUrl') });

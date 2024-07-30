@@ -4,7 +4,6 @@ import MCL from '../../../config/config';
 import BrowserStorage from '../../common/browser/browser-storage';
 
 const storageKey = MCL?.config?.storageKey?.apikey;
-console.log('store', storageKey)
 
 /**
  *
@@ -36,7 +35,6 @@ function ApikeyInfo() {
 }
 
 export const apikeyInfo = ApikeyInfo();
-console.log('apikeyInfo', apikeyInfo)
 
 /**
  *
@@ -44,7 +42,6 @@ console.log('apikeyInfo', apikeyInfo)
  */
 async function init() {
     const result = await BrowserStorage.get(storageKey);
-    console.log('result', result)
     if (!result || !result[storageKey]) {
         return this.save();
     }
