@@ -41,6 +41,22 @@ export const validateCoreSettings = async (newApikey, newUrl) => {
     return false;
 };
 
+export const validateCustomApikey = async (newCustomApikey) => {
+    try {
+        const apikeyCustom = newCustomApikey || settings.apikeyCustom;
+        console.log('apikeyCustom', apikeyCustom)
+
+        if (apikeyCustom && apikeyCustom.length !== 32) {
+            throw new Error('API key invalid');
+        }
+
+        return true;
+    } catch (error) {
+        console.warn(error.message);
+        return false;
+    }
+};
+
 export const SettingsProvider = ({ children }) => {
 
     const config = useContext(ConfigContext);
@@ -51,7 +67,6 @@ export const SettingsProvider = ({ children }) => {
     const getScanRules = async (newApikey, newUrl) => {
 
         const validCore = await validateCoreSettings(newApikey, newUrl);
-
         if (validCore) {
             const { coreV4, rules } = validCore;
             settings.merge({ coreV4, rules });
@@ -68,7 +83,6 @@ export const SettingsProvider = ({ children }) => {
      */
     const updateSettings = async (key, coreSettingsParam) => {
         const newSettings = { ...settings.data };
-        console.log('newSettings', newSettings)
         switch (key) {
             case 'coreSettings': {
                 newSettings.coreApikey = coreSettingsParam.coreApikey;
@@ -93,17 +107,28 @@ export const SettingsProvider = ({ children }) => {
                 }
                 break;
             }
-            case 'useCustomApiKey': {
-                const isApiKeyValid = newSettings.apikeyCustom !== undefined && newSettings.apikeyCustom !== null && newSettings.apikeyCustom !== '';
-                if (isApiKeyValid) {
-                    newSettings.useCustomApiKey = true;
-                } else {
+            case 'customSettings': {
+                newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
+                if (!coreSettingsParam.apikeyCustom) {
                     newSettings.useCustomApiKey = false;
+                    break;
+                }
+                const validApikey = await validateCustomApikey(coreSettingsParam?.apikeyCustom)
+                console.log('validApikey11', validApikey)
+                if (validApikey) {
+                    newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
+                    await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
+                    newSettings.useCustomApiKey = true
+                } else {
+                    newSettings.apikeyCustom = ''
+                    newSettings.useCustomApiKey = false;
+                    await BrowserNotification.create(BrowserTranslate.getMessage('apikeyInvalidNotification'), 'info');
                 }
                 break;
             }
             case 'useCore': {
                 const useCore = !newSettings.useCore;
+                console.log('useCore', useCore)
 
                 if (useCore) {
                     const validCore = await validateCoreSettings();
@@ -117,12 +142,21 @@ export const SettingsProvider = ({ children }) => {
                 }
                 break;
             }
+            case 'useCustomApiKey': {
+                const useCustomApiKey = !newSettings.useCustomApiKey
+                console.log('useCustomApiKey', useCustomApiKey)
+                if (useCustomApiKey) {
+                    const validApikey = await validateCustomApikey();
+                    if (validApikey) {
+                        newSettings.apikeyCustom = validApikey.apikeyCustom
+                        newSettings.useCustomApiKey = true
+                    }
+                } else {
+                    newSettings.useCustomApiKey = false
+                }
+            }
             case 'scanDownloads': {
                 newSettings.scanDownloads = !newSettings.scanDownloads && isAllowedFileSchemeAccess;
-                break;
-            }
-            case 'customSettings': {
-                newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
                 break;
             }
             default:

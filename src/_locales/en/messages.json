@@ -161,6 +161,12 @@
   "coreSettingsSavedNotification": {
     "message": "Core settings saved!"
   },
+  "apikeyNotification": {
+    "message": "Apikey saved!"
+  },
+  "apikeyInvalidNotification": {
+    "message": "Apikey are not valid!"
+  },
   "coreSettingsInvalidNotification": {
     "message": "Core settings are not valid!"
   },

@@ -2,6 +2,7 @@ import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { validateCoreSettings } from '../../../providers/SettingsProvider';
+import { validateCustomApikey } from '../../../providers/SettingsProvider';
 import BrowserTranslate from '../../../services/common/browser/browser-translate';
 
 
@@ -40,9 +41,11 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
     const saveCustomSettings = async () => {
         setError(null);
+        const validApikey = await validateCustomApikey(customApikey);
+        console.log('validApikey', validApikey)
 
-        if (customApikey.length !== 32) {
-            return;
+        if (!validApikey) {
+            setError({ coreUrl: BrowserTranslate.getMessage('coreSettingsInvalidUrl') });
         }
 
         const customSettings = {
@@ -169,6 +172,7 @@ Checkbox.propTypes = {
     validateCoreSettings: PropTypes.func,
     labelFor: PropTypes.string,
     getScanRules: PropTypes.func,
+    getCustomApikey: PropTypes.func,
     coreApikey: PropTypes.string,
     coreUrl: PropTypes.string,
     coreRule: PropTypes.string,
