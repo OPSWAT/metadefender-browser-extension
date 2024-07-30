@@ -19,6 +19,7 @@ const Settings = () => {
         updateSettings,
         isAllowedFileSchemeAccess,
         getScanRules,
+        getCustomApikey
     } = useContext(SettingsContext);
 
     const handleCheckboxChange = async (labelFor, options = null) => {
@@ -49,6 +50,7 @@ const Settings = () => {
             scanRules={(item.labelFor === 'useCore') ? settingsData.rules : null}
             apikeyCustom={(item.labelFor === 'useCustomApiKey') ? settingsData.apikeyCustom : null}
             getScanRules={getScanRules}
+            getCustomApikey={getCustomApikey}
         />);
     }, [settingsData, apikeyData, isAllowedFileSchemeAccess]);
 

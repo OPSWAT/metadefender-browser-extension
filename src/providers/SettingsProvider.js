@@ -74,6 +74,17 @@ export const SettingsProvider = ({ children }) => {
         }
     }
 
+    const getCustomApikey = async (newApikey) => {
+        const validApikey = await validateCustomApikey(newApikey);
+        console.log('validApikey', validApikey)
+        if (validApikey) {
+            const { apikeyCustom } = apikeyCustom
+            settings.merge({ apikeyCustom })
+            await settings.save();
+            setSettingsData({ ...settings.data })
+        }
+    }
+
 
     /**
      * Update settings
@@ -197,6 +208,7 @@ export const SettingsProvider = ({ children }) => {
             updateSettings,
             isAllowedFileSchemeAccess,
             getScanRules,
+            getCustomApikey
         }}>
             {children}
         </SettingsContext.Provider>

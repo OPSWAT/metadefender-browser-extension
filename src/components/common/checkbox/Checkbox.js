@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { validateCoreSettings } from '../../../providers/SettingsProvider';
 import { validateCustomApikey } from '../../../providers/SettingsProvider';
 import BrowserTranslate from '../../../services/common/browser/browser-translate';
-
+import BackgroundTask from '../../../services/background/background-task';
 
 import './Checkbox.scss';
 
@@ -53,6 +53,8 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         };
 
         await handleCheckboxChange('customSettings', customSettings);
+        const backgroundTask = new BackgroundTask();
+        await backgroundTask.init();
     };
 
     const checkCoreSettings = async () => {
