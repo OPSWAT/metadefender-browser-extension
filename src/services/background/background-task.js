@@ -118,7 +118,9 @@ export default class BackgroundTask {
             const response = await MetascanClient.apikey.info(apikey);
 
             if (response?.error) {
-                BrowserNotification.create(response.error.messages.join(', '));
+                setTimeout(() => {
+                    BrowserNotification.create(response.error.messages.join(', '));
+                }, 5000);
                 return;
             }
 
