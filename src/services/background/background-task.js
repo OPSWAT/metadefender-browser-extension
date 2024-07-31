@@ -31,6 +31,17 @@ export default class BackgroundTask {
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
     }
 
+    async getAuthCookie() {
+        const cookie = await cookieManager.get();
+        console.log('cookie', cookie.value)
+
+        if (cookie) {
+            this.setApikey(cookie.value);
+        } else {
+            setTimeout(getAuthCookie.bind(this), 300);
+        }
+    }
+
     async init() {
         try {
             await this.settings.init();
@@ -76,17 +87,7 @@ export default class BackgroundTask {
         BrowserStorage.addListener(this.browserStorageListener.bind(this));
 
         this.setupContextMenu(this.settings.data.saveCleanFiles);
-
-        async function getAuthCookie() {
-            const cookie = await cookieManager.get();
-
-            if (cookie) {
-                this.setApikey(cookie.value);
-            } else {
-                setTimeout(getAuthCookie.bind(this), 300);
-            }
-        }
-        getAuthCookie.call(this);
+        await this.getAuthCookie(this);
 
         SafeUrl.toggle(this.settings.data.safeUrl);
     }

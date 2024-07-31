@@ -45,7 +45,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         const validApikey = await validateCustomApikey(customApikey);
 
         if (!validApikey) {
-            setError({ coreUrl: BrowserTranslate.getMessage('coreSettingsInvalidUrl') });
+            setError({ coreUrl: BrowserTranslate.getMessage('apikeyInvalidNotification') });
         }
 
         const customSettings = {
@@ -53,7 +53,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         };
 
         await handleCheckboxChange('customSettings', customSettings);
-        await backgroundTask.init();
+        await backgroundTask.updateApikeyInfo(customApikey, true);
     };
 
     const checkCoreSettings = async () => {

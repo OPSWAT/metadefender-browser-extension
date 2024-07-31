@@ -13,6 +13,7 @@ import { GaTrack } from '../services/ga-track';
 import ConfigContext from './ConfigProvider';
 import browserStorage from '../services/common/browser/browser-storage';
 import BackgroundTask from '../services/background/background-task';
+import cookieManager from '../services/background/cookie-manager';
 
 const SettingsContext = createContext();
 export default SettingsContext;
@@ -48,6 +49,7 @@ export const validateCustomApikey = async (newCustomApikey) => {
 
         if (apikeyCustom && apikeyCustom.length !== 32) {
             settings.apikeyCustom = ''
+            return;
         }
 
         return true;
@@ -93,6 +95,8 @@ export const SettingsProvider = ({ children }) => {
     const updateSettings = async (key, coreSettingsParam) => {
         const newSettings = { ...settings.data };
         const backgroundTask = new BackgroundTask();
+        const cookie = await cookieManager.get();
+        const authCookie = JSON.parse(cookie.value);
         switch (key) {
             case 'coreSettings': {
                 newSettings.coreApikey = coreSettingsParam.coreApikey;
@@ -124,15 +128,15 @@ export const SettingsProvider = ({ children }) => {
                     newSettings.useCustomApiKey = false;
                     break;
                 }
-                const validApikey = await validateCustomApikey(coreSettingsParam?.apikeyCustom)
+                const validApikey = await validateCustomApikey(coreSettingsParam?.apikeyCustom);
                 if (validApikey) {
                     newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
                     await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
                     newSettings.useCustomApiKey = true;
                 } else {
+                    await BrowserNotification.create(BrowserTranslate.getMessage('apikeyInvalidNotification'), 'info');
                     newSettings.apikeyCustom = '';
                     newSettings.useCustomApiKey = false;
-                    await BrowserNotification.create(BrowserTranslate.getMessage('apikeyInvalidNotification'), 'info');
                 }
                 break;
             }
@@ -162,7 +166,7 @@ export const SettingsProvider = ({ children }) => {
                 } else {
                     newSettings.apikeyCustom = ''
                     newSettings.useCustomApiKey = false;
-                    await backgroundTask.init();
+                    await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
                 }
             }
             case 'scanDownloads': {
