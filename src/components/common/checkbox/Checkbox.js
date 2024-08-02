@@ -173,7 +173,6 @@ Checkbox.propTypes = {
     validateCoreSettings: PropTypes.func,
     labelFor: PropTypes.string,
     getScanRules: PropTypes.func,
-    getCustomApikey: PropTypes.func,
     coreApikey: PropTypes.string,
     coreUrl: PropTypes.string,
     coreRule: PropTypes.string,

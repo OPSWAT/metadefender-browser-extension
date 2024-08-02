@@ -76,16 +76,6 @@ export const SettingsProvider = ({ children }) => {
         }
     }
 
-    const getCustomApikey = async (newApikey) => {
-        const validApikey = await validateCustomApikey(newApikey);
-        if (validApikey) {
-            const { apikeyCustom } = apikeyCustom
-            settings.merge({ apikeyCustom })
-            await settings.save();
-            setSettingsData({ ...settings.data })
-        }
-    }
-
 
     /**
      * Update settings
@@ -137,6 +127,7 @@ export const SettingsProvider = ({ children }) => {
                     await BrowserNotification.create(BrowserTranslate.getMessage('apikeyInvalidNotification'), 'info');
                     newSettings.apikeyCustom = '';
                     newSettings.useCustomApiKey = false;
+                    await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
                 }
                 break;
             }
@@ -215,7 +206,6 @@ export const SettingsProvider = ({ children }) => {
             updateSettings,
             isAllowedFileSchemeAccess,
             getScanRules,
-            getCustomApikey
         }}>
             {children}
         </SettingsContext.Provider>
