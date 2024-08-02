@@ -1,8 +1,7 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { validateCoreSettings } from '../../../providers/SettingsProvider';
-import { validateCustomApikey } from '../../../providers/SettingsProvider';
+import { validateCoreSettings, validateCustomApikey } from '../../../providers/SettingsProvider';
 import BrowserTranslate from '../../../services/common/browser/browser-translate';
 import BackgroundTask from '../../../services/background/background-task';
 
@@ -170,13 +169,11 @@ Checkbox.propTypes = {
     hasForm: PropTypes.bool,
     hasFormApikey: PropTypes.bool,
     handleCheckboxChange: PropTypes.func,
-    validateCoreSettings: PropTypes.func,
     labelFor: PropTypes.string,
     getScanRules: PropTypes.func,
     coreApikey: PropTypes.string,
     coreUrl: PropTypes.string,
     coreRule: PropTypes.string,
-    coreRules: PropTypes.array,
     apikeyCustom: PropTypes.string,
 };
 

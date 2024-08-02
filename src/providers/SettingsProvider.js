@@ -49,7 +49,7 @@ export const validateCustomApikey = async (newCustomApikey) => {
 
         if (apikeyCustom && apikeyCustom.length !== 32) {
             settings.apikeyCustom = ''
-            return;
+            return false;
         }
 
         return true;
@@ -80,29 +80,29 @@ export const SettingsProvider = ({ children }) => {
     /**
      * Update settings
      * @param {string} key 
-     * @param {object} coreSettingsParam
+     * @param {object} newSettingsData
      */
-    const updateSettings = async (key, coreSettingsParam) => {
+    const updateSettings = async (key, newSettingsData) => {
         const newSettings = { ...settings.data };
         const backgroundTask = new BackgroundTask();
         const cookie = await cookieManager.get();
         const authCookie = JSON.parse(cookie.value);
         switch (key) {
             case 'coreSettings': {
-                newSettings.coreApikey = coreSettingsParam.coreApikey;
-                newSettings.coreUrl = coreSettingsParam.coreUrl;
+                newSettings.coreApikey = newSettingsData.coreApikey;
+                newSettings.coreUrl = newSettingsData.coreUrl;
 
-                if (!coreSettingsParam.coreApikey || !coreSettingsParam.coreUrl) {
+                if (!newSettingsData.coreApikey || !newSettingsData.coreUrl) {
                     newSettings.useCore = false;
                     break;
                 }
 
-                const validCore = await validateCoreSettings(coreSettingsParam.coreApikey, coreSettingsParam.coreUrl);
+                const validCore = await validateCoreSettings(newSettingsData.coreApikey, newSettingsData.coreUrl);
 
                 if (validCore) {
                     newSettings.coreV4 = validCore.coreV4;
                     newSettings.rules = validCore.rules;
-                    newSettings.coreRule = coreSettingsParam.coreRule;
+                    newSettings.coreRule = newSettingsData.coreRule;
                     await BrowserNotification.create(BrowserTranslate.getMessage('coreSettingsSavedNotification'), 'info');
                     newSettings.useCore = true;
                 } else {
@@ -112,15 +112,15 @@ export const SettingsProvider = ({ children }) => {
                 break;
             }
             case 'customSettings': {
-                newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
-                if (!coreSettingsParam.apikeyCustom) {
+                newSettings.apikeyCustom = newSettingsData?.apikeyCustom;
+                if (!newSettingsData.apikeyCustom) {
                     newSettings.apikeyCustom = '';
                     newSettings.useCustomApiKey = false;
                     break;
                 }
-                const validApikey = await validateCustomApikey(coreSettingsParam?.apikeyCustom);
+                const validApikey = await validateCustomApikey(newSettingsData?.apikeyCustom);
                 if (validApikey) {
-                    newSettings.apikeyCustom = coreSettingsParam?.apikeyCustom;
+                    newSettings.apikeyCustom = newSettingsData?.apikeyCustom;
                     await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
                     newSettings.useCustomApiKey = true;
                 } else {
@@ -147,11 +147,11 @@ export const SettingsProvider = ({ children }) => {
                 break;
             }
             case 'useCustomApiKey': {
-                const useCustomApiKey = !newSettings.useCustomApiKey
+                const useCustomApiKey = !newSettings.useCustomApiKey;
                 if (useCustomApiKey) {
                     const validApikey = await validateCustomApikey();
                     if (validApikey) {
-                        newSettings.apikeyCustom = validApikey.apikeyCustom
+                        newSettings.apikeyCustom = validApikey.apikeyCustom;
                         newSettings.useCustomApiKey = true;
                     }
                 } else {
@@ -159,6 +159,7 @@ export const SettingsProvider = ({ children }) => {
                     newSettings.useCustomApiKey = false;
                     await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
                 }
+                break;
             }
             case 'scanDownloads': {
                 newSettings.scanDownloads = !newSettings.scanDownloads && isAllowedFileSchemeAccess;

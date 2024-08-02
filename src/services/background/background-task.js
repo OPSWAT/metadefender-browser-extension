@@ -33,7 +33,6 @@ export default class BackgroundTask {
 
     async getAuthCookie() {
         const cookie = await cookieManager.get();
-        console.log('cookie', cookie.value)
 
         if (cookie) {
             this.setApikey(cookie.value);
@@ -87,7 +86,7 @@ export default class BackgroundTask {
         BrowserStorage.addListener(this.browserStorageListener.bind(this));
 
         this.setupContextMenu(this.settings.data.saveCleanFiles);
-        await this.getAuthCookie(this);
+        await this.getAuthCookie.call(this);
 
         SafeUrl.toggle(this.settings.data.safeUrl);
     }
