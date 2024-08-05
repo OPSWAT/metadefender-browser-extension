@@ -124,7 +124,6 @@ export const SettingsProvider = ({ children }) => {
                     await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
                     newSettings.useCustomApiKey = true;
                 } else {
-                    await BrowserNotification.create(BrowserTranslate.getMessage('apikeyInvalidNotification'), 'info');
                     newSettings.apikeyCustom = '';
                     newSettings.useCustomApiKey = false;
                     await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
