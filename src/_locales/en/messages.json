@@ -165,7 +165,7 @@
     "message": "Apikey saved!"
   },
   "apikeyInvalidNotification": {
-    "message": "Apikey are not valid!"
+    "message": "Apikey is not valid!"
   },
   "coreSettingsInvalidNotification": {
     "message": "Core settings are not valid!"
