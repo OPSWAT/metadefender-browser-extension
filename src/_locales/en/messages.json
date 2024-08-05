@@ -128,7 +128,7 @@
     "description": ""
   },
   "useCustomApiKey": {
-    "message": "Use custom ApiKey",
+    "message": "Scanning using Custom MetaDefender Cloud API Key",
     "description": ""
   },
   "useCoreSub": {
