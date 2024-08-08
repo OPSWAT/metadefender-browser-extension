@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useMemo, useState, useContext } from 'react';
+import React, { useEffect, useMemo, useContext } from 'react';
 import { Col, Row } from 'react-bootstrap';
 
 import openSettingsImg from '../../assets/images/how-to/open-settings.png';
@@ -25,9 +25,9 @@ const LABELS = {
 const About = () => {
 
     const context = useContext(GAContext);
-    const gaTrackEvent = context?.gaTrackEvent || (() => {});
+    const gaTrackEvent = context?.gaTrackEvent || (() => { });
     const userContext = useContext(UserContext);
-    const apikeyData = userContext?.apikeyData || (() => {})
+    const apikeyData = userContext?.apikeyData || (() => { })
 
     useEffect(() => {
         (async () => {

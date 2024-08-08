@@ -10,7 +10,6 @@ export default UserContext;
 
 export const UserProvider = ({ children }) => {
     const [apikeyData, setApikeyData] = useState(null);
-
     const apikeyUpdateHandler = (changes) => {
         if (Object.keys(changes).includes('apikey')) {
             setApikeyData(changes.apikey.newValue);
@@ -73,7 +72,7 @@ async function findTab(tabs) {
             await chrome.scripting.executeScript({ target: { tabId }, func: connect });
             chrome.tabs.onUpdated.removeListener(onUpdate);
             return;
-        } catch (e) {}
+        } catch (e) { }
     }
     chrome.tabs.onUpdated.addListener(onUpdate);
 }
