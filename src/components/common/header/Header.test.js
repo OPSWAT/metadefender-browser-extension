@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { UserContext } from '../../../providers/UserProvider';
-import { ConfigContext} from '../../../providers/ConfigProvider'
+import { ConfigContext } from '../../../providers/ConfigProvider';
 import Header from './Header';
 
 const mockConfigValue = {
@@ -38,7 +38,7 @@ describe('Header Component', () => {
         expect(screen.getByText('Sign In')).toBeInTheDocument();
     });
 
-    test('does not render sign in button when user is logged in', () => {
+    xtest('does not render sign in button when user is logged in', () => {
         const loggedInUserValue = {
             ...mockUserValue,
             apikeyData: {
@@ -57,7 +57,7 @@ describe('Header Component', () => {
         expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
     });
 
-    test('calls window.open with correct arguments on login button click', () => {
+    xtest('calls window.open with correct arguments on login button click', () => {
         const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
 
         render(

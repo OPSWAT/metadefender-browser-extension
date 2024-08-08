@@ -19,12 +19,12 @@ export default SettingsContext;
 export const validateCoreSettings = async (newApikey, newUrl) => {
     const apikey = newApikey || settings.coreApikey;
     const endpoint = newUrl || settings.coreUrl;
-    
+
     if (!apikey || !endpoint) {
         return;
     }
 
-    CoreClient.configure({apikey, endpoint});
+    CoreClient.configure({ apikey, endpoint });
 
     try {
         const versionResult = await CoreClient.version();
@@ -54,11 +54,11 @@ export const SettingsProvider = ({ children }) => {
 
         if (validCore) {
             const { coreV4, rules } = validCore;
-            settings.merge({coreV4, rules});
+            settings.merge({ coreV4, rules });
             await settings.save();
-            setSettingsData({...settings.data});
+            setSettingsData({ ...settings.data });
         }
-    }
+    };
 
 
     /**
@@ -67,7 +67,7 @@ export const SettingsProvider = ({ children }) => {
      * @param {object} coreSettingsParam 
      */
     const updateSettings = async (key, coreSettingsParam) => {
-        const newSettings = {...settings.data};
+        const newSettings = { ...settings.data };
         switch (key) {
             case 'coreSettings': {
                 newSettings.coreApikey = coreSettingsParam.coreApikey;
@@ -115,10 +115,10 @@ export const SettingsProvider = ({ children }) => {
                 newSettings[key] = !newSettings[key];
                 break;
         }
-        
+
         settings.merge(newSettings);
         await settings.save();
-        setSettingsData({...settings.data});
+        setSettingsData({ ...settings.data });
 
         GaTrack(['_trackEvent', config.gaEventCategory.name, config.gaEventCategory.action.settingsChanged, key, (newSettings[key] ? 'enabled' : 'disabled')]);
     };
@@ -136,29 +136,29 @@ export const SettingsProvider = ({ children }) => {
         (async () => {
             await settings.init();
             setIsAllowedFileSchemeAccess(await BrowserExtension.isAllowedFileSchemeAccess());
-            setSettingsData({...settings.data});
+            setSettingsData({ ...settings.data });
         })();
 
         browserStorage.addListener(storageUpdateHandler);
 
         return () => {
             browserStorage.removeListener(storageUpdateHandler);
-        }
+        };
     }, []);
 
     return (
         <SettingsContext.Provider value={{
-            settings, 
-            settingsData, 
+            settings,
+            settingsData,
             updateSettings,
             isAllowedFileSchemeAccess,
             getScanRules,
         }}>
             {children}
         </SettingsContext.Provider>
-    )
+    );
 
-}
+};
 
 SettingsProvider.propTypes = {
     children: PropTypes.element.isRequired

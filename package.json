@@ -13,13 +13,14 @@
     "classnames": "^2.3.2",
     "core-js": "^3.28.0",
     "css-loader": "^5.2.7",
+    "jest-watch-typeahead": "^0.6.5",
     "moment": "^2.29.4",
     "prop-types": "^15.8.1",
+    "react": "^17.0.2",
     "react-bootstrap": "^1.6.6",
     "react-dom": "^16.14.0",
     "react-router-dom": "^6.8.1",
     "react-scripts": "^5.0.1",
-    "react": "^17.0.2",
     "spark-md5": "^3.0.2",
     "uniqid": "^5.4.0",
     "web-vitals": "^1.1.2"
@@ -28,9 +29,23 @@
   "scripts": {
     "start": "webpack --watch --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "test": "react-scripts test",
-    "test:coverage": "react-scripts test --coverage .",
+    "test": "react-scripts test --config .src/jest.config.js ",
+    "coverage": "react-scripts test --coverage .",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/src/config/",
+      "/src/constants",
+      "src/reportWebVitals.js"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "clover"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -57,7 +72,7 @@
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-react": "^7.18.6",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "@types/chrome": "^0.0.144",
@@ -72,11 +87,11 @@
     "css-minimizer-webpack-plugin": "^4.0.0",
     "dotenv-webpack": "^7.1.1",
     "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.7",
+    "enzyme-adapter-react-16": "^1.15.6",
     "eslint-plugin-react": "^7.32.2",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
-    "jest": "^27.5.1",
+    "jest": "^27.4.5",
     "jquery": "^3.6.3",
     "mini-css-extract-plugin": "^1.6.2",
     "node-sass": "^8.0.0",
@@ -86,7 +101,7 @@
     "rollup": "^2.79.1",
     "sass": "^1.58.1",
     "sass-loader": "^10.4.1",
-    "sinon-chrome": "^3.0.1",
+    "sinon-chrome": "^2.3.2",
     "typescript": "^3.9.10",
     "url-loader": "^4.1.1",
     "webpack": "^5.76.0",

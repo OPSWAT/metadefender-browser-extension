@@ -73,7 +73,7 @@ async function findTab(tabs) {
             await chrome.scripting.executeScript({ target: { tabId }, func: connect });
             chrome.tabs.onUpdated.removeListener(onUpdate);
             return;
-        } catch (e) {}
+        } catch (e) { }
     }
     chrome.tabs.onUpdated.addListener(onUpdate);
 }
