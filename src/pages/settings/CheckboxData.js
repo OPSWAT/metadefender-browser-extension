@@ -9,7 +9,7 @@ const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess) => {
                     {chrome.i18n.getMessage('fileAccessDisabled')}
                     {' '}
                     <a href="" onClick={() => {
-                        chrome.tabs.query({url: `chrome://extensions/?id=${chrome.runtime.id.toString()}`}, (tabs) => {
+                        chrome.tabs.query({ url: `chrome://extensions/?id=${chrome.runtime.id.toString()}` }, (tabs) => {
                             if (tabs.length === 0) {
                                 chrome.tabs.update({ url: `chrome://extensions/?id=${chrome.runtime.id.toString()}` });
                             }
@@ -45,6 +45,11 @@ const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess) => {
             label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('safeUrl') }} />,
             otherContent: <sub dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('safeUrlSub') }} />,
             labelFor: 'safeUrl'
+        },
+        {
+            label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useCustomApiKey') }} />,
+            hasFormApikey: true,
+            labelFor: 'useCustomApiKey'
         },
         {
             label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useCore') }} />,

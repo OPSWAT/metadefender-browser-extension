@@ -31,6 +31,16 @@ export default class BackgroundTask {
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
     }
 
+    async getAuthCookie() {
+        const cookie = await cookieManager.get();
+
+        if (cookie) {
+            this.setApikey(cookie.value);
+        } else {
+            setTimeout(getAuthCookie.bind(this), 300);
+        }
+    }
+
     async init() {
         try {
             await this.settings.init();
@@ -76,17 +86,7 @@ export default class BackgroundTask {
         BrowserStorage.addListener(this.browserStorageListener.bind(this));
 
         this.setupContextMenu(this.settings.data.saveCleanFiles);
-
-        async function getAuthCookie() {
-            const cookie = await cookieManager.get();
-
-            if (cookie) {
-                this.setApikey(cookie.value);
-            } else {
-                setTimeout(getAuthCookie.bind(this), 300);
-            }
-        }
-        getAuthCookie.call(this);
+        await this.getAuthCookie.call(this);
 
         SafeUrl.toggle(this.settings.data.safeUrl);
     }
@@ -112,8 +112,38 @@ export default class BackgroundTask {
      *
      * @param {string} cookieValue
      */
+
+    async updateApikeyInfo(apikey, loggedIn) {
+        try {
+            const response = await MetascanClient.apikey.info(apikey);
+
+            if (response?.error) {
+                setTimeout(() => {
+                    BrowserNotification.create(response.error.messages.join(', '));
+                }, 5000);
+                return;
+            }
+
+            this.apikeyInfo.data.apikey = apikey;
+            this.apikeyInfo.data.loggedIn = loggedIn;
+            this.apikeyInfo.parseMclInfo(response);
+            await this.apikeyInfo.save();
+
+            this.settings.data.shareResults = this.settings.data.shareResults || !this.apikeyInfo.data.paidUser;
+            await this.settings.save();
+        } catch (error) {
+            console.warn(error);
+        }
+    }
+
     async setApikey(cookieValue) {
         let cookieData = decodeURIComponent(cookieValue);
+        const settingsData = await this.settings.load();
+
+        if (settingsData?.apikeyCustom && settingsData.apikeyCustom !== "") {
+            await this.updateApikeyInfo(settingsData?.apikeyCustom, true);
+            return
+        }
 
         try {
             cookieData = JSON.parse(cookieData);
@@ -126,24 +156,7 @@ export default class BackgroundTask {
             return;
         }
 
-        try {
-            const response = await MetascanClient.apikey.info(cookieData.apikey);
-
-            if (response?.error) {
-                BrowserNotification.create(response.error.messages.join(', '));
-                return;
-            }
-
-            this.apikeyInfo.data.apikey = cookieData.apikey;
-            this.apikeyInfo.data.loggedIn = cookieData.loggedIn;
-            this.apikeyInfo.parseMclInfo(response);
-            await this.apikeyInfo.save();
-
-            this.settings.data.shareResults = this.settings.data.shareResults || !this.apikeyInfo.data.paidUser;
-            await this.settings.save();
-        } catch (error) {
-            console.warn(error);
-        }
+        await this.updateApikeyInfo(cookieData?.apikey, cookieData?.loggedIn);
     }
 
     onInstallExtensionListener(details) {
