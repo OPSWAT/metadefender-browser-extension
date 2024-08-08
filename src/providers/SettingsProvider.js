@@ -121,6 +121,7 @@ export const SettingsProvider = ({ children }) => {
                 const validApikey = await validateCustomApikey(newSettingsData?.apikeyCustom);
                 if (validApikey) {
                     newSettings.apikeyCustom = newSettingsData?.apikeyCustom;
+                    await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
                     newSettings.useCustomApiKey = true;
                 } else {
                     newSettings.apikeyCustom = '';

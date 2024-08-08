@@ -118,7 +118,9 @@ export default class BackgroundTask {
             const response = await MetascanClient.apikey.info(apikey);
 
             if (response?.error) {
-                BrowserNotification.create(response.error.messages.join(', '));
+                setTimeout(() => {
+                    BrowserNotification.create(response.error.messages.join(', '));
+                }, 5000);
                 return;
             }
 
@@ -129,7 +131,6 @@ export default class BackgroundTask {
 
             this.settings.data.shareResults = this.settings.data.shareResults || !this.apikeyInfo.data.paidUser;
             await this.settings.save();
-            BrowserNotification.create('Apikey saved!')
         } catch (error) {
             console.warn(error);
         }
