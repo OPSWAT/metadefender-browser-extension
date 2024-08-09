@@ -26,7 +26,7 @@ class FileProcessor {
             return;
         }
 
-        const file = new ScanFile();
+        const file = ScanFile();
 
         if (file.isSanitizedFile(linkUrl)) {
             return;
@@ -72,6 +72,7 @@ class FileProcessor {
             try {
                 fileData = await this.getDownloadedFile(downloadItem.localPath || 'file://' + downloadItem.filename);
                 BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
+
             }
             catch (e) {
                 BrowserNotification.create(e, file.id);
@@ -107,7 +108,12 @@ class FileProcessor {
      * @returns {Promise}
      */
     async getDownloadedFile(localPath) {
-        return fetch(localPath);
+        return fetch(localPath).then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error, status = ${response.status}`);
+            }
+            return Promise.resolve(response.arrayBuffer());
+        });
     }
 
     /**
@@ -165,7 +171,7 @@ class FileProcessor {
         file.dataId = info.data_id;
 
         if (file.useCore) {
-            if (settings.data.coreV4 === true){
+            if (settings.data.coreV4 === true) {
                 file.scanResults = `${settings.data.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
             } else {
                 file.scanResults = `${settings.data.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
@@ -217,7 +223,7 @@ class FileProcessor {
         let response;
 
         if (file.useCore) {
-            if (settings.data.coreV4 === true){
+            if (settings.data.coreV4 === true) {
                 file.scanResults = `${settings.data.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
             } else {
                 file.scanResults = `${settings.data.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
