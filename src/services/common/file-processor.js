@@ -38,6 +38,14 @@ class FileProcessor {
         }
 
         else {
+            const response = await fetch(linkUrl, {
+                method: 'HEAD',
+                redirect: 'follow'
+            });
+            if (response.url !== linkUrl) {
+                linkUrl = response.url;
+            }
+
             file.fileName = linkUrl.split('/').pop();
             file.fileName = file.fileName.split('?')[0];
 
