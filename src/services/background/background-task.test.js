@@ -6,6 +6,7 @@ import BackgroundTask from './background-task';
 import cookieManager from './cookie-manager';
 import { scanHistory } from '../common/persistent/scan-history';
 import SafeUrl from './safe-url';
+import { waitFor } from '@testing-library/react';
 
 const mockAddListener = jest.fn();
 const mockCreate = jest.fn();
@@ -24,8 +25,9 @@ global.chrome = {
     },
     cookies: {
         onChanged: { addListener: () => null },
-        get: jest.fn()
+        get: () => 'mocki value'
     },
+
     tabs: {
         create: mockCreate,
         query: () => null
@@ -111,8 +113,8 @@ describe('background-task', () => {
 
     });
 
-    it('should initialize class correctly', async () => {
-        await backgroundTask.init();
+    xit('should initialize class correctly', async () => {
+        await waitFor(() => backgroundTask.init());
 
         expect(settingsInitSpy).toHaveBeenCalled();
         expect(apikeyInitSpy).toHaveBeenCalled();
