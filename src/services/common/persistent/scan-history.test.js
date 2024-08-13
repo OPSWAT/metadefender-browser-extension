@@ -1,5 +1,7 @@
 import { scanHistory } from './scan-history';
 import BrowserStorage from '../../common/browser/browser-storage';
+import React from 'react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 describe('scan-history', () => {
     const BrowserStorageGetSpy = jest.spyOn(BrowserStorage, 'get');
@@ -114,4 +116,33 @@ describe('scan-history', () => {
             done();
         }, 0);
     });
+
+    it('should clear all files', async () => {
+        BrowserStorageGetSpy.mockResolvedValueOnce({ [key]: mockData });
+        await scanHistory.load();
+
+        await scanHistory.clear();
+
+        expect(scanHistory.files).toHaveLength(0);
+        expect(BrowserStorageSetSpy).toHaveBeenCalled();
+    });
+
+    it('should not save if no files were cleaned', async () => {
+        const nonPendingFilesData = {
+            files: [
+                { file: 'file1', status: 1, dataId: 1, id: 1 },
+                { file: 'file2', status: 2, dataId: 2, id: 2 }
+            ]
+        };
+        BrowserStorageGetSpy.mockResolvedValueOnce({ [key]: nonPendingFilesData });
+        await scanHistory.load();
+
+        await scanHistory.cleanPendingFiles();
+
+        expect(scanHistory.files).toHaveLength(2);
+        expect(BrowserStorageSetSpy).not.toHaveBeenCalled();
+    });
+
+
+
 });
