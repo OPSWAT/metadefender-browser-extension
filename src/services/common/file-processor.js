@@ -282,7 +282,7 @@ class FileProcessor {
             file.statusLabel = file.getScanStatusLabel(file.scan_results.scan_all_result_i);
             if (error?.error?.details?.code === 400144) {
                 BrowserNotification.create(error?.error?.details?.message, error?.error?.state?.requestId);
-                file.statusLabel = chrome.i18n.getMessage('scanResultFileSizeExceeded');
+                file.statusLabel = chrome.i18n.getMessage('fileSizeLimitExceeded');
             } else {
                 BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));
             }
