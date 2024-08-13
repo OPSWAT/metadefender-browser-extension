@@ -73,6 +73,21 @@ describe('scan-history', () => {
         }, 0);
     });
 
+
+    it('should update file by file id', (done) => {
+        BrowserStorageGetSpy.mockImplementation(() => ({ ...mockData }));
+
+        const dataIdToUpdate = 1;
+        const { dataId, id, ...data } = newFile;
+        scanHistory.updateFileById(dataIdToUpdate, data);
+
+        setTimeout(() => {
+            expect(scanHistory.files.find(({ dataId }) => dataId === dataIdToUpdate)).toEqual(undefined);
+            done();
+        }, 0);
+    });
+
+
     it('should remove file by id', (done) => {
         scanHistory.removeFile(1);
 
@@ -84,6 +99,15 @@ describe('scan-history', () => {
 
     it('should remove all files', (done) => {
         scanHistory.clear();
+
+        setTimeout(() => {
+            expect(scanHistory.files).toHaveLength(0);
+            done();
+        }, 0);
+    });
+
+    it('should remove pending all files', (done) => {
+        scanHistory.cleanPendingFiles();
 
         setTimeout(() => {
             expect(scanHistory.files).toHaveLength(0);

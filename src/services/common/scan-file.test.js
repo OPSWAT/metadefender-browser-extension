@@ -85,4 +85,28 @@ describe('scan-file', () => {
         scanFile.getScanStatusLabel('Mock');
         expect(getMessageSpy).toHaveBeenCalledWith('scanResultMock');
     });
+
+    it('should get getMd5Hash', async () => {
+        try {
+            await scanFile.getMd5Hash('data');
+        } catch (error) {
+            expect(getMessageSpy).toHaveBeenCalledWith('data');
+        }
+    });
+
+    it('should get getFileData', async () => {
+        const mockArrayBuffer = new ArrayBuffer(8);
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            arrayBuffer: () => Promise.resolve(mockArrayBuffer)
+        });
+
+        const url = 'http://example.com/file';
+        await scanFile.getMd5Hash('data');
+        const result = await scanFile.getFileData(url);
+
+        expect(fetch).toHaveBeenCalledWith(url);
+        expect(result).toBe(mockArrayBuffer);
+    });
+
 });

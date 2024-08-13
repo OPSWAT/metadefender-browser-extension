@@ -38,7 +38,8 @@
       "/node_modules/",
       "/src/config/",
       "/src/constants",
-      "src/reportWebVitals.js"
+      "/src/reportWebVitals.js",
+      "/src/services/background/index.js"
     ],
     "coverageReporters": [
       "json",

@@ -10,7 +10,7 @@ export default browserExtension;
  * 
  * @link https://developer.chrome.com/extensions/extension#method-isAllowedFileSchemeAccess
  */
-function isAllowedFileSchemeAccess(){
+function isAllowedFileSchemeAccess() {
     return new Promise((resolve) => {
         chrome.extension.isAllowedFileSchemeAccess((isAllowedAccess) => {
             resolve(isAllowedAccess);
