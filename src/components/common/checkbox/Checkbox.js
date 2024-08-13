@@ -1,19 +1,21 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { validateCoreSettings } from '../../../providers/SettingsProvider';
+import { validateCoreSettings, validateCustomApikey } from '../../../providers/SettingsProvider';
 import BrowserTranslate from '../../../services/common/browser/browser-translate';
-
+import BackgroundTask from '../../../services/background/background-task';
 
 import './Checkbox.scss';
 
-const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleCheckboxChange, labelFor, getScanRules, coreApikey, coreUrl, coreRule, scanRules }) => {
+const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, handleCheckboxChange, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules }) => {
     const checkboxRef = useRef(null);
     const [isInputChecked, setIsInputChecked] = useState(typeof isChecked === 'boolean' ? isChecked : false);
     const [apikey, setApikey] = useState();
     const [url, setUrl] = useState();
     const [rule, setCoreRule] = useState();
     const [error, setError] = useState({});
+    const [customApikey, setCustomApikey] = useState();
+    const backgroundTask = new BackgroundTask();
 
     const handleClick = async () => {
         if (!isDisabled) {
@@ -25,18 +27,33 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
     const saveCoreSettings = async () => {
         setError(null);
         const validCore = await validateCoreSettings(apikey, url);
-        if(!validCore)
-        {
-            setError({coreUrl: BrowserTranslate.getMessage('coreSettingsInvalidUrl')});
+        if (!validCore) {
+            setError({ coreUrl: BrowserTranslate.getMessage('coreSettingsInvalidUrl') });
         }
         const coreSettings = {
             coreApikey: apikey,
             coreUrl: url,
             coreRule: rule,
         };
-    
+
         await handleCheckboxChange('coreSettings', coreSettings);
     }
+
+    const saveCustomSettings = async () => {
+        setError(null);
+        const validApikey = await validateCustomApikey(customApikey);
+
+        if (!validApikey) {
+            setError({ coreUrl: BrowserTranslate.getMessage('apikeyInvalidNotification') });
+        }
+
+        const customSettings = {
+            apikeyCustom: customApikey,
+        };
+
+        await handleCheckboxChange('customSettings', customSettings);
+        await backgroundTask.updateApikeyInfo(customApikey, true);
+    };
 
     const checkCoreSettings = async () => {
         getScanRules(apikey, url);
@@ -54,6 +71,29 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
         setCoreRule(e.target.value);
     }
 
+    const handleCustomApikeyChange = (e) => {
+        setCustomApikey(e.target.value);
+    };
+
+    const formDomApikey = useMemo(() => {
+        if (!hasFormApikey) {
+            return;
+        }
+
+        return <fieldset className="form-with-inputs" disabled={!isInputChecked}>
+            <Form.Group controlId="apiKey">
+                <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
+                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={customApikey || ''} onChange={handleCustomApikeyChange} />
+            </Form.Group>
+
+            <div className="col-md-12 d-flex justify-content-end p-0">
+                <Button variant="primary" type="button" onClick={saveCustomSettings}>
+                    {chrome.i18n.getMessage('coreSettingsSave')}
+                </Button>
+            </div>
+        </fieldset>;
+    }, [hasFormApikey, isInputChecked, customApikey]);
+
     const formDom = useMemo(() => {
         if (!hasForm) {
             return;
@@ -62,20 +102,20 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
         return <fieldset className="form-with-inputs" disabled={!isInputChecked}>
             <Form.Group controlId="apiKey">
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
-                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={apikey || ''} onChange={handleApikeyChange} onBlur={checkCoreSettings}/>
+                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={apikey || ''} onChange={handleApikeyChange} onBlur={checkCoreSettings} />
             </Form.Group>
-            <Form.Group controlId="url" className={error?.coreUrl?"m-0":""}>
+            <Form.Group controlId="url" className={error?.coreUrl ? "m-0" : ""}>
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">URL</Form.Label>
                 <div className="col-md-10 col-sm-12 p-0">
-                    <Form.Control className="w-100" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings}/>
-                    
+                    <Form.Control className="w-100" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings} />
+
                 </div>
-                
+
             </Form.Group>
             <Form.Group>
-                <span className='col-md-2 col-sm-12'></span>  
+                <span className='col-md-2 col-sm-12'></span>
                 <p className='red col-md-10 col-sm-12 p-0'>{error?.coreUrl}</p>
-            </Form.Group>         
+            </Form.Group>
             <Form.Group controlId="workflow">
                 <Form.Label className="col-sm-2 text-md-right text-left">Workflow</Form.Label>
 
@@ -102,18 +142,22 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, handleC
         setApikey(coreApikey);
         setUrl(coreUrl);
         setCoreRule(coreRule);
-    }, [isChecked, coreApikey, coreUrl, coreRule]);
+        setCustomApikey(apikeyCustom)
+    }, [isChecked, coreApikey, coreUrl, coreRule, apikeyCustom]);
 
     return (
-        <div className="form-group-wrapper">
-            <Form.Group onClick={handleClick} className={`${isDisabled ? 'disabled' : ''}`}>
-                <Form.Check type="checkbox" label={label} onChange={handleClick} checked={isInputChecked} disabled={isDisabled} ref={checkboxRef} />
-            </Form.Group>
-            <div className='other-content'>
-                {otherContent}
+        <>
+            <div className="form-group-wrapper">
+                <Form.Group onClick={handleClick} className={`${isDisabled ? 'disabled' : ''}`}>
+                    <Form.Check type="checkbox" label={label} onChange={handleClick} checked={isInputChecked} disabled={isDisabled} ref={checkboxRef} />
+                </Form.Group>
+                <div className='other-content'>
+                    {otherContent}
+                </div>
+                {formDomApikey}
+                {formDom}
             </div>
-            {formDom}
-        </div>
+        </>
     );
 };
 
@@ -123,14 +167,14 @@ Checkbox.propTypes = {
     isDisabled: PropTypes.bool,
     otherContent: PropTypes.node,
     hasForm: PropTypes.bool,
+    hasFormApikey: PropTypes.bool,
     handleCheckboxChange: PropTypes.func,
-    validateCoreSettings: PropTypes.func,
     labelFor: PropTypes.string,
     getScanRules: PropTypes.func,
     coreApikey: PropTypes.string,
     coreUrl: PropTypes.string,
     coreRule: PropTypes.string,
-    coreRules: PropTypes.array,
+    apikeyCustom: PropTypes.string,
 };
 
 export default Checkbox;

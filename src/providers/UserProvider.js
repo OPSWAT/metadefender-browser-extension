@@ -10,7 +10,6 @@ export default UserContext;
 
 export const UserProvider = ({ children }) => {
     const [apikeyData, setApikeyData] = useState(null);
-
     const apikeyUpdateHandler = (changes) => {
         if (Object.keys(changes).includes('apikey')) {
             setApikeyData(changes.apikey.newValue);

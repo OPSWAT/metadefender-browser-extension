@@ -42,7 +42,6 @@ export const apikeyInfo = ApikeyInfo();
  */
 async function init() {
     const result = await BrowserStorage.get(storageKey);
-
     if (!result || !result[storageKey]) {
         return this.save();
     }
@@ -64,7 +63,7 @@ function merge(newData) {
  * @returns {Promise.<*>}
  */
 async function save() {
-    await BrowserStorage.set({[storageKey]: this.data});
+    await BrowserStorage.set({ [storageKey]: this.data });
 }
 
 /**

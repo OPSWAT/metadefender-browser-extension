@@ -12,6 +12,8 @@ import CoreClient from '../services/common/core-client';
 import { GaTrack } from '../services/ga-track';
 import ConfigContext from './ConfigProvider';
 import browserStorage from '../services/common/browser/browser-storage';
+import BackgroundTask from '../services/background/background-task';
+import cookieManager from '../services/background/cookie-manager';
 
 const SettingsContext = createContext();
 export default SettingsContext;
@@ -25,7 +27,6 @@ export const validateCoreSettings = async (newApikey, newUrl) => {
     }
 
     CoreClient.configure({ apikey, endpoint });
-
     try {
         const versionResult = await CoreClient.version();
         const coreV4 = (versionResult?.version.split('.')[0] === '4') || settings.coreV4;
@@ -42,6 +43,22 @@ export const validateCoreSettings = async (newApikey, newUrl) => {
     return false;
 };
 
+export const validateCustomApikey = async (newCustomApikey) => {
+    try {
+        const apikeyCustom = newCustomApikey || settings.apikeyCustom;
+
+        if (apikeyCustom && apikeyCustom.length !== 32) {
+            settings.apikeyCustom = '';
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.warn(error.message);
+        return false;
+    }
+};
+
 export const SettingsProvider = ({ children }) => {
 
     const config = useContext(ConfigContext);
@@ -51,7 +68,6 @@ export const SettingsProvider = ({ children }) => {
     const getScanRules = async (newApikey, newUrl) => {
 
         const validCore = await validateCoreSettings(newApikey, newUrl);
-
         if (validCore) {
             const { coreV4, rules } = validCore;
             settings.merge({ coreV4, rules });
@@ -64,31 +80,53 @@ export const SettingsProvider = ({ children }) => {
     /**
      * Update settings
      * @param {string} key 
-     * @param {object} coreSettingsParam 
+     * @param {object} newSettingsData
      */
-    const updateSettings = async (key, coreSettingsParam) => {
+    const updateSettings = async (key, newSettingsData) => {
         const newSettings = { ...settings.data };
+        const backgroundTask = new BackgroundTask();
+        const cookie = await cookieManager.get();
+        const authCookie = JSON.parse(cookie.value);
         switch (key) {
             case 'coreSettings': {
-                newSettings.coreApikey = coreSettingsParam.coreApikey;
-                newSettings.coreUrl = coreSettingsParam.coreUrl;
+                newSettings.coreApikey = newSettingsData.coreApikey;
+                newSettings.coreUrl = newSettingsData.coreUrl;
 
-                if (!coreSettingsParam.coreApikey || !coreSettingsParam.coreUrl) {
+                if (!newSettingsData.coreApikey || !newSettingsData.coreUrl) {
                     newSettings.useCore = false;
                     break;
                 }
 
-                const validCore = await validateCoreSettings(coreSettingsParam.coreApikey, coreSettingsParam.coreUrl);
+                const validCore = await validateCoreSettings(newSettingsData.coreApikey, newSettingsData.coreUrl);
 
                 if (validCore) {
                     newSettings.coreV4 = validCore.coreV4;
                     newSettings.rules = validCore.rules;
-                    newSettings.coreRule = coreSettingsParam.coreRule;
+                    newSettings.coreRule = newSettingsData.coreRule;
                     await BrowserNotification.create(BrowserTranslate.getMessage('coreSettingsSavedNotification'), 'info');
                     newSettings.useCore = true;
                 } else {
                     newSettings.useCore = false;
                     await BrowserNotification.create(BrowserTranslate.getMessage('coreSettingsInvalidNotification'), 'info');
+                }
+                break;
+            }
+            case 'customSettings': {
+                newSettings.apikeyCustom = newSettingsData?.apikeyCustom;
+                if (!newSettingsData.apikeyCustom) {
+                    newSettings.apikeyCustom = '';
+                    newSettings.useCustomApiKey = false;
+                    break;
+                }
+                const validApikey = await validateCustomApikey(newSettingsData?.apikeyCustom);
+                if (validApikey) {
+                    newSettings.apikeyCustom = newSettingsData?.apikeyCustom;
+                    await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
+                    newSettings.useCustomApiKey = true;
+                } else {
+                    newSettings.apikeyCustom = '';
+                    newSettings.useCustomApiKey = false;
+                    await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
                 }
                 break;
             }
@@ -104,6 +142,21 @@ export const SettingsProvider = ({ children }) => {
                     }
                 } else {
                     newSettings.useCore = false;
+                }
+                break;
+            }
+            case 'useCustomApiKey': {
+                const useCustomApiKey = !newSettings.useCustomApiKey;
+                if (useCustomApiKey) {
+                    const validApikey = await validateCustomApikey();
+                    if (validApikey) {
+                        newSettings.apikeyCustom = validApikey.apikeyCustom;
+                        newSettings.useCustomApiKey = true;
+                    }
+                } else {
+                    newSettings.apikeyCustom = '';
+                    newSettings.useCustomApiKey = false;
+                    await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
                 }
                 break;
             }
