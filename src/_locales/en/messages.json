@@ -210,7 +210,7 @@
     "message": "To use this feature, 'Allow access to file URLs' must be enabled for OPSWAT extension"
   },
   "fileSizeLimitExceeded": {
-    "message": "Your file exceeded the file size limit. Please select a file less than 140 MB"
+    "message": "Not scanned / Exceeded file size"
   },
   "fileEmpty": {
     "message": "File is empty. Please select another file",
