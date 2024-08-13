@@ -280,7 +280,12 @@ class FileProcessor {
             };
             file.status = file.getScanStatus(file.scan_results.scan_all_result_i);
             file.statusLabel = file.getScanStatusLabel(file.scan_results.scan_all_result_i);
-            BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));
+            if (error?.error?.details?.code === 400144) {
+                BrowserNotification.create(error?.error?.details?.message, error?.error?.state?.requestId);
+                file.statusLabel = chrome.i18n.getMessage('scanResultFileSizeExceeded');
+            } else {
+                BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));
+            }
             global._gaq?.push(['exception', { exDescription: 'file-processor:scanFile' + JSON.stringify(error) }]);
         }
 
