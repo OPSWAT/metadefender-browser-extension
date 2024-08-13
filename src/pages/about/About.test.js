@@ -35,12 +35,43 @@ describe('<About />', () => {
     it('should render properly', () => {
         const wrapper = shallow(<About />);
         expect(wrapper.find('SidebarLayout').exists()).toBe(true);
-    });  
+    });
 
     it('should render API key information when apikeyData is provided', () => {
         const wrapper = shallow(<About />);
         const apiKeyInfoDom = wrapper.find('h4').filterWhere(n => n.text() === 'mocked_message');
-        
+
+        expect(apiKeyInfoDom.exists()).toBe(false);
+    });
+
+});
+
+
+describe('<About /> w no apikey ', () => {
+    const mockGAContextValue = {
+        gaTrackEvent: jest.fn(),
+    };
+
+    const mockUserContextValue = {
+        apikeyData: {
+        }
+    };
+
+    beforeEach(() => {
+        React.useContext
+            .mockImplementationOnce(() => mockGAContextValue)
+            .mockImplementationOnce(() => mockUserContextValue);
+    });
+
+    it('should render properly', () => {
+        const wrapper = shallow(<About />);
+        expect(wrapper.find('SidebarLayout').exists()).toBe(true);
+    });
+
+    it('should render API key information when apikeyData is provided', () => {
+        const wrapper = shallow(<About />);
+        const apiKeyInfoDom = wrapper.find('h4').filterWhere(n => n.text() === 'mocked_message');
+
         expect(apiKeyInfoDom.exists()).toBe(false);
     });
 
