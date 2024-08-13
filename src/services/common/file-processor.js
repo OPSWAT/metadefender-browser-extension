@@ -26,7 +26,7 @@ class FileProcessor {
             return;
         }
 
-        const file = new ScanFile();
+        const file = ScanFile();
 
         if (file.isSanitizedFile(linkUrl)) {
             return;
@@ -38,6 +38,14 @@ class FileProcessor {
         }
 
         else {
+            const response = await fetch(linkUrl, {
+                method: 'HEAD',
+                redirect: 'follow'
+            });
+            if (response.url !== linkUrl) {
+                linkUrl = response.url;
+            }
+
             file.fileName = linkUrl.split('/').pop();
             file.fileName = file.fileName.split('?')[0];
 
@@ -72,6 +80,7 @@ class FileProcessor {
             try {
                 fileData = await this.getDownloadedFile(downloadItem.localPath || 'file://' + downloadItem.filename);
                 BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
+
             }
             catch (e) {
                 BrowserNotification.create(e, file.id);
@@ -107,7 +116,12 @@ class FileProcessor {
      * @returns {Promise}
      */
     async getDownloadedFile(localPath) {
-        return fetch(localPath);
+        return fetch(localPath).then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error, status = ${response.status}`);
+            }
+            return Promise.resolve(response.arrayBuffer());
+        });
     }
 
     /**
@@ -165,7 +179,7 @@ class FileProcessor {
         file.dataId = info.data_id;
 
         if (file.useCore) {
-            if (settings.data.coreV4 === true){
+            if (settings.data.coreV4 === true) {
                 file.scanResults = `${settings.data.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
             } else {
                 file.scanResults = `${settings.data.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
@@ -217,7 +231,7 @@ class FileProcessor {
         let response;
 
         if (file.useCore) {
-            if (settings.data.coreV4 === true){
+            if (settings.data.coreV4 === true) {
                 file.scanResults = `${settings.data.coreUrl}/#/user/dashboard/processingHistory/dataId/${file.dataId}`;
             } else {
                 file.scanResults = `${settings.data.coreUrl}/#/user/scanResult?type=dataId&value=${file.dataId}`;
@@ -266,7 +280,12 @@ class FileProcessor {
             };
             file.status = file.getScanStatus(file.scan_results.scan_all_result_i);
             file.statusLabel = file.getScanStatusLabel(file.scan_results.scan_all_result_i);
-            BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));
+            if (error?.error?.details?.code === 400144) {
+                BrowserNotification.create(error?.error?.details?.message, error?.error?.state?.requestId);
+                file.statusLabel = chrome.i18n.getMessage('fileSizeLimitExceeded');
+            } else {
+                BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));
+            }
             global._gaq?.push(['exception', { exDescription: 'file-processor:scanFile' + JSON.stringify(error) }]);
         }
 
