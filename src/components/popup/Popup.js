@@ -10,7 +10,7 @@ import ScanHistoryContext from '../../providers/ScanHistoryProvider';
 import './Popup.scss';
 
 const Popup = () => {
-    
+
     const config = useContext(ConfigContext);
     const { gaTrackEvent } = useContext(GAContext);
     const { files } = useContext(ScanHistoryContext);
@@ -82,8 +82,8 @@ const Popup = () => {
                 <a href={scannedFile.scanResults || getScanUrl(scannedFile)} target="_blank" rel="noreferrer noopener">
                     {scannedFile.fileName}
                 </a>
-                <span className={`mcl-icon ${getStatusIcon(scannedFile.status)}`}></span>
-            </li>
+                <span data-testid={getStatusIcon(scannedFile.status)} className={`mcl-icon ${getStatusIcon(scannedFile.status)}`}></span>
+            </li >
         ));
     }, [files]);
 

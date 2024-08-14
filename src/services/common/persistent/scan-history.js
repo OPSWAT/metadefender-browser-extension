@@ -41,7 +41,7 @@ async function init() {
     if (!historyData) {
         return this.save();
     }
-    
+
     this.merge(historyData);
 }
 
@@ -73,9 +73,11 @@ function merge(newData) {
  * @returns {Promise.<void>}
  */
 async function save() {
-    await BrowserStorage.set({[storageKey]: {
-        files: this.files
-    }});
+    await BrowserStorage.set({
+        [storageKey]: {
+            files: this.files
+        }
+    });
 }
 
 async function cleanPendingFiles() {
@@ -94,7 +96,7 @@ async function cleanPendingFiles() {
  * @returns {Promise<void>}
  */
 async function addFile(file) {
-    
+
     this.files.unshift(file);
     this.save();
 }

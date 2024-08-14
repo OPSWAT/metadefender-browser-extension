@@ -48,7 +48,7 @@ export const validateCustomApikey = async (newCustomApikey) => {
         const apikeyCustom = newCustomApikey || settings.apikeyCustom;
 
         if (apikeyCustom && apikeyCustom.length !== 32) {
-            settings.apikeyCustom = ''
+            settings.apikeyCustom = '';
             return false;
         }
 
@@ -74,7 +74,7 @@ export const SettingsProvider = ({ children }) => {
             await settings.save();
             setSettingsData({ ...settings.data });
         }
-    }
+    };
 
 
     /**
@@ -154,7 +154,7 @@ export const SettingsProvider = ({ children }) => {
                         newSettings.useCustomApiKey = true;
                     }
                 } else {
-                    newSettings.apikeyCustom = ''
+                    newSettings.apikeyCustom = '';
                     newSettings.useCustomApiKey = false;
                     await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
                 }
@@ -196,7 +196,7 @@ export const SettingsProvider = ({ children }) => {
 
         return () => {
             browserStorage.removeListener(storageUpdateHandler);
-        }
+        };
     }, []);
 
     return (
@@ -209,9 +209,9 @@ export const SettingsProvider = ({ children }) => {
         }}>
             {children}
         </SettingsContext.Provider>
-    )
+    );
 
-}
+};
 
 SettingsProvider.propTypes = {
     children: PropTypes.element.isRequired
