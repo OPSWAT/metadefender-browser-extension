@@ -174,4 +174,52 @@ describe('UserProvider', () => {
         expect(chrome.tabs.onUpdated.removeListener).not.toHaveBeenCalled();
     });
 
+    it('should handle errors during apikeyInfo.init gracefully', async () => {
+        const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => { });
+        apikeyInfo.init.mockRejectedValueOnce(new Error('Initialization Failed'));
+
+        render(
+            <UserProvider>
+                <UserContext.Consumer>
+                    {value => <div>{value.apikeyData ? 'Data Exists' : 'No Data'}</div>}
+                </UserContext.Consumer>
+            </UserProvider>
+        );
+
+        await act(async () => {
+            await apikeyInfo.init();
+        });
+
+        expect(consoleWarnSpy).toHaveBeenCalledWith(new Error('Initialization Failed'));
+        expect(screen.getByText('No Data')).toBeInTheDocument();
+
+        consoleWarnSpy.mockRestore();
+    });
+
+    it('should remove browserStorage listener on unmount', () => {
+        const { unmount } = render(
+            <UserProvider>
+                <UserContext.Consumer>
+                    {value => <div>{value.apikeyData ? 'Data Exists' : 'No Data'}</div>}
+                </UserContext.Consumer>
+            </UserProvider>
+        );
+
+        unmount();
+        expect(browserStorage.removeListener).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    it('should have apikeyData as null initially', () => {
+        apikeyInfo.data = null;
+
+        render(
+            <UserProvider>
+                <UserContext.Consumer>
+                    {value => <div>{value.apikeyData === null ? 'No Data' : 'Data Exists'}</div>}
+                </UserContext.Consumer>
+            </UserProvider>
+        );
+
+        expect(screen.getByText('No Data')).toBeInTheDocument();
+    });
 });

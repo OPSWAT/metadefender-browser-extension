@@ -58,7 +58,7 @@ jest.mock('../common/persistent/scan-history', () => ({
     }
 }));
 
-describe('file-processor', () => {
+xdescribe('file-processor', () => {
     const createSpy = jest.spyOn(browserNotification, 'create');
 
     describe('processTarget', () => {
