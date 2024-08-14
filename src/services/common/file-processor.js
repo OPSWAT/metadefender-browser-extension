@@ -50,7 +50,7 @@ class FileProcessor {
             file.fileName = file.fileName.split('?')[0];
 
             try {
-                file.size = file.getFileSize(linkUrl, file.fileName);
+                file.size = await file.getFileSize(linkUrl, file.fileName);
             }
             catch (errMsg) {
                 if (errMsg) {
@@ -63,12 +63,8 @@ class FileProcessor {
         file.extension = file.fileName.split('.').pop();
         file.canBeSanitized = file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
 
-        if (file.size === null) {
+        if (file.size === null || file.size === 0) {
             BrowserNotification.create(chrome.i18n.getMessage('fileEmpty'));
-            return;
-        }
-        if (parseInt(file.size) > parseInt(MCL.config.fileSizeLimit)) {
-            BrowserNotification.create(chrome.i18n.getMessage('fileSizeLimitExceeded'));
             return;
         }
 
@@ -106,13 +102,7 @@ class FileProcessor {
                 await scanHistory.removeFile(file);
                 return;
             }
-        }
-        else {
-            if (file.size === 0) {
-                BrowserNotification.create(chrome.i18n.getMessage('fileEmpty'));
-                return;
-            }
-
+        } else {
             BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
             fileData = await file.getFileData(linkUrl);
         }
@@ -320,7 +310,7 @@ class FileProcessor {
     async scanWithCore(file, fileData) {
         let response = await CoreClient.hash.lookup(file.md5);
 
-        if (response[file.md5] === 'Not Found') {
+        if (!response?.data_id || response?.error) {
             response = await CoreClient.file.upload({
                 fileData: fileData,
                 fileName: file.fileName,
@@ -338,20 +328,15 @@ class FileProcessor {
      * @param {*} fileData file content
      */
     async scanWithCloud(file, fileData) {
-        let response;
-        try {
-            response = await MetascanClient.setAuth(apikeyInfo.data.apikey).hash.lookup(file.md5);
+        let response = await MetascanClient.setAuth(apikeyInfo.data.apikey).hash.lookup(file.md5);
 
-            if (!response || !response.data_id || response.error) {
-                response = await MetascanClient.setAuth(apikeyInfo.data.apikey).file.upload({
-                    fileName: file.fileName,
-                    fileData,
-                    sampleSharing: settings.data.shareResults,
-                    canBeSanitized: file.canBeSanitized
-                });
-            }
-        } catch (error) {
-            console.warn(error);
+        if (!response?.data_id || response?.error) {
+            response = await MetascanClient.setAuth(apikeyInfo.data.apikey).file.upload({
+                fileName: file.fileName,
+                fileData,
+                sampleSharing: settings.data.shareResults,
+                canBeSanitized: file.canBeSanitized
+            });
         }
 
         return response;

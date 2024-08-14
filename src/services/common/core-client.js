@@ -120,7 +120,7 @@ function hashLookup(hash) {
         headers: authHeader
     };
 
-    return callAPI(restEndpoint, options);
+    return callAPI(restEndpoint, options).catch((error) => ({ error }));
 }
 
 /**

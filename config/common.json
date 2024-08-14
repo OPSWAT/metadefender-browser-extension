@@ -40,8 +40,6 @@
     "scanId": "scan_with_mcl"
   },
 
-  "fileSizeLimit": 146800640,
-
   "scanResults": {
     "incrementor": 1.2,
     "maxInterval": 300000
