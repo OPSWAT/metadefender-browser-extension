@@ -1,4 +1,4 @@
-image: node:18.00.0
+image: node:18.20.4
 clone:
   depth: full
 options:
