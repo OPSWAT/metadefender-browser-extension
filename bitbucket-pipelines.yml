@@ -29,7 +29,7 @@ pipelines:
       - step:
           name: Run Unit tests
           script:
-            - npm i;
+            - npm i --legacy-peer-deps;
             - npm run coverage;
           artifacts:
             - coverage/**
