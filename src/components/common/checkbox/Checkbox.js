@@ -8,14 +8,15 @@ import BrowserNotification from '../../../services/common/browser/browser-notifi
 
 import './Checkbox.scss';
 
-const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, hasFormWhiteList, handleCheckboxChange, whiteListCustom, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules }) => {
+const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, hasFormWhiteList, fileSizeLimit, handleCheckboxChange, whiteListCustom, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules }) => {
     const checkboxRef = useRef(null);
     const inputRef = useRef(null);
     const [isInputChecked, setIsInputChecked] = useState(typeof isChecked === 'boolean' ? isChecked : false);
     const [apikey, setApikey] = useState();
     const [url, setUrl] = useState();
-    const [rule, setCoreRule] = useState();
+    const [rule, setRule] = useState();
     const [error, setError] = useState({});
+    const [skipLimit, setSkipLimit] = useState();
     const [customApikey, setCustomApikey] = useState();
     const backgroundTask = new BackgroundTask();
     const [whiteList, setWhiteList] = useState([]);
@@ -25,6 +26,12 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
             setIsInputChecked(!isInputChecked);
             await handleCheckboxChange(labelFor);
         }
+    };
+
+    const saveFileSettings = async () => {
+        const fileSettings = { fileSizeLimit: skipLimit };
+
+        await handleCheckboxChange('fileSettings', fileSettings);
     };
 
     const saveCoreSettings = async () => {
@@ -40,7 +47,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         };
 
         await handleCheckboxChange('coreSettings', coreSettings);
-    }
+    };
 
     const saveCustomSettings = async () => {
         setError(null);
@@ -80,8 +87,12 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     };
 
     const handleWorkflowChange = (e) => {
-        setCoreRule(e.target.value);
-    }
+        setRule(e.target.value);
+    };
+
+    const handleSkipLimitChange = (e) => {
+        setSkipLimit(e.target.value);
+    };
 
     const handleCustomApikeyChange = (e) => {
         setCustomApikey(e.target.value);
@@ -114,7 +125,6 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         }
     };
 
-
     const handleRemove = (index) => {
         setWhiteList(prevWhiteList => {
             if (!Array.isArray(prevWhiteList)) return [];
@@ -123,6 +133,26 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
             return updatedList;
         });
     };
+
+    const skipLimitDom = useMemo(() => {
+        if (fileSizeLimit === null) {
+            return;
+        }
+
+        return (
+            <fieldset className="form-with-inputs" disabled={!isInputChecked}>
+                <Form.Group controlId="skipLimit">
+                    <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Limit (MB)</Form.Label>
+                    <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={skipLimit || ''} onChange={handleSkipLimitChange} />
+                </Form.Group>
+                <div className="col-md-12 d-flex justify-content-end p-0">
+                    <Button variant="primary" type="button" onClick={saveFileSettings}>
+                        {chrome.i18n.getMessage('coreSettingsSave')}
+                    </Button>
+                </div>
+            </fieldset>
+        );
+    }, [isInputChecked, skipLimit]);
 
     const formDomApikey = useMemo(() => {
         if (!hasFormApikey) {
@@ -251,9 +281,10 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         }
         setApikey(coreApikey);
         setUrl(coreUrl);
-        setCoreRule(coreRule);
+        setRule(coreRule);
         setCustomApikey(apikeyCustom);
         setWhiteList(whiteListCustom);
+        setSkipLimit(fileSizeLimit);
     }, [isChecked, coreApikey, coreUrl, coreRule, apikeyCustom, whiteListCustom]);
 
     return (
@@ -264,6 +295,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
             <div className='other-content'>
                 {otherContent}
             </div>
+            {skipLimitDom}
             {formDomApikey}
             {formDom}
             {formWhiteList}
@@ -286,9 +318,10 @@ Checkbox.propTypes = {
     coreApikey: PropTypes.string,
     coreUrl: PropTypes.string,
     coreRule: PropTypes.string,
+    scanRules: PropTypes.array,
     apikeyCustom: PropTypes.string,
     whiteListCustom: PropTypes.array,
-    scanRules: PropTypes.array
+    fileSizeLimit: PropTypes.string,
 };
 
 export default Checkbox;

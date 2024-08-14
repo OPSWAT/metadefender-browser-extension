@@ -23,6 +23,8 @@ function Settings() {
             useCustomApiKey: false,
             useWhiteList: false,
             coreV4: false,
+            skipLimit: false,
+            fileSizeLimit: '',
             coreUrl: '',
             coreApikey: '',
             apikeyCustom: '',
@@ -80,7 +82,7 @@ async function load() {
 function merge(newData) {
     const settingKeys = Object.keys(this.data);
     for (const key in newData) {
-        if (Object.prototype.hasOwnProperty.call(newData, key)) {
+        if (Object.hasOwn(newData, key)) {
             if (settingKeys.includes(key)) {
                 this.data[key] = newData[key];
             } else {
