@@ -29,7 +29,7 @@ pipelines:
       - step:
           name: Run Unit tests
           script:
-            - npm coverage;
+            - npm run coverage;
           artifacts:
             - coverage/**
           services:
