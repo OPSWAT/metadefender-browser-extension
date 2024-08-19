@@ -76,11 +76,30 @@ class FileProcessor {
 
         let fileData = null;
 
+        const getDomain = async () => {
+            return new Promise((resolve, reject) => {
+                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                    if (tabs.length > 0) {
+                        let url = new URL(tabs[0].url);
+                        let hostname = url.hostname;
+                        hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
+                        resolve(hostname);
+                    } else {
+                        reject('No active tab found');
+                    }
+                });
+            });
+        };
+
         if (downloadItem) {
             try {
+                const domain = await getDomain();
+                if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
+                    return;
+                }
+
                 fileData = await this.getDownloadedFile(downloadItem.localPath || 'file://' + downloadItem.filename);
                 BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
-
             }
             catch (e) {
                 BrowserNotification.create(e, file.id);
