@@ -1,7 +1,7 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { validateCoreSettings, validateCustomApikey, validateWhiteList } from '../../../providers/SettingsProvider';
+import { validateCoreSettings, validateCustomApikey } from '../../../providers/SettingsProvider';
 import BrowserTranslate from '../../../services/common/browser/browser-translate';
 import BackgroundTask from '../../../services/background/background-task';
 
@@ -9,6 +9,7 @@ import './Checkbox.scss';
 
 const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, hasFormWhiteList, handleCheckboxChange, whiteListCustom, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules }) => {
     const checkboxRef = useRef(null);
+    const inputRef = useRef(null);
     const [isInputChecked, setIsInputChecked] = useState(typeof isChecked === 'boolean' ? isChecked : false);
     const [apikey, setApikey] = useState();
     const [url, setUrl] = useState();
@@ -58,17 +59,10 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
     const saveCustomWhiteList = async () => {
         setError(null);
-
-        const validWhiteList = await validateWhiteList(whiteList);
-        if (!validWhiteList) {
-            setError({ whiteList: BrowserTranslate.getMessage('whiteListInvalidNotification') });
-            return;
-        }
-
+        inputRef.current.value = "";
         const whiteListCustomSettings = {
-            whiteListCustom: whiteList,
+            whiteListCustom: whiteList || [],
         };
-
         await handleCheckboxChange('whiteListCustomSettings', whiteListCustomSettings);
     };
 
@@ -94,7 +88,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
     const handleWhiteList = (e) => {
         if (e.key === 'Enter') {
-            const value = e.target.value;
+            const value = inputRef.current.value;
             console.log('value', value);
             if (value !== "") {
                 setWhiteList(prevWhiteList => {
@@ -102,11 +96,10 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                     console.log('updatedList', updatedList);
                     return updatedList;
                 });
-                e.target.value = "";
+                inputRef.current.value = "";
             }
         }
     };
-
 
     const handleRemove = (index) => {
         setWhiteList(prevWhiteList => {
@@ -185,9 +178,8 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         return (
             <fieldset className="form-with-inputs">
                 <Form.Group controlId="whiteList">
-                    <Form.Label className="col-md-2 col-sm-12 text-md-right text-left form-label"></Form.Label>
-
-                    <div className="col-md-10 col-sm-12">
+                    <Form.Label className="col-md-2 col-sm-12 text-md-right text-left form-label">WhiteList</Form.Label>
+                    <div className="col-md-10 col-sm-12 nopadding">
                         <div
                             className='whitelist-container'
                         >
@@ -196,6 +188,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                                 placeholder=""
                                 onKeyDown={handleWhiteList}
                                 disabled={!isInputChecked}
+                                ref={inputRef}
                             />
 
                             <div className="whitelist-badges">

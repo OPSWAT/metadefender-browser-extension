@@ -59,21 +59,6 @@ export const validateCustomApikey = async (newCustomApikey) => {
     }
 };
 
-export const validateWhiteList = async (newWhiteList) => {
-    try {
-        const whiteListCustom = newWhiteList || settings.whiteListCustom;
-
-        if (!whiteListCustom || whiteListCustom.length === 0) {
-            settings.whiteListCustom = [];
-            return false;
-        }
-
-        return true;
-    } catch (error) {
-        console.warn(error.message);
-        return false;
-    }
-};
 
 export const SettingsProvider = ({ children }) => {
 
@@ -153,13 +138,13 @@ export const SettingsProvider = ({ children }) => {
                     newSettings.useWhiteList = false;
                     break;
                 }
-                const validWhiteList = await validateWhiteList(newSettingsData?.whiteListCustom);
-                if (validWhiteList) {
+                if (newSettingsData?.whiteListCustom.length > 0) {
                     newSettings.whiteListCustom = newSettingsData?.whiteListCustom;
                     newSettings.useWhiteList = true;
                     await BrowserNotification.create(BrowserTranslate.getMessage('whiteListSavedNotification'), 'info');
                 } else {
                     newSettings.useWhiteList = false;
+                    newSettings.whiteListCustom = []
                 }
                 break;
             }
@@ -196,15 +181,14 @@ export const SettingsProvider = ({ children }) => {
 
             case 'useWhitelist': {
                 const useWhiteList = !newSettings.useWhiteList;
-                console.log('useWhiteList', useWhiteList);
                 if (useWhiteList) {
-                    const validWhiteList = await validateWhiteList(settings?.whiteListCustom);
-                    if (validWhiteList) {
+                    if (newSettingsData?.whiteListCustom.length > 0) {
                         newSettings.whiteListCustom = settings?.whiteListCustom;
                         newSettings.useWhiteList = true;
                     }
                 } else {
                     newSettings.useWhiteList = false;
+                    newSettings.whiteListCustom = []
                 }
                 break;
             }

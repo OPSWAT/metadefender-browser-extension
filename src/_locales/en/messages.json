@@ -168,6 +168,9 @@
   "apikeyNotification": {
     "message": "Apikey saved!"
   },
+  "whiteListSavedNotification": {
+    "message": "WhiteList saved!"
+  },
   "apikeyInvalidNotification": {
     "message": "Apikey is not valid!"
   },
