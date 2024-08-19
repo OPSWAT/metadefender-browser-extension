@@ -57,6 +57,43 @@
             }
         }
 
+
+        .whitelist-container {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ced4da;
+            padding: 5px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .whitelist-badges {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            min-height: 38px;
+        }
+
+        .badge-pill {
+            margin-top: 10px;
+            margin-right: 5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: $colorWhite;
+            background-color: $secondaryColor;
+            border-radius: 10rem;
+
+            .close-icon {
+                margin-left: 8px;
+                cursor: pointer;
+            }
+        }
+
         .btn {
             width: 100%;
             padding: 9px 20px;
@@ -73,7 +110,7 @@
 
     .other-content {
         padding-left: 30px;
-        
+
         sub {
             display: block;
             line-height: 18px;
@@ -84,7 +121,7 @@
             }
         }
     }
-        
+
     @include media-breakpoint-up(sm) {
         .other-content {
             padding-left: 40px;
@@ -97,19 +134,19 @@
         margin-bottom: 0;
         font-size: 15px;
         padding-left: 30px;
-        
+
         @include media-breakpoint-up(sm) {
             padding-left: 40px;
         }
-    
+
         &:not(.disabled) {
             cursor: pointer;
-    
+
             .form-check-label {
                 cursor: pointer;
             }
         }
-    
+
         &.disabled {
             cursor: not-allowed;
 
@@ -121,15 +158,15 @@
         .text-secondary {
             color: $colorGreyDark !important;
         }
-    
-        .form-check {   
-            position: unset;  
+
+        .form-check {
+            position: unset;
             padding-left: 0;
-               
+
             .form-check-input {
                 display: none;
             }
-    
+
             .form-check-label {
                 &:before {
                     content: "";
@@ -139,7 +176,7 @@
                     height: 20px;
                     top: 1.5px;
                     left: 0;
-                    background-color:$colorWhite;
+                    background-color: $colorWhite;
                     border: 1px solid $colorGrey;
                     border-radius: 4px;
 
@@ -159,8 +196,8 @@
                     }
                 }
             }
-    
-            .form-check-input:checked + .form-check-label {
+
+            .form-check-input:checked+.form-check-label {
                 &:before {
                     content: '\e808';
                     font-family: mcl-ext-icons;

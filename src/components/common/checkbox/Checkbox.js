@@ -185,19 +185,11 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         return (
             <fieldset className="form-with-inputs">
                 <Form.Group controlId="whiteList">
-                    <Form.Label className="col-md-2 col-sm-12 text-md-right text-left"></Form.Label>
+                    <Form.Label className="col-md-2 col-sm-12 text-md-right text-left form-label"></Form.Label>
 
                     <div className="col-md-10 col-sm-12">
                         <div
-                            className={` ${!isInputChecked ? 'disabled-div' : ''}`}
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                border: '1px solid #ced4da',
-                                padding: '5px',
-                                borderRadius: '4px',
-                                width: '100%'
-                            }}
+                            className='whitelist-container'
                         >
                             <Form.Control
                                 type="text"
@@ -206,27 +198,19 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                                 disabled={!isInputChecked}
                             />
 
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    alignItems: 'center',
-                                    minHeight: '38px'
-                                }}
-                            >
+                            <div className="whitelist-badges">
                                 {whiteList?.map((item, index) => (
                                     <div
                                         key={index}
-                                        className="badge badge-pill badge-primary mr-1"
+                                        className="badge badge-pill"
                                         style={{
-                                            marginBottom: '5px',
                                             pointerEvents: !isInputChecked ? 'none' : 'auto',
                                             opacity: !isInputChecked ? 0.5 : 1
                                         }}
                                     >
                                         {item}
                                         <span
-                                            style={{ marginLeft: '8px', cursor: 'pointer' }}
+                                            className="close-icon"
                                             onClick={() => handleRemove(index)}
                                         >
                                             &times;
@@ -245,6 +229,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                 </Form.Group>
             </fieldset>
         );
+
     }, [isInputChecked, whiteList]);
 
     useEffect(() => {
