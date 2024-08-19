@@ -269,9 +269,15 @@ class FileProcessor {
      * @param {boolean} useCore use core API instead of cloud
      */
     async scanFile(file, linkUrl, fileData, downloadItem, useCore) {
-        try {
-            file.useCore = useCore;
+        const customFileSizeError = 'Custom file size limit exceeded';
 
+        try {
+            const fileSizeLimit = Number(settings.data.fileSizeLimit) * 1000000;
+            if (fileSizeLimit && (file.size > fileSizeLimit)) {
+                throw Error(customFileSizeError);
+            }
+
+            file.useCore = useCore;
             const response = useCore
                 ? await this.scanWithCore(file, fileData)
                 : await this.scanWithCloud(file, fileData);
@@ -292,6 +298,10 @@ class FileProcessor {
             if (error?.error?.details?.code === 400144) {
                 BrowserNotification.create(error?.error?.details?.message, error?.error?.state?.requestId);
                 file.statusLabel = chrome.i18n.getMessage('fileSizeLimitExceeded');
+            } else if (error.message === customFileSizeError) {
+                const skipLimitMessage = chrome.i18n.getMessage('customFileSizeLimitExceeded');
+                BrowserNotification.create(skipLimitMessage);
+                file.statusLabel = skipLimitMessage;
             } else {
                 BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));
             }

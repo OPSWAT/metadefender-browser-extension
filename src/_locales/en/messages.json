@@ -235,6 +235,9 @@
   "fileSizeLimitExceeded": {
     "message": "Not scanned / Exceeded file size"
   },
+  "customFileSizeLimitExceeded": {
+    "message": "Skipped scanning due to file size configuration"
+  },
   "fileEmpty": {
     "message": "File is empty. Please select another file",
     "description": ""
