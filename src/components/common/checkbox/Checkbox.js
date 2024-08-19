@@ -1,13 +1,13 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { validateCoreSettings, validateCustomApikey } from '../../../providers/SettingsProvider';
+import { validateCoreSettings, validateCustomApikey, validateWhiteList } from '../../../providers/SettingsProvider';
 import BrowserTranslate from '../../../services/common/browser/browser-translate';
 import BackgroundTask from '../../../services/background/background-task';
 
 import './Checkbox.scss';
 
-const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, handleCheckboxChange, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules }) => {
+const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, hasFormWhiteList, handleCheckboxChange, whiteListCustom, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules }) => {
     const checkboxRef = useRef(null);
     const [isInputChecked, setIsInputChecked] = useState(typeof isChecked === 'boolean' ? isChecked : false);
     const [apikey, setApikey] = useState();
@@ -16,6 +16,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     const [error, setError] = useState({});
     const [customApikey, setCustomApikey] = useState();
     const backgroundTask = new BackgroundTask();
+    const [whiteList, setWhiteList] = useState([]);
 
     const handleClick = async () => {
         if (!isDisabled) {
@@ -55,6 +56,22 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         await backgroundTask.updateApikeyInfo(customApikey, true);
     };
 
+    const saveCustomWhiteList = async () => {
+        setError(null);
+
+        const validWhiteList = await validateWhiteList(whiteList);
+        if (!validWhiteList) {
+            setError({ whiteList: BrowserTranslate.getMessage('whiteListInvalidNotification') });
+            return;
+        }
+
+        const whiteListCustomSettings = {
+            whiteListCustom: whiteList,
+        };
+
+        await handleCheckboxChange('whiteListCustomSettings', whiteListCustomSettings);
+    };
+
     const checkCoreSettings = async () => {
         getScanRules(apikey, url);
     }
@@ -73,6 +90,31 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
     const handleCustomApikeyChange = (e) => {
         setCustomApikey(e.target.value);
+    };
+
+    const handleWhiteList = (e) => {
+        if (e.key === 'Enter') {
+            const value = e.target.value;
+            console.log('value', value);
+            if (value !== "") {
+                setWhiteList(prevWhiteList => {
+                    const updatedList = [...(prevWhiteList || []), value];
+                    console.log('updatedList', updatedList);
+                    return updatedList;
+                });
+                e.target.value = "";
+            }
+        }
+    };
+
+
+    const handleRemove = (index) => {
+        setWhiteList(prevWhiteList => {
+            if (!Array.isArray(prevWhiteList)) return [];
+            const updatedList = [...prevWhiteList];
+            updatedList.splice(index, 1);
+            return updatedList;
+        });
     };
 
     const formDomApikey = useMemo(() => {
@@ -135,6 +177,76 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         </fieldset>;
     }, [hasForm, isInputChecked, apikey, url, rule, scanRules, error]);
 
+    const formWhiteList = useMemo(() => {
+        if (!hasFormWhiteList) {
+            return null;
+        } console.log('whiteList', whiteList);
+
+        return (
+            <fieldset className="form-with-inputs">
+                <Form.Group controlId="whiteList">
+                    <Form.Label className="col-md-2 col-sm-12 text-md-right text-left"></Form.Label>
+
+                    <div className="col-md-10 col-sm-12">
+                        <div
+                            className={` ${!isInputChecked ? 'disabled-div' : ''}`}
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                border: '1px solid #ced4da',
+                                padding: '5px',
+                                borderRadius: '4px',
+                                width: '100%'
+                            }}
+                        >
+                            <Form.Control
+                                type="text"
+                                placeholder=""
+                                onKeyDown={handleWhiteList}
+                                disabled={!isInputChecked}
+                            />
+
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    alignItems: 'center',
+                                    minHeight: '38px'
+                                }}
+                            >
+                                {whiteList?.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className="badge badge-pill badge-primary mr-1"
+                                        style={{
+                                            marginBottom: '5px',
+                                            pointerEvents: !isInputChecked ? 'none' : 'auto',
+                                            opacity: !isInputChecked ? 0.5 : 1
+                                        }}
+                                    >
+                                        {item}
+                                        <span
+                                            style={{ marginLeft: '8px', cursor: 'pointer' }}
+                                            onClick={() => handleRemove(index)}
+                                        >
+                                            &times;
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="col-md-12 p-0 mt-3">
+                            <Button variant="primary" type="button" onClick={saveCustomWhiteList} disabled={!isInputChecked}>
+                                {chrome.i18n.getMessage('coreSettingsSave')}
+                            </Button>
+                        </div>
+                    </div>
+                </Form.Group>
+            </fieldset>
+        );
+    }, [isInputChecked, whiteList]);
+
     useEffect(() => {
         if (typeof isChecked === 'boolean') {
             setIsInputChecked(isChecked);
@@ -142,8 +254,9 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         setApikey(coreApikey);
         setUrl(coreUrl);
         setCoreRule(coreRule);
-        setCustomApikey(apikeyCustom)
-    }, [isChecked, coreApikey, coreUrl, coreRule, apikeyCustom]);
+        setCustomApikey(apikeyCustom);
+        setWhiteList(whiteListCustom);
+    }, [isChecked, coreApikey, coreUrl, coreRule, apikeyCustom, whiteListCustom]);
 
     return (
         <>
@@ -156,6 +269,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                 </div>
                 {formDomApikey}
                 {formDom}
+                {formWhiteList}
             </div>
         </>
     );
@@ -168,6 +282,7 @@ Checkbox.propTypes = {
     otherContent: PropTypes.node,
     hasForm: PropTypes.bool,
     hasFormApikey: PropTypes.bool,
+    hasFormWhiteList: PropTypes.bool,
     handleCheckboxChange: PropTypes.func,
     labelFor: PropTypes.string,
     getScanRules: PropTypes.func,
@@ -175,6 +290,7 @@ Checkbox.propTypes = {
     coreUrl: PropTypes.string,
     coreRule: PropTypes.string,
     apikeyCustom: PropTypes.string,
+    whiteListCustom: PropTypes.array
 };
 
 export default Checkbox;

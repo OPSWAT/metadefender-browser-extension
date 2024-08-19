@@ -131,6 +131,10 @@
     "message": "Scanning using Custom MetaDefender Cloud API Key",
     "description": ""
   },
+  "useWhiteList": {
+    "message": "Use Whitelist",
+    "description": ""
+  },
   "useCoreSub": {
     "message": ""
   },

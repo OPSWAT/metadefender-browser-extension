@@ -59,6 +59,22 @@ export const validateCustomApikey = async (newCustomApikey) => {
     }
 };
 
+export const validateWhiteList = async (newWhiteList) => {
+    try {
+        const whiteListCustom = newWhiteList || settings.whiteListCustom;
+
+        if (!whiteListCustom || whiteListCustom.length === 0) {
+            settings.whiteListCustom = [];
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.warn(error.message);
+        return false;
+    }
+};
+
 export const SettingsProvider = ({ children }) => {
 
     const config = useContext(ConfigContext);
@@ -87,6 +103,7 @@ export const SettingsProvider = ({ children }) => {
         const backgroundTask = new BackgroundTask();
         const cookie = await cookieManager.get();
         const authCookie = JSON.parse(cookie.value);
+        console.log('newSettings', newSettings)
         switch (key) {
             case 'coreSettings': {
                 newSettings.coreApikey = newSettingsData.coreApikey;
@@ -130,6 +147,22 @@ export const SettingsProvider = ({ children }) => {
                 }
                 break;
             }
+            case 'whiteListCustomSettings': {
+                if (!newSettingsData?.whiteListCustom) {
+                    newSettings.whiteListCustom = [];
+                    newSettings.useWhiteList = false;
+                    break;
+                }
+                const validWhiteList = await validateWhiteList(newSettingsData?.whiteListCustom);
+                if (validWhiteList) {
+                    newSettings.whiteListCustom = newSettingsData?.whiteListCustom;
+                    newSettings.useWhiteList = true;
+                    await BrowserNotification.create(BrowserTranslate.getMessage('whiteListSavedNotification'), 'info');
+                } else {
+                    newSettings.useWhiteList = false;
+                }
+                break;
+            }
             case 'useCore': {
                 const useCore = !newSettings.useCore;
 
@@ -160,6 +193,22 @@ export const SettingsProvider = ({ children }) => {
                 }
                 break;
             }
+
+            case 'useWhitelist': {
+                const useWhiteList = !newSettings.useWhiteList;
+                console.log('useWhiteList', useWhiteList);
+                if (useWhiteList) {
+                    const validWhiteList = await validateWhiteList(settings?.whiteListCustom);
+                    if (validWhiteList) {
+                        newSettings.whiteListCustom = settings?.whiteListCustom;
+                        newSettings.useWhiteList = true;
+                    }
+                } else {
+                    newSettings.useWhiteList = false;
+                }
+                break;
+            }
+
             case 'scanDownloads': {
                 newSettings.scanDownloads = !newSettings.scanDownloads && isAllowedFileSchemeAccess;
                 break;
