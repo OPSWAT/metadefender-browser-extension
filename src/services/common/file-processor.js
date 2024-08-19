@@ -32,45 +32,14 @@ class FileProcessor {
             return;
         }
 
-        if (downloadItem) {
-            file.fileName = downloadItem.filename.split('/').pop();
-            file.size = downloadItem.fileSize;
-        }
-
-        else {
-            const response = await fetch(linkUrl, {
-                method: 'HEAD',
-                redirect: 'follow'
-            });
-            if (response.url !== linkUrl) {
-                linkUrl = response.url;
-            }
-
-            file.fileName = linkUrl.split('/').pop();
-            file.fileName = file.fileName.split('?')[0];
-
-            try {
-                file.size = await file.getFileSize(linkUrl, file.fileName);
-            }
-            catch (errMsg) {
-                if (errMsg) {
-                    BrowserNotification.create(errMsg);
-                }
-                return;
-            }
-        }
-
+        file.useCore = settings.data.useCore;
+        file.fileName = await file.getFileName(linkUrl, downloadItem);
         file.extension = file.fileName.split('.').pop();
         file.canBeSanitized = file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
-
-        if (file.size === null || file.size === 0) {
-            BrowserNotification.create(chrome.i18n.getMessage('fileEmpty'));
-            return;
-        }
-
         file.statusLabel = file.getScanStatusLabel();
 
         let fileData = null;
+        BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
 
         const getDomain = async () => {
             return new Promise((resolve, reject) => {
@@ -88,26 +57,22 @@ class FileProcessor {
         };
 
         if (downloadItem) {
-            try {
-                const domain = await getDomain();
-                if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
-                    return;
-                }
-
-                fileData = await this.getDownloadedFile(downloadItem.localPath || 'file://' + downloadItem.filename);
-                BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
-            }
-            catch (e) {
-                BrowserNotification.create(e, file.id);
-                await scanHistory.removeFile(file);
+            const domain = await getDomain();
+            if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
                 return;
             }
-        } else {
-            BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
-            fileData = await file.getFileData(linkUrl);
         }
 
-        file.md5 = file.getMd5Hash(fileData);
+        try {
+            const fileUrl = downloadItem ? downloadItem.localPath || 'file://' + downloadItem.filename : linkUrl;
+            fileData = await file.getFileData(fileUrl);
+            file.size = fileData.size;
+        } catch (error) {
+            BrowserNotification.create(error.message);
+            return;
+        }
+
+        file.md5 = await file.getMd5Hash(fileData);
 
         if (file.fileName === '') {
             file.fileName = file.md5;
@@ -115,22 +80,7 @@ class FileProcessor {
 
         await scanHistory.addFile(file);
 
-        await this.scanFile(file, linkUrl, fileData, downloadItem, settings.data.useCore);
-    }
-
-    /**
-     * Load a local file content.
-     *
-     * @param {string} localPath local file path
-     * @returns {Promise}
-     */
-    async getDownloadedFile(localPath) {
-        return fetch(localPath).then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error, status = ${response.status}`);
-            }
-            return Promise.resolve(response.arrayBuffer());
-        });
+        await this.scanFile(file, linkUrl, fileData, downloadItem);
     }
 
     /**
@@ -266,19 +216,17 @@ class FileProcessor {
      * @param {string} linkUrl file url
      * @param {*} fileData file content
      * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
-     * @param {boolean} useCore use core API instead of cloud
      */
-    async scanFile(file, linkUrl, fileData, downloadItem, useCore) {
+    async scanFile(file, linkUrl, fileData, downloadItem) {
         const customFileSizeError = 'Custom file size limit exceeded';
+        const fileSizeLimit = Number(settings.data.fileSizeLimit) * 1000000;
 
         try {
-            const fileSizeLimit = Number(settings.data.fileSizeLimit) * 1000000;
             if (fileSizeLimit && (file.size > fileSizeLimit)) {
                 throw Error(customFileSizeError);
             }
 
-            file.useCore = useCore;
-            const response = useCore
+            const response = file.useCore
                 ? await this.scanWithCore(file, fileData)
                 : await this.scanWithCloud(file, fileData);
 
@@ -300,7 +248,7 @@ class FileProcessor {
                 file.statusLabel = chrome.i18n.getMessage('fileSizeLimitExceeded');
             } else if (error.message === customFileSizeError) {
                 const skipLimitMessage = chrome.i18n.getMessage('customFileSizeLimitExceeded');
-                BrowserNotification.create(skipLimitMessage);
+                setTimeout(() => { BrowserNotification.create(skipLimitMessage); }, 1000);
                 file.statusLabel = skipLimitMessage;
             } else {
                 BrowserNotification.create(chrome.i18n.getMessage('scanFileError'));

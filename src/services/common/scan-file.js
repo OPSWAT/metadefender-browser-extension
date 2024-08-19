@@ -22,6 +22,7 @@ function ScanFile() {
         getScanStatusLabel: getScanStatusLabel,
         download: download,
         isSanitizedFile: isSanitizedFile,
+        getFileName: getFileName,
         getFileSize: getFileSize,
         getFileData: getFileData,
         getMd5Hash: getMd5Hash,
@@ -88,49 +89,84 @@ function isSanitizedFile(url) {
     }
 }
 
-function getFileSize(url, filename) {
-    if (url.match(/^data/)) {
-        chrome.i18n.getMessage('unsupportedUrl');
-        return;
+/**
+ * Extract the filename from a file url or a downloaded file.
+ *
+ * @param {string} url file url
+ * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
+ */
+async function getFileName(url, downloadItem) {
+    if (downloadItem) {
+        return downloadItem.filename.split('/').pop();
+    }
+    const fileUrl = await fetch(url, { method: 'HEAD', redirect: 'follow' })
+        .then(response => response.url)
+        .catch(() => linkUrl);
+
+    const path = fileUrl.split('/').pop();
+    return path.split('?').shift();
+}
+
+/**
+ * Extract the file size from a file url.
+ *
+ * @param {string} url File url
+ * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
+ * @returns {Promise<number>} File size as bytes
+ */
+async function getFileSize(url, downloadItem) {
+    let fileSize;
+
+    if (/^data/i.exec(url)) {
+        throw Error(chrome.i18n.getMessage('unsupportedUrl'));
     }
 
-    if (url.match(/^ftp/)) {
-        chrome.i18n.getMessage('unableToScanFTP');
-        return;
+    if (/^ftp/i.test(url)) {
+        throw Error(chrome.i18n.getMessage('unableToScanFTP'));
     }
 
-    if (url.match(/^file/)) {
-        chrome.i18n.getMessage('unableToScanFileProtocol');
-        return;
+    if (/^file/i.test(url)) {
+        throw Error(chrome.i18n.getMessage('unableToScanFileProtocol'));
     }
 
-    if (!url.match(/^http/)) {
+    if (!/^http/i.test(url)) {
         url = 'http://' + url;
     }
 
-    return fetch(url, { method: 'HEAD' })
-        .then(resp => {
-            if ([0, 403, 404, 500, 503].indexOf(resp.status) >= 0) {
-                chrome.i18n.getMessage('errorWhileDownloading');
-                return;
-            }
+    if (downloadItem) {
+        fileSize = downloadItem.fileSize;
+    } else {
+        fileSize = await fetch(url, { method: 'HEAD' })
+            .then(response => response.headers.get('content-length'))
+            .catch(() => {
+                throw Error(chrome.i18n.getMessage('errorWhileDownloading'));
+            });
+    }
 
-            if (!filename) {
-                const respUrl = resp.url;
-                filename = respUrl.substr(respUrl.lastIndexOf('/') + 1);
-            }
+    if (!fileSize) {
+        throw Error(chrome.i18n.getMessage('fileEmpty'));
+    }
 
-            return resp.headers.get('content-length');
-        });
+    return fileSize;
 }
 
+/**
+ * Download a file.
+ *
+ * @param {string} url File url
+ * @returns {Promise<Blob>} File data as a Blob object
+ */
 async function getFileData(url) {
-    return fetch(url).then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error, status = ${response.status}`);
-        }
-        return Promise.resolve(response.arrayBuffer());
-    });
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw Error(chrome.i18n.getMessage('errorWhileDownloading'));
+            }
+            return response.blob();
+        })
+        .catch(() => {
+            throw Error(chrome.i18n.getMessage('errorWhileDownloading'));
+        });
 }
 
 /**
@@ -160,8 +196,15 @@ function getScanStatusLabel(status) {
     return chrome.i18n.getMessage('scanResult' + status);
 }
 
-function getMd5Hash(fileData) {
-    let spark = new SparkMD5.ArrayBuffer();
-    spark.append(fileData);
+/**
+ * Generate a file hash.
+ *
+ * @param {Blob} data File data as a Blob object
+ * @returns {Promise<string>} The MD5 hash of the file data
+ */
+async function getMd5Hash(data) {
+    const spark = new SparkMD5.ArrayBuffer();
+    const fileArrayBuffer = await data.arrayBuffer();
+    spark.append(fileArrayBuffer);
     return spark.end().toUpperCase();
 }
