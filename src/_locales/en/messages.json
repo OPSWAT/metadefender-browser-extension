@@ -132,7 +132,7 @@
     "description": ""
   },
   "useWhiteList": {
-    "message": "Use Whitelist",
+    "message": "Whitelisted Domains<div class='text-secondary text-14'>Disable scanning for the selected domains. After entering a value, please tap on 'Enter' and click on the save button.</div>",
     "description": ""
   },
   "useCoreSub": {
@@ -169,7 +169,7 @@
     "message": "Apikey saved!"
   },
   "whiteListSavedNotification": {
-    "message": "WhiteList saved!"
+    "message": "Whitelisted Domains saved!"
   },
   "apikeyInvalidNotification": {
     "message": "Apikey is not valid!"
