@@ -15,7 +15,7 @@ body {
   -webkit-font-smoothing: antialiased;
   color: $colorBlack;
   background-color: $colorWhite;
-  
+
   .list-group {
     margin-bottom: 0;
   }
@@ -45,7 +45,7 @@ body {
     padding: $padding;
   }
 
-  .table > :not(:first-child) {
+  .table> :not(:first-child) {
     border-top: none !important;
   }
 
@@ -62,16 +62,16 @@ body {
     border: 1px solid $colorGrey;
   }
 
-  .table-bordered > tbody > tr > td {
+  .table-bordered>tbody>tr>td {
     border: none;
   }
 
-  .table > thead > tr > th,
-  .table > tbody > tr > th,
-  .table > tfoot > tr > th,
-  .table > thead > tr > td,
-  .table > tbody > tr > td,
-  .table > tfoot > tr > td {
+  .table>thead>tr>th,
+  .table>tbody>tr>th,
+  .table>tfoot>tr>th,
+  .table>thead>tr>td,
+  .table>tbody>tr>td,
+  .table>tfoot>tr>td {
     padding: 18px 20px 17px;
   }
 
@@ -136,7 +136,8 @@ body {
     box-shadow: none;
   }
 
-  a, button {
+  a,
+  button {
     &.btn {
       border: 1px solid;
       border-radius: 0;
@@ -154,6 +155,13 @@ body {
           border-color: #1f56bc;
           color: $colorWhite;
         }
+      }
+
+      &.btn-close-icon {
+        padding: 0px !important;
+        border: none;
+        color: white;
+        min-width: 5px !important;
       }
 
       &.btn-blue-outline {
@@ -186,12 +194,19 @@ body {
     color: $colorWhite;
   }
 
-  .btn-black:hover, .btn-black:focus, .btn-black:active {
+  .btn-black:hover,
+  .btn-black:focus,
+  .btn-black:active {
     background-color: #000000;
     color: #ffffff;
   }
 
-  [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak{
+  [ng\:cloak],
+  [ng-cloak],
+  [data-ng-cloak],
+  [x-ng-cloak],
+  .ng-cloak,
+  .x-ng-cloak {
     display: none !important;
   }
 }
@@ -233,7 +248,9 @@ a {
   text-decoration: none;
   color: $secondaryColor;
 
-  &:visited, &:focus, &:active {
+  &:visited,
+  &:focus,
+  &:active {
     text-decoration: none;
     color: $secondaryColor;
   }
@@ -266,7 +283,8 @@ a {
   text-align: center;
   display: inline-block;
 
-  &.icon-cancel, &.icon-help {
+  &.icon-cancel,
+  &.icon-help {
     color: $red;
   }
 

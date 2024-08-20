@@ -203,13 +203,14 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                                             }}
                                         >
                                             {item}
-                                            <span
+                                            <Button
                                                 type='button'
                                                 className="close-icon"
                                                 onClick={() => handleRemove(index)}
+                                                variant='close-icon'
                                             >
                                                 &times;
-                                            </span>
+                                            </Button>
                                         </div>
                                     );
                                 })}
