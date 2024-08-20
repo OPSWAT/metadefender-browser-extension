@@ -192,7 +192,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                             <div className="whitelist-badges">
                                 {whiteList?.map((item, index) => (
                                     <div
-                                        key={index}
+                                        key={item?.key}
                                         className="badge badge-pill"
                                         style={{
                                             pointerEvents: !isInputChecked ? 'none' : 'auto',
@@ -203,6 +203,13 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                                         <span
                                             className="close-icon"
                                             onClick={() => handleRemove(index)}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    handleRemove(index);
+                                                }
+                                            }}
                                         >
                                             &times;
                                         </span>
@@ -235,19 +242,18 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     }, [isChecked, coreApikey, coreUrl, coreRule, apikeyCustom, whiteListCustom]);
 
     return (
-        <>
-            <div className="form-group-wrapper">
-                <Form.Group onClick={handleClick} className={`${isDisabled ? 'disabled' : ''}`}>
-                    <Form.Check type="checkbox" label={label} onChange={handleClick} checked={isInputChecked} disabled={isDisabled} ref={checkboxRef} />
-                </Form.Group>
-                <div className='other-content'>
-                    {otherContent}
-                </div>
-                {formDomApikey}
-                {formDom}
-                {formWhiteList}
+        <div className="form-group-wrapper">
+            <Form.Group onClick={handleClick} className={`${isDisabled ? 'disabled' : ''}`}>
+                <Form.Check type="checkbox" label={label} onChange={handleClick} checked={isInputChecked} disabled={isDisabled} ref={checkboxRef} />
+            </Form.Group>
+            <div className='other-content'>
+                {otherContent}
             </div>
-        </>
+            {formDomApikey}
+            {formDom}
+            {formWhiteList}
+        </div>
+
     );
 };
 
@@ -266,7 +272,8 @@ Checkbox.propTypes = {
     coreUrl: PropTypes.string,
     coreRule: PropTypes.string,
     apikeyCustom: PropTypes.string,
-    whiteListCustom: PropTypes.array
+    whiteListCustom: PropTypes.array,
+    scanRules: PropTypes.array
 };
 
 export default Checkbox;
