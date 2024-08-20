@@ -17,7 +17,6 @@ const mockScanHistory = {
     updateFileById: jest.fn().mockResolvedValue(),
 };
 
-const mockGetFileSize = jest.fn();
 global.scanHistory = mockScanHistory;
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -27,7 +26,6 @@ jest.mock('./scan-file', () => {
 
     class MockScan {
         isSanitizedFile = () => false;
-        getFileSize = mockGetFileSize;
         getScanStatusLabel = () => 1;
         getFileData = () => null;
         getMd5Hash = () => null;
@@ -80,34 +78,6 @@ xdescribe('file-processor', () => {
             }, 0);
         });
 
-        it('should create browser notification if empty file', (done) => {
-            apikeyInfo.data.apikey = 'mock';
-            mockGetFileSize.mockImplementationOnce(() => null);
-
-            fileProcessor.processTarget(linkUrl);
-
-            setTimeout(() => {
-                expect(createSpy).toHaveBeenCalledWith('fileEmpty');
-
-                done();
-            }, 0);
-        });
-
-        it('should create browser notification if file size too big', (done) => {
-            apikeyInfo.data.apikey = 'mock';
-            const downloadItem = { filename: 'name', fileSize: 34589999 };
-            mockGetFileSize.mockImplementationOnce(() => 200);
-
-            fileProcessor.processTarget(linkUrl, downloadItem);
-
-            setTimeout(() => {
-                expect(createSpy).toHaveBeenCalledWith('fileSizeLimitExceeded');
-
-                done();
-            }, 0);
-        });
-
-
         it('should start the scan when downloadItem has a valid size', (done) => {
             const linkUrl = 'http://example.com/file.txt';
             const downloadItem = { filename: 'file.txt', fileSize: 99, localPath: './' };
@@ -120,7 +90,6 @@ xdescribe('file-processor', () => {
             }, 0);
         }, 1_0000);
 
-
         it('should start the scan without downloadItem ', (done) => {
             const linkUrl = 'http://example.com/file.txt';
             fileProcessor.processTarget(linkUrl);
@@ -131,6 +100,5 @@ xdescribe('file-processor', () => {
                 done();
             }, 0);
         }, 1_0000);
-
     });
 });

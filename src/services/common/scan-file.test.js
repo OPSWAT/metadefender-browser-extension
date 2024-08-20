@@ -12,37 +12,10 @@ describe('scan-file', () => {
     const urlSafe = 'https://mocl.t.files.metadefender.com';
     const urlMdcSafe = 'https://mock/file/converted/mock?apikey=mockApyKey';
     const filename = 'mock.txt';
+    const file = new Blob(['This is some file content'], { type: 'text/plain' });
 
     beforeEach(() => {
         mockFetch.mockImplementation(() => Promise.resolve({ json: () => Promise.resolve(), url: 'mockUrl', headers: { get: () => 200 } }));
-    });
-
-    describe('getFileSize', () => {
-        it('should faile because of data in start of the url', async () => {
-            try {
-                await scanFile.getFileSize('data', filename);
-            } catch (error) {
-                expect(getMessageSpy).toHaveBeenCalledWith('unsupportedUrl');
-            }
-        });
-
-        it('should faile because of ftp in start of the url', async () => {
-            try {
-                await scanFile.getFileSize('ftp', filename);
-            } catch (error) {
-                expect(getMessageSpy).toHaveBeenCalledWith('unableToScanFTP');
-            }
-        });
-
-        it('should corect call fetch', async () => {
-            try {
-                await scanFile.getFileSize('mock url');
-
-                expect(mockFetch).toHaveBeenCalledWith('http://mock url', { method: 'HEAD' });
-            } catch (error) {
-                console.warn('Testing error', error);
-            }
-        });
     });
 
     it('should download a file', () => {
@@ -79,26 +52,25 @@ describe('scan-file', () => {
     });
 
     it('should get getMd5Hash', async () => {
-        try {
-            await scanFile.getMd5Hash('data');
-        } catch (error) {
-            expect(getMessageSpy).toHaveBeenCalledWith('data');
-        }
+        // Mock the arrayBuffer method to simulate the browser environment
+        Blob.prototype.arrayBuffer = jest.fn().mockResolvedValue(new ArrayBuffer(8));
+
+        const fileHash = await scanFile.getMd5Hash(file);
+
+        expect(typeof fileHash).toBe('string');
+        expect(fileHash).toEqual(fileHash.toUpperCase());
+
+        Blob.prototype.arrayBuffer.mockRestore();
     });
 
     it('should get getFileData', async () => {
-        const mockArrayBuffer = new ArrayBuffer(8);
-        mockFetch.mockResolvedValueOnce({
-            ok: true,
-            arrayBuffer: () => Promise.resolve(mockArrayBuffer)
-        });
+        const mockResponse = new Response(file);
+        jest.spyOn(global, 'fetch').mockResolvedValue(mockResponse);
 
         const url = 'http://example.com/file';
-        await scanFile.getMd5Hash('data');
         const result = await scanFile.getFileData(url);
 
         expect(fetch).toHaveBeenCalledWith(url);
-        expect(result).toBe(mockArrayBuffer);
+        expect(result).toBe(file);
     });
-
 });
