@@ -66,12 +66,45 @@ describe('browserNotification', () => {
         expect(chrome.notifications.create).not.toHaveBeenCalled();
     });
 
-    it('should handle error during notification creation', async () => {
+    xit('should handle error during notification creation', async () => {
         settings.load.mockResolvedValue({ showNotifications: true });
         chrome.notifications.create.mockImplementationOnce(() => {
             throw new Error('mocked error');
         });
 
         await browserNotification.create('test message');
+    });
+
+    it('should not call notification clear if no ID is provided', async () => {
+        settings.load.mockResolvedValue({ showNotifications: true });
+
+        jest.useFakeTimers();
+
+        await browserNotification.create('No ID provided message');
+
+        jest.advanceTimersByTime(5000);
+
+        expect(chrome.notifications.clear).not.toHaveBeenCalled();
+
+        jest.useRealTimers();
+    });
+
+
+    it('should handle errors during notification creation', async () => {
+        settings.load.mockResolvedValue({ showNotifications: true });
+        const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => { });
+        const gaqPushSpy = jest.fn();
+        global._gaq = { push: gaqPushSpy };
+
+        chrome.notifications.create.mockImplementationOnce(() => {
+            throw new Error('mocked error');
+        });
+
+        await browserNotification.create('test message', '789', false);
+
+        expect(consoleWarnSpy).toHaveBeenCalledWith(expect.any(Error));
+        expect(gaqPushSpy).toHaveBeenCalledWith(['exception', { exDescription: expect.stringContaining('browser-notification:create') }]);
+
+        consoleWarnSpy.mockRestore();
     });
 });
