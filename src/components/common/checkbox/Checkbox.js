@@ -190,31 +190,29 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                             />
 
                             <div className="whitelist-badges">
-                                {whiteList?.map((item, index) => (
-                                    <div
-                                        key={item?.key}
-                                        className="badge badge-pill"
-                                        style={{
-                                            pointerEvents: !isInputChecked ? 'none' : 'auto',
-                                            opacity: !isInputChecked ? 0.5 : 1
-                                        }}
-                                    >
-                                        {item}
-                                        <span
-                                            className="close-icon"
-                                            onClick={() => handleRemove(index)}
-                                            role="button"
-                                            tabIndex={0}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' || e.key === ' ') {
-                                                    handleRemove(index);
-                                                }
+                                {whiteList?.map((item, index) => {
+                                    const uniqueKey = `${item}_${index}`;
+
+                                    return (
+                                        <div
+                                            key={uniqueKey}
+                                            className="badge badge-pill"
+                                            style={{
+                                                pointerEvents: !isInputChecked ? 'none' : 'auto',
+                                                opacity: !isInputChecked ? 0.5 : 1
                                             }}
                                         >
-                                            &times;
-                                        </span>
-                                    </div>
-                                ))}
+                                            {item}
+                                            <span
+                                                type='button'
+                                                className="close-icon"
+                                                onClick={() => handleRemove(index)}
+                                            >
+                                                &times;
+                                            </span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -225,7 +223,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                         </div>
                     </div>
                 </Form.Group>
-            </fieldset>
+            </fieldset >
         );
 
     }, [isInputChecked, whiteList]);
