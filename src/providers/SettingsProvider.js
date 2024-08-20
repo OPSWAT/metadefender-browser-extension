@@ -88,7 +88,6 @@ export const SettingsProvider = ({ children }) => {
         const backgroundTask = new BackgroundTask();
         const cookie = await cookieManager.get();
         const authCookie = JSON.parse(cookie.value);
-        console.log('newSettings', newSettings)
         switch (key) {
             case 'coreSettings': {
                 newSettings.coreApikey = newSettingsData.coreApikey;

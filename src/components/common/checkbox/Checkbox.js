@@ -89,11 +89,9 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     const handleWhiteList = (e) => {
         if (e.key === 'Enter') {
             const value = inputRef.current.value;
-            console.log('value', value);
             if (value !== "") {
                 setWhiteList(prevWhiteList => {
                     const updatedList = [...(prevWhiteList || []), value];
-                    console.log('updatedList', updatedList);
                     return updatedList;
                 });
                 inputRef.current.value = "";
@@ -173,7 +171,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     const formWhiteList = useMemo(() => {
         if (!hasFormWhiteList) {
             return null;
-        } console.log('whiteList', whiteList);
+        }
 
         return (
             <fieldset className="form-with-inputs">
