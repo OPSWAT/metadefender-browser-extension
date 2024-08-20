@@ -34,14 +34,6 @@ describe('scan-file', () => {
             }
         });
 
-        it('should faile because of file in start of the url', async () => {
-            try {
-                await scanFile.getFileSize('file', filename);
-            } catch (error) {
-                expect(getMessageSpy).toHaveBeenCalledWith('unableToScanFileProtocol');
-            }
-        });
-
         it('should corect call fetch', async () => {
             try {
                 await scanFile.getFileSize('mock url');

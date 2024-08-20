@@ -211,10 +211,6 @@
     "message": "We are unable to scan files hosted on FTP servers. Please try another file",
     "description": ""
   },
-  "unableToScanFileProtocol": {
-    "message": "We are unable to scan file:// protocol. Please upload the file you would like to scan at metadefender.opswat.com",
-    "description": ""
-  },
   "unsupportedUrl": {
     "message": "URL not supported.\nYou may be able to scan the file by downloading it while 'Scan Downloads' is enabled"
   },

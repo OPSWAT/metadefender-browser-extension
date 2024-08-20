@@ -23,7 +23,6 @@ function ScanFile() {
         download: download,
         isSanitizedFile: isSanitizedFile,
         getFileName: getFileName,
-        getFileSize: getFileSize,
         getFileData: getFileData,
         getMd5Hash: getMd5Hash,
     };
@@ -108,16 +107,13 @@ async function getFileName(url, downloadItem) {
 }
 
 /**
- * Extract the file size from a file url.
+ * Download a file.
  *
  * @param {string} url File url
- * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
- * @returns {Promise<number>} File size as bytes
+ * @returns {Promise<Blob>} File data as a Blob object
  */
-async function getFileSize(url, downloadItem) {
-    let fileSize;
-
-    if (/^data/i.exec(url)) {
+async function getFileData(url) {
+    if (/^data/i.test(url)) {
         throw Error(chrome.i18n.getMessage('unsupportedUrl'));
     }
 
@@ -125,38 +121,6 @@ async function getFileSize(url, downloadItem) {
         throw Error(chrome.i18n.getMessage('unableToScanFTP'));
     }
 
-    if (/^file/i.test(url)) {
-        throw Error(chrome.i18n.getMessage('unableToScanFileProtocol'));
-    }
-
-    if (!/^http/i.test(url)) {
-        url = 'http://' + url;
-    }
-
-    if (downloadItem) {
-        fileSize = downloadItem.fileSize;
-    } else {
-        fileSize = await fetch(url, { method: 'HEAD' })
-            .then(response => response.headers.get('content-length'))
-            .catch(() => {
-                throw Error(chrome.i18n.getMessage('errorWhileDownloading'));
-            });
-    }
-
-    if (!fileSize) {
-        throw Error(chrome.i18n.getMessage('fileEmpty'));
-    }
-
-    return fileSize;
-}
-
-/**
- * Download a file.
- *
- * @param {string} url File url
- * @returns {Promise<Blob>} File data as a Blob object
- */
-async function getFileData(url) {
     return fetch(url)
         .then(response => {
             if (!response.ok) {
@@ -199,12 +163,12 @@ function getScanStatusLabel(status) {
 /**
  * Generate a file hash.
  *
- * @param {Blob} data File data as a Blob object
+ * @param {Blob} file File data as a Blob object
  * @returns {Promise<string>} The MD5 hash of the file data
  */
-async function getMd5Hash(data) {
+async function getMd5Hash(file) {
     const spark = new SparkMD5.ArrayBuffer();
-    const fileArrayBuffer = await data.arrayBuffer();
+    const fileArrayBuffer = await file.arrayBuffer();
     spark.append(fileArrayBuffer);
     return spark.end().toUpperCase();
 }
