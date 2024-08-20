@@ -204,9 +204,15 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                                         >
                                             {item}
                                             <span
-                                                type='button'
+                                                type="button"
                                                 className="close-icon"
                                                 onClick={() => handleRemove(index)}
+                                                tabIndex="0"
+                                                onKeyDown={(event) => {
+                                                    if (event.key === 'Enter' || event.key === ' ') {
+                                                        handleRemove(index);
+                                                    }
+                                                }}
                                             >
                                                 &times;
                                             </span>
