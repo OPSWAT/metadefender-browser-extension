@@ -177,6 +177,9 @@
   "coreSettingsInvalidNotification": {
     "message": "Core settings are not valid!"
   },
+  "domainInvalid": {
+    "message": "Domain is not valid!"
+  },
   "coreSettingsInvalidApikey": {
     "message": "Invalid MetaDefender Core apikey!"
   },

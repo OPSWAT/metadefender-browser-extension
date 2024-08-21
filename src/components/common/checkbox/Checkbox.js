@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { validateCoreSettings, validateCustomApikey } from '../../../providers/SettingsProvider';
 import BrowserTranslate from '../../../services/common/browser/browser-translate';
 import BackgroundTask from '../../../services/background/background-task';
+import BrowserNotification from '../../../services/common/browser/browser-notification'
 
 import './Checkbox.scss';
 
@@ -86,14 +87,23 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         setCustomApikey(e.target.value);
     };
 
+    const validateDomainName = (domain) => {
+        const domainRegex = /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z]{2,})+$/;
+        return domainRegex.test(domain);
+    };
+
     const handleWhiteList = (e) => {
         if (e.key === 'Enter') {
-            const value = inputRef.current.value;
-            if (value !== "") {
+            const value = inputRef.current.value.trim();
+            console.log('validateDomainName(value)', validateDomainName(value))
+            if (value !== "" && validateDomainName(value)) {
                 setWhiteList(prevWhiteList => {
                     const updatedList = [...(prevWhiteList || []), value];
                     return updatedList;
                 });
+                inputRef.current.value = "";
+            } else {
+                BrowserNotification.create(BrowserTranslate.getMessage('domainInvalid'), 'info');
                 inputRef.current.value = "";
             }
         }
