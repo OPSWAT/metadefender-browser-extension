@@ -4,6 +4,7 @@ import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import SidebarLayout from '../../components/common/sidebar-layout/SidebarLayout';
 import ScanHistoryTable from '../../components/scan-history-table/ScanHistoryTable';
 import ScanFile from '../../services/common/scan-file';
+import { settings } from '../../services/common/persistent/settings';
 
 import ConfigContext from '../../providers/ConfigProvider';
 import GAContext from '../../providers/GAProvider';
@@ -64,9 +65,14 @@ const ScanHistory = () => {
     };
 
     const getScanUrl = (file) => {
+        if (file.useCore) {
+            return `${settings.data.coreUrl}/#/user/scanResult?type=hash&value=${file.md5}`;
+        }
+
         if (file.dataId) {
             return `${scanUrl}/results/file/${file.dataId}/regular/overview`;
         }
+
         return `${scanUrl}/results/file/${file.md5}/hash/overview`;
     };
 

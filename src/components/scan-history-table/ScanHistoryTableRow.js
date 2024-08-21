@@ -19,13 +19,13 @@ const ScanHistoryTableRow = ({ fileName, scanUrl, hash, scanTime, results, remov
         <td>
             <span className={`${useCore ? 'icon-server' : 'icon-cloud'} mr-2`} />
             <div>
-                <a className={`scanNameHash ${cleanClassName}`} href={scanUrl} target='_blank' rel='noreferrer'>{fileName}</a>
+                {scanUrl ? <a className={`scanNameHash ${cleanClassName}`} href={scanUrl} target='_blank' rel='noreferrer'>{fileName}</a> : <div className={`scanNameHash ${cleanClassName}`}>{fileName}</div>}
                 <small className="d-block">{hash}</small>
             </div>
         </td>
         <td>{scanTime}</td>
         <td>
-            <a href={scanUrl} className={cleanClassName}>{results}</a>
+            {scanUrl ? <a className={cleanClassName} href={scanUrl} target='_blank' rel='noreferrer'>{results}</a> : <div className={cleanClassName}>{results}</div>}
         </td>
         <td className="p-0">
             <span className={`${getStatusIcon(status)} ${cleanClassName}`} />
