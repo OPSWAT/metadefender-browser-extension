@@ -83,6 +83,11 @@ class FileProcessor {
                         let url = new URL(tabs[0].url);
                         let hostname = url.hostname;
                         hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
+                        let parts = hostname.split('.');
+                        if (parts.length > 2) {
+                            hostname = parts.slice(-2).join('.');
+                        }
+
                         resolve(hostname);
                     } else {
                         reject('No active tab found');
