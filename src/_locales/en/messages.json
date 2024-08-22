@@ -123,6 +123,10 @@
   "safeUrlSub": {
     "message": "Read more about <a target='blank' href='https://docs.opswat.com/mdcloud/operation/safe-url-redirect#how-it-works'>Safe URL Redirect</a>"
   },
+  "skipLimit": {
+    "message": "Skip scanning files larger than",
+    "description": ""
+  },
   "useCore": {
     "message": "On-premise scanning using MetaDefender Core <div class='text-secondary text-14'>Send your files to a private <a target='blank' href='https://docs.opswat.com/mdcore/metadefender-core/ref'>MetaDefender Core server</a></div>",
     "description": ""
@@ -165,6 +169,12 @@
   "coreSettingsSavedNotification": {
     "message": "Core settings saved!"
   },
+  "fileSettingsSavedNotification": {
+    "message": "File size limit saved"
+  },
+  "fileSettingsInvalidNotification": {
+    "message": "Invalid file size limit"
+  },
   "apikeyNotification": {
     "message": "Apikey saved!"
   },
@@ -201,10 +211,6 @@
     "message": "We are unable to scan files hosted on FTP servers. Please try another file",
     "description": ""
   },
-  "unableToScanFileProtocol": {
-    "message": "We are unable to scan file:// protocol. Please upload the file you would like to scan at metadefender.opswat.com",
-    "description": ""
-  },
   "unsupportedUrl": {
     "message": "URL not supported.\nYou may be able to scan the file by downloading it while 'Scan Downloads' is enabled"
   },
@@ -224,6 +230,9 @@
   },
   "fileSizeLimitExceeded": {
     "message": "Not scanned / Exceeded file size"
+  },
+  "customFileSizeLimitExceeded": {
+    "message": "Skipped scanning due to file size configuration"
   },
   "fileEmpty": {
     "message": "File is empty. Please select another file",

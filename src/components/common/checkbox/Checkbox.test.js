@@ -17,6 +17,8 @@ describe('Checkbox', () => {
         getScanRules,
         validateCoreSettings,
         hasForm: false,
+        hasFormApikey: false,
+        fileSizeLimit: null,
         coreApikey: '',
         coreUrl: '',
         coreRule: '',

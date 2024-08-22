@@ -80,9 +80,12 @@ describe('core-client', () => {
         CoreClient.hash.lookup('mock-hash');
 
         setTimeout(() => {
-            expect(callAPISpy).toHaveBeenCalledWith(
+            expect(mockFetch).toHaveBeenCalledWith(
                 'null/hash/mock-hash',
-                { headers: { 'apikey': null, } },
+                {
+                    headers: { apikey: null },
+                    method: 'GET',
+                },
             );
 
             done();

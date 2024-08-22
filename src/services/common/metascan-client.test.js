@@ -43,7 +43,10 @@ describe('metascan-client', () => {
         setTimeout(() => {
             expect(mockFetch).toHaveBeenCalledWith(
                 '/* @echo metadefenderDomain *///* @echo metadefenderVersion *//hash/mock-hash',
-                { headers: { apikey: null } },
+                {
+                    headers: { apikey: null },
+                    method: 'GET',
+                },
             );
 
             done();

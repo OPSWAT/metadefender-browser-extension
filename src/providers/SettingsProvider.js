@@ -77,6 +77,18 @@ export const SettingsProvider = ({ children }) => {
         }
     };
 
+    const updateFileSettings = async (newSettings, newSettingsData) => {
+        const fileSizeLimit = newSettingsData?.fileSizeLimit;
+        const limit = Number(fileSizeLimit);
+
+        if (Number.isInteger(limit) && (limit > 0)) {
+            newSettings.fileSizeLimit = fileSizeLimit;
+            newSettings.skipLimit = true;
+            await BrowserNotification.create(BrowserTranslate.getMessage('fileSettingsSavedNotification'), 'info');
+        } else {
+            await BrowserNotification.create(BrowserTranslate.getMessage('fileSettingsInvalidNotification'), 'info');
+        }
+    };
 
     /**
      * Update settings
@@ -143,7 +155,19 @@ export const SettingsProvider = ({ children }) => {
         }
     };
 
+    const toggleSkipLimit = async (newSettings) => {
+        newSettings.skipLimit = !newSettings.skipLimit;
+
+        if (newSettings.skipLimit === true && newSettings.fileSizeLimit === '') {
+            newSettings.skipLimit = false;
+        } else if (newSettings.skipLimit === false) {
+            newSettings.fileSizeLimit = '';
+        }
+    };
+
     const toggleUseCore = async (newSettings) => {
+        newSettings.useCustomApiKey = false;
+        newSettings.apikeyCustom = '';
         const useCore = !newSettings.useCore;
 
         if (useCore) {
@@ -159,6 +183,7 @@ export const SettingsProvider = ({ children }) => {
     };
 
     const toggleUseCustomApiKey = async (newSettings, authCookie, backgroundTask) => {
+        newSettings.useCore = false;
         const useCustomApiKey = !newSettings.useCustomApiKey;
 
         if (useCustomApiKey) {
@@ -197,6 +222,10 @@ export const SettingsProvider = ({ children }) => {
         const authCookie = JSON.parse(cookie.value);
 
         switch (key) {
+            case 'fileSettings': {
+                await updateFileSettings(newSettings, newSettingsData);
+                break;
+            }
             case 'coreSettings':
                 await updateCoreSettings(newSettings, newSettingsData);
                 break;
@@ -206,6 +235,10 @@ export const SettingsProvider = ({ children }) => {
             case 'whiteListCustomSettings':
                 await updateWhiteListCustomSettings(newSettings, newSettingsData);
                 break;
+            case 'skipLimit': {
+                await toggleSkipLimit(newSettings);
+                break;
+            }
             case 'useCore':
                 await toggleUseCore(newSettings);
                 break;

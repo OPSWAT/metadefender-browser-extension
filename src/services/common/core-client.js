@@ -117,10 +117,13 @@ function fileLookup(dataId) {
 function hashLookup(hash) {
     const restEndpoint = `${config.endpoint}/hash/${hash}`;
     const options = {
-        headers: authHeader
+        method: 'GET',
+        headers: authHeader,
     };
 
-    return callAPI(restEndpoint, options);
+    return fetch(restEndpoint, options)
+        .then(data => data.json())
+        .catch((error) => ({ error }));
 }
 
 /**

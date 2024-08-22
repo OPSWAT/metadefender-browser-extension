@@ -44,6 +44,7 @@ const Settings = () => {
             hasForm={item?.hasForm ?? null}
             hasFormApikey={item?.hasFormApikey ?? null}
             hasFormWhiteList={item?.hasFormWhiteList ?? null}
+            fileSizeLimit={(item.labelFor === 'skipLimit') ? settingsData.fileSizeLimit : null}
             coreApikey={(item.labelFor === 'useCore') ? settingsData.coreApikey : null}
             coreUrl={(item.labelFor === 'useCore') ? settingsData.coreUrl : null}
             coreRule={(item.labelFor === 'useCore') ? settingsData.coreRule : null}
