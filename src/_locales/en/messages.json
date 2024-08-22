@@ -131,6 +131,10 @@
     "message": "Scanning using Custom MetaDefender Cloud API Key",
     "description": ""
   },
+  "useWhiteList": {
+    "message": "Allowlisted Domains<div class='text-secondary text-14'>Disable scanning for the selected domains. After entering a value, please tap on 'Enter' and click on the save button.</div>",
+    "description": ""
+  },
   "useCoreSub": {
     "message": ""
   },
@@ -164,11 +168,20 @@
   "apikeyNotification": {
     "message": "Apikey saved!"
   },
+  "whiteListSavedNotification": {
+    "message": "Allowlisted Domains saved!"
+  },
   "apikeyInvalidNotification": {
     "message": "Apikey is not valid!"
   },
   "coreSettingsInvalidNotification": {
     "message": "Core settings are not valid!"
+  },
+  "domainInvalid": {
+    "message": "Domain is not valid!"
+  },
+  "domainAlreadyExists": {
+    "message": "Domain already exist!"
   },
   "coreSettingsInvalidApikey": {
     "message": "Invalid MetaDefender Core apikey!"

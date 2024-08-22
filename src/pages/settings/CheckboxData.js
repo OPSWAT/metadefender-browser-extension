@@ -56,6 +56,11 @@ const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess) => {
             hasForm: true,
             labelFor: 'useCore'
         },
+        {
+            label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useWhiteList') }} />,
+            hasFormWhiteList: true,
+            labelFor: 'useWhiteList'
+        },
     ];
 };
 
