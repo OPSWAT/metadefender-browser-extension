@@ -169,7 +169,7 @@
     "message": "Apikey saved!"
   },
   "whiteListSavedNotification": {
-    "message": "Whitelisted Domains saved!"
+    "message": "Allowlisted Domains saved!"
   },
   "apikeyInvalidNotification": {
     "message": "Apikey is not valid!"
