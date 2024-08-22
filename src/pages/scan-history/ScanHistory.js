@@ -66,7 +66,7 @@ const ScanHistory = () => {
 
     const getScanUrl = (file) => {
         if (file.useCore) {
-            return `${settings.data.coreUrl}/#/user/scanResult?type=hash&value=${file.md5}`;
+            return;
         }
 
         if (file.dataId) {
