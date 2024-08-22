@@ -132,7 +132,7 @@
     "description": ""
   },
   "useWhiteList": {
-    "message": "Whitelisted Domains<div class='text-secondary text-14'>Disable scanning for the selected domains. After entering a value, please tap on 'Enter' and click on the save button.</div>",
+    "message": "Allowlisted Domains<div class='text-secondary text-14'>Disable scanning for the selected domains. After entering a value, please tap on 'Enter' and click on the save button.</div>",
     "description": ""
   },
   "useCoreSub": {

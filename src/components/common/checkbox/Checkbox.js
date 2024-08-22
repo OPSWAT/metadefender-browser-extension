@@ -191,7 +191,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         return (
             <fieldset className="form-with-inputs">
                 <Form.Group controlId="whiteList">
-                    <Form.Label className="col-md-2 col-sm-12 text-md-right text-left form-label whitelistLabel"> WhiteList</Form.Label>
+                    <Form.Label className="col-md-2 col-sm-12 text-md-right text-left form-label whitelistLabel"> AllowList</Form.Label>
                     <div className="col-md-10 col-sm-12 nopadding">
                         <div
                             className='whitelist-container'
