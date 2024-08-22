@@ -94,8 +94,8 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
     const handleWhiteList = (e) => {
         if (e.key === 'Enter') {
-            const value = inputRef.current.value.trim();
-
+            let value = inputRef.current.value.trim();
+            value = value.replace(/^(https?:\/\/)?(www\.)?/, '');
             if (value !== "" && validateDomainName(value)) {
                 setWhiteList(prevWhiteList => {
                     if (prevWhiteList && !prevWhiteList.includes(value)) {
