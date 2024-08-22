@@ -38,9 +38,6 @@ class FileProcessor {
         file.canBeSanitized = file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
         file.statusLabel = file.getScanStatusLabel();
 
-        let fileData = null;
-        BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
-
         const getDomain = async () => {
             return new Promise((resolve, reject) => {
                 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -63,6 +60,8 @@ class FileProcessor {
             }
         }
 
+        let fileData = null;
+        BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
         try {
             const fileUrl = downloadItem ? downloadItem.localPath || 'file://' + downloadItem.filename : linkUrl;
             fileData = await file.getFileData(fileUrl);
