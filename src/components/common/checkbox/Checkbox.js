@@ -95,11 +95,15 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
     const handleWhiteList = (e) => {
         if (e.key === 'Enter') {
             const value = inputRef.current.value.trim();
-            console.log('validateDomainName(value)', validateDomainName(value))
+
             if (value !== "" && validateDomainName(value)) {
                 setWhiteList(prevWhiteList => {
-                    const updatedList = [...(prevWhiteList || []), value];
-                    return updatedList;
+                    if (prevWhiteList && !prevWhiteList.includes(value)) {
+                        return [...prevWhiteList, value];
+                    } else {
+                        BrowserNotification.create(BrowserTranslate.getMessage('domainAlreadyExists'), 'info');
+                        return prevWhiteList;
+                    }
                 });
                 inputRef.current.value = "";
             } else {
@@ -108,6 +112,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
             }
         }
     };
+
 
     const handleRemove = (index) => {
         setWhiteList(prevWhiteList => {

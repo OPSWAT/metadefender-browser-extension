@@ -180,6 +180,9 @@
   "domainInvalid": {
     "message": "Domain is not valid!"
   },
+  "domainAlreadyExists": {
+    "message": "Domain already exist!"
+  },
   "coreSettingsInvalidApikey": {
     "message": "Invalid MetaDefender Core apikey!"
   },
