@@ -35,7 +35,7 @@ export default class BackgroundTask {
         const cookie = await cookieManager.get();
 
         if (cookie) {
-            this.setApikey(cookie?.value);
+            this.setApikey(cookie.value);
         } else {
             setTimeout(getAuthCookie.bind(this), 300);
         }
