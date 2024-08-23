@@ -38,23 +38,27 @@ class FileProcessor {
         file.canBeSanitized = file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
         file.statusLabel = file.getScanStatusLabel();
 
-        const getDomain = async () => {
+        const getDomain = (url) => {
             return new Promise((resolve, reject) => {
-                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                    if (tabs.length > 0) {
-                        let url = new URL(tabs[0].url);
-                        let hostname = url.hostname;
-                        hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
-                        resolve(hostname);
-                    } else {
-                        reject('No active tab found');
+                try {
+                    console.log('URL received:', url);
+                    if (url.startsWith('blob:')) {
+                        url = url.substring(5);
                     }
-                });
+                    let urlObj = new URL(url);
+                    let hostname = urlObj.hostname;
+                    hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
+                    resolve(hostname);
+                } catch (error) {
+                    console.error('Error parsing URL:', error);
+                    reject('Invalid URL');
+                }
             });
         };
 
         if (downloadItem) {
-            const domain = await getDomain();
+            const urlToUse = downloadItem.referrer || downloadItem.url;
+            const domain = await getDomain(urlToUse);
             if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
                 return;
             }
