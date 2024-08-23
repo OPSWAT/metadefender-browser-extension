@@ -41,7 +41,6 @@ class FileProcessor {
         const getDomain = (url) => {
             return new Promise((resolve, reject) => {
                 try {
-                    console.log('URL received:', url);
                     if (url.startsWith('blob:')) {
                         url = url.substring(5);
                     }
@@ -50,7 +49,6 @@ class FileProcessor {
                     hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
                     resolve(hostname);
                 } catch (error) {
-                    console.error('Error parsing URL:', error);
                     reject('Invalid URL');
                 }
             });
