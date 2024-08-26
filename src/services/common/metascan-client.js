@@ -2,6 +2,7 @@
 
 import { SANITIZATION, UNARCHIVE } from '../constants/workflow';
 import MCL from '../../config/config';
+import { callAPI } from './callAPI';
 
 /**
  *
@@ -120,10 +121,7 @@ function hashLookup(hash) {
         headers: authHeader
     };
 
-    return fetch(restEndpoint, options).then(response => response.json()).catch(error => {
-        console.warn(error);
-        return { error };
-    });
+    return callAPI(restEndpoint, options).catch((error) => ({ error }));
 }
 
 /**
@@ -157,15 +155,11 @@ function fileUpload({ fileName, fileData, sampleSharing, password, canBeSanitize
     }
 
     const options = {
-        method: 'POST',
         headers: { ...authHeader, ...additionalHeaders },
         body: fileData
     };
 
-    return fetch(restEndpoint, options).then(response => response.json()).catch(error => {
-        console.warn(error);
-        return { error };
-    });
+    return callAPI(restEndpoint, options, 'post');
 }
 
 /**

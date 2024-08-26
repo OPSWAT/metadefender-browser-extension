@@ -47,6 +47,10 @@ const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess) => {
             labelFor: 'safeUrl'
         },
         {
+            label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('skipLimit') }} />,
+            labelFor: 'skipLimit'
+        },
+        {
             label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useCustomApiKey') }} />,
             hasFormApikey: true,
             labelFor: 'useCustomApiKey'
@@ -55,6 +59,11 @@ const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess) => {
             label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useCore') }} />,
             hasForm: true,
             labelFor: 'useCore'
+        },
+        {
+            label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('useWhiteList') }} />,
+            hasFormWhiteList: true,
+            labelFor: 'useWhiteList'
         },
     ];
 };

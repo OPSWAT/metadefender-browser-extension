@@ -41,8 +41,6 @@ export default {
             'scanId': '/* @echo contextMenu.scanId */'
         },
 
-        'fileSizeLimit': '/* @echo fileSizeLimit */',
-
         'scanResults': {
             'incrementor': '/* @echo scanResults.incrementor */',
             'maxInterval': '/* @echo scanResults.maxInterval */'

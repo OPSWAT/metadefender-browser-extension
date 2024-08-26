@@ -39,7 +39,7 @@ class DownloadManager {
     updateActiveDownloads(downloadItem) {
         const ignoreDownloads = this.ignoreDownloads;
         const activeDownloads = this.activeDownloads;
-        
+
         if (!this.settings.data.scanDownloads || typeof downloadItem.filename === 'undefined') {
             return;
         }
@@ -60,7 +60,7 @@ class DownloadManager {
             idx = filepath.lastIndexOf('/');
         }
         const filename = filepath.substring(idx + 1);
-        
+
         activeDownloads[downloadItem?.id].filename = filename;
         activeDownloads[downloadItem?.id].localPath = 'file://' + filepath;
     }
@@ -85,7 +85,7 @@ class DownloadManager {
         if (!activeDownloads[downloadItem?.id]) {
             return;
         }
-        
+
         downloadItem = activeDownloads[downloadItem?.id];
         await this.processTarget(downloadItem.url, downloadItem);
         delete activeDownloads[downloadItem?.id];

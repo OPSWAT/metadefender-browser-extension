@@ -188,7 +188,7 @@ while [[ $# -gt 0 ]]; do
         exit 0
         ;;
     coverage)
-        npm run test:coverage
+        npm run coverage
         exit 0
         ;;
     docs)

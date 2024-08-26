@@ -48,7 +48,7 @@ export const validateCustomApikey = async (newCustomApikey) => {
         const apikeyCustom = newCustomApikey || settings.apikeyCustom;
 
         if (apikeyCustom && apikeyCustom.length !== 32) {
-            settings.apikeyCustom = ''
+            settings.apikeyCustom = '';
             return false;
         }
 
@@ -58,6 +58,7 @@ export const validateCustomApikey = async (newCustomApikey) => {
         return false;
     }
 };
+
 
 export const SettingsProvider = ({ children }) => {
 
@@ -74,96 +75,182 @@ export const SettingsProvider = ({ children }) => {
             await settings.save();
             setSettingsData({ ...settings.data });
         }
-    }
+    };
 
+    const updateFileSettings = async (newSettings, newSettingsData) => {
+        const fileSizeLimit = newSettingsData?.fileSizeLimit;
+        const limit = Number(fileSizeLimit);
+
+        if (Number.isInteger(limit) && (limit > 0)) {
+            newSettings.fileSizeLimit = fileSizeLimit;
+            newSettings.skipLimit = true;
+            await BrowserNotification.create(BrowserTranslate.getMessage('fileSettingsSavedNotification'), 'info');
+        } else {
+            await BrowserNotification.create(BrowserTranslate.getMessage('fileSettingsInvalidNotification'), 'info');
+        }
+    };
 
     /**
      * Update settings
      * @param {string} key 
      * @param {object} newSettingsData
      */
+    const updateCoreSettings = async (newSettings, newSettingsData) => {
+        newSettings.coreApikey = newSettingsData.coreApikey;
+        newSettings.coreUrl = newSettingsData.coreUrl;
+
+        if (!newSettingsData.coreApikey || !newSettingsData.coreUrl) {
+            newSettings.useCore = false;
+            return;
+        }
+
+        const validCore = await validateCoreSettings(newSettingsData.coreApikey, newSettingsData.coreUrl);
+
+        if (validCore) {
+            newSettings.coreV4 = validCore.coreV4;
+            newSettings.rules = validCore.rules;
+            newSettings.coreRule = newSettingsData.coreRule;
+            await BrowserNotification.create(BrowserTranslate.getMessage('coreSettingsSavedNotification'), 'info');
+            newSettings.useCore = true;
+        } else {
+            newSettings.useCore = false;
+            await BrowserNotification.create(BrowserTranslate.getMessage('coreSettingsInvalidNotification'), 'info');
+        }
+    };
+
+    const updateCustomSettings = async (newSettings, newSettingsData, authCookie, backgroundTask) => {
+        newSettings.apikeyCustom = newSettingsData?.apikeyCustom || '';
+
+        if (!newSettingsData.apikeyCustom) {
+            newSettings.useCustomApiKey = false;
+            return;
+        }
+
+        const validApikey = await validateCustomApikey(newSettingsData.apikeyCustom);
+
+        if (validApikey) {
+            await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
+            newSettings.useCustomApiKey = true;
+        } else {
+            newSettings.apikeyCustom = '';
+            newSettings.useCustomApiKey = false;
+            await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
+        }
+    };
+
+    const updateWhiteListCustomSettings = async (newSettings, newSettingsData) => {
+        if (!newSettingsData?.whiteListCustom) {
+            newSettings.whiteListCustom = [];
+            newSettings.useWhiteList = false;
+            return;
+        }
+
+        if (newSettingsData?.whiteListCustom.length > 0) {
+            newSettings.whiteListCustom = newSettingsData.whiteListCustom;
+            newSettings.useWhiteList = true;
+            await BrowserNotification.create(BrowserTranslate.getMessage('whiteListSavedNotification'), 'info');
+        } else {
+            newSettings.useWhiteList = false;
+            newSettings.whiteListCustom = [];
+        }
+    };
+
+    const toggleSkipLimit = async (newSettings) => {
+        newSettings.skipLimit = !newSettings.skipLimit;
+
+        if (newSettings.skipLimit === true && newSettings.fileSizeLimit === '') {
+            newSettings.skipLimit = false;
+        } else if (newSettings.skipLimit === false) {
+            newSettings.fileSizeLimit = '';
+        }
+    };
+
+    const toggleUseCore = async (newSettings) => {
+        newSettings.useCustomApiKey = false;
+        newSettings.apikeyCustom = '';
+        const useCore = !newSettings.useCore;
+
+        if (useCore) {
+            const validCore = await validateCoreSettings();
+            if (validCore) {
+                newSettings.coreV4 = validCore.coreV4;
+                newSettings.rules = validCore.rules;
+                newSettings.useCore = true;
+            }
+        } else {
+            newSettings.useCore = false;
+        }
+    };
+
+    const toggleUseCustomApiKey = async (newSettings, authCookie, backgroundTask) => {
+        newSettings.useCore = false;
+        const useCustomApiKey = !newSettings.useCustomApiKey;
+
+        if (useCustomApiKey) {
+            const validApikey = await validateCustomApikey();
+            if (validApikey) {
+                newSettings.apikeyCustom = validApikey.apikeyCustom;
+                newSettings.useCustomApiKey = true;
+            }
+        } else {
+            newSettings.apikeyCustom = '';
+            newSettings.useCustomApiKey = false;
+            await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
+        }
+    };
+
+    const toggleUseWhitelist = async (newSettings, newSettingsData) => {
+        const useWhiteList = !newSettings.useWhiteList;
+
+        if (useWhiteList && newSettingsData?.whiteListCustom.length > 0) {
+            newSettings.whiteListCustom = settings?.whiteListCustom;
+            newSettings.useWhiteList = true;
+        } else {
+            newSettings.useWhiteList = false;
+            newSettings.whiteListCustom = [];
+        }
+    };
+
+    const toggleScanDownloads = async (newSettings) => {
+        newSettings.scanDownloads = !newSettings.scanDownloads && isAllowedFileSchemeAccess;
+    };
+
     const updateSettings = async (key, newSettingsData) => {
         const newSettings = { ...settings.data };
         const backgroundTask = new BackgroundTask();
         const cookie = await cookieManager.get();
         const authCookie = JSON.parse(cookie.value);
+
         switch (key) {
-            case 'coreSettings': {
-                newSettings.coreApikey = newSettingsData.coreApikey;
-                newSettings.coreUrl = newSettingsData.coreUrl;
-
-                if (!newSettingsData.coreApikey || !newSettingsData.coreUrl) {
-                    newSettings.useCore = false;
-                    break;
-                }
-
-                const validCore = await validateCoreSettings(newSettingsData.coreApikey, newSettingsData.coreUrl);
-
-                if (validCore) {
-                    newSettings.coreV4 = validCore.coreV4;
-                    newSettings.rules = validCore.rules;
-                    newSettings.coreRule = newSettingsData.coreRule;
-                    await BrowserNotification.create(BrowserTranslate.getMessage('coreSettingsSavedNotification'), 'info');
-                    newSettings.useCore = true;
-                } else {
-                    newSettings.useCore = false;
-                    await BrowserNotification.create(BrowserTranslate.getMessage('coreSettingsInvalidNotification'), 'info');
-                }
+            case 'fileSettings': {
+                await updateFileSettings(newSettings, newSettingsData);
                 break;
             }
-            case 'customSettings': {
-                newSettings.apikeyCustom = newSettingsData?.apikeyCustom;
-                if (!newSettingsData.apikeyCustom) {
-                    newSettings.apikeyCustom = '';
-                    newSettings.useCustomApiKey = false;
-                    break;
-                }
-                const validApikey = await validateCustomApikey(newSettingsData?.apikeyCustom);
-                if (validApikey) {
-                    newSettings.apikeyCustom = newSettingsData?.apikeyCustom;
-                    await BrowserNotification.create(BrowserTranslate.getMessage('apikeyNotification'), 'info');
-                    newSettings.useCustomApiKey = true;
-                } else {
-                    newSettings.apikeyCustom = '';
-                    newSettings.useCustomApiKey = false;
-                    await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
-                }
+            case 'coreSettings':
+                await updateCoreSettings(newSettings, newSettingsData);
+                break;
+            case 'customSettings':
+                await updateCustomSettings(newSettings, newSettingsData, authCookie, backgroundTask);
+                break;
+            case 'whiteListCustomSettings':
+                await updateWhiteListCustomSettings(newSettings, newSettingsData);
+                break;
+            case 'skipLimit': {
+                await toggleSkipLimit(newSettings);
                 break;
             }
-            case 'useCore': {
-                const useCore = !newSettings.useCore;
-
-                if (useCore) {
-                    const validCore = await validateCoreSettings();
-                    if (validCore) {
-                        newSettings.coreV4 = validCore.coreV4;
-                        newSettings.rules = validCore.rules;
-                        newSettings.useCore = true;
-                    }
-                } else {
-                    newSettings.useCore = false;
-                }
+            case 'useCore':
+                await toggleUseCore(newSettings);
                 break;
-            }
-            case 'useCustomApiKey': {
-                const useCustomApiKey = !newSettings.useCustomApiKey;
-                if (useCustomApiKey) {
-                    const validApikey = await validateCustomApikey();
-                    if (validApikey) {
-                        newSettings.apikeyCustom = validApikey.apikeyCustom;
-                        newSettings.useCustomApiKey = true;
-                    }
-                } else {
-                    newSettings.apikeyCustom = ''
-                    newSettings.useCustomApiKey = false;
-                    await backgroundTask.updateApikeyInfo(authCookie.apikey, authCookie.loggedIn);
-                }
+            case 'useCustomApiKey':
+                await toggleUseCustomApiKey(newSettings, authCookie, backgroundTask);
                 break;
-            }
-            case 'scanDownloads': {
-                newSettings.scanDownloads = !newSettings.scanDownloads && isAllowedFileSchemeAccess;
+            case 'useWhitelist':
+                await toggleUseWhitelist(newSettings, newSettingsData);
                 break;
-            }
+            case 'scanDownloads':
+                await toggleScanDownloads(newSettings);
+                break;
             default:
                 newSettings[key] = !newSettings[key];
                 break;
@@ -196,7 +283,7 @@ export const SettingsProvider = ({ children }) => {
 
         return () => {
             browserStorage.removeListener(storageUpdateHandler);
-        }
+        };
     }, []);
 
     return (
@@ -209,9 +296,9 @@ export const SettingsProvider = ({ children }) => {
         }}>
             {children}
         </SettingsContext.Provider>
-    )
+    );
 
-}
+};
 
 SettingsProvider.propTypes = {
     children: PropTypes.element.isRequired

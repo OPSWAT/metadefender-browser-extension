@@ -123,12 +123,20 @@
   "safeUrlSub": {
     "message": "Read more about <a target='blank' href='https://docs.opswat.com/mdcloud/operation/safe-url-redirect#how-it-works'>Safe URL Redirect</a>"
   },
+  "skipLimit": {
+    "message": "Skip scanning files larger than",
+    "description": ""
+  },
   "useCore": {
     "message": "On-premise scanning using MetaDefender Core <div class='text-secondary text-14'>Send your files to a private <a target='blank' href='https://docs.opswat.com/mdcore/metadefender-core/ref'>MetaDefender Core server</a></div>",
     "description": ""
   },
   "useCustomApiKey": {
     "message": "Scanning using Custom MetaDefender Cloud API Key",
+    "description": ""
+  },
+  "useWhiteList": {
+    "message": "Allowlisted Domains<div class='text-secondary text-14'>Disable scanning for the selected domains. After entering a value, please tap on 'Enter' and click on the save button.</div>",
     "description": ""
   },
   "useCoreSub": {
@@ -161,14 +169,29 @@
   "coreSettingsSavedNotification": {
     "message": "Core settings saved!"
   },
+  "fileSettingsSavedNotification": {
+    "message": "File size limit saved"
+  },
+  "fileSettingsInvalidNotification": {
+    "message": "Invalid file size limit"
+  },
   "apikeyNotification": {
     "message": "Apikey saved!"
+  },
+  "whiteListSavedNotification": {
+    "message": "Allowlisted Domains saved!"
   },
   "apikeyInvalidNotification": {
     "message": "Apikey is not valid!"
   },
   "coreSettingsInvalidNotification": {
     "message": "Core settings are not valid!"
+  },
+  "domainInvalid": {
+    "message": "Domain is not valid!"
+  },
+  "domainAlreadyExists": {
+    "message": "Domain already exist!"
   },
   "coreSettingsInvalidApikey": {
     "message": "Invalid MetaDefender Core apikey!"
@@ -186,10 +209,6 @@
   },
   "unableToScanFTP": {
     "message": "We are unable to scan files hosted on FTP servers. Please try another file",
-    "description": ""
-  },
-  "unableToScanFileProtocol": {
-    "message": "We are unable to scan file:// protocol. Please upload the file you would like to scan at metadefender.opswat.com",
     "description": ""
   },
   "unsupportedUrl": {
@@ -211,6 +230,9 @@
   },
   "fileSizeLimitExceeded": {
     "message": "Not scanned / Exceeded file size"
+  },
+  "customFileSizeLimitExceeded": {
+    "message": "Skipped scanning due to file size configuration"
   },
   "fileEmpty": {
     "message": "File is empty. Please select another file",

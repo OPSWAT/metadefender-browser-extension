@@ -43,11 +43,14 @@ const Settings = () => {
             labelFor={item.labelFor}
             hasForm={item?.hasForm ?? null}
             hasFormApikey={item?.hasFormApikey ?? null}
+            hasFormWhiteList={item?.hasFormWhiteList ?? null}
+            fileSizeLimit={(item.labelFor === 'skipLimit') ? settingsData.fileSizeLimit : null}
             coreApikey={(item.labelFor === 'useCore') ? settingsData.coreApikey : null}
             coreUrl={(item.labelFor === 'useCore') ? settingsData.coreUrl : null}
             coreRule={(item.labelFor === 'useCore') ? settingsData.coreRule : null}
             scanRules={(item.labelFor === 'useCore') ? settingsData.rules : null}
             apikeyCustom={(item.labelFor === 'useCustomApiKey') ? settingsData.apikeyCustom : null}
+            whiteListCustom={(item.labelFor === 'useWhiteList') ? settingsData.whiteListCustom : null}
             getScanRules={getScanRules}
         />);
     }, [settingsData, apikeyData, isAllowedFileSchemeAccess]);

@@ -57,7 +57,7 @@ const handleUrlValidatorResponse = (testUrl, err, res) => {
     removeOldUrls();
 };
 
-const isSafeUrl = (testUrl, urlValidator) => {
+export const isSafeUrl = (testUrl, urlValidator) => {
     return fetch(urlValidator, { sync: true, headers: { noredirect: true } })
         .then(res => handleUrlValidatorResponse(testUrl, null, res))
         .catch(err => handleUrlValidatorResponse(testUrl, err, null));
@@ -71,7 +71,7 @@ const isSafeUrl = (testUrl, urlValidator) => {
  * @param {object} changeInfo changed informations
  * @param {object} tab tab object 
  */
-const doSafeRedirect = async (tabId, changeInfo, tab) => {
+export const doSafeRedirect = async (tabId, changeInfo, tab) => {
     const tabUrl = tab.url;
 
     if (changeInfo.status === 'loading' && !tabUrl.startsWith(safeRedirectEndpoint)) {
