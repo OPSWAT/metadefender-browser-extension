@@ -285,7 +285,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         setCustomApikey(apikeyCustom);
         setWhiteList(whiteListCustom);
         setSkipLimit(fileSizeLimit);
-    }, [isChecked, coreApikey, coreUrl, coreRule, apikeyCustom, whiteListCustom]);
+    }, [isChecked, coreApikey, coreUrl, coreRule, apikeyCustom, whiteListCustom, fileSizeLimit]);
 
     return (
         <div className="form-group-wrapper">

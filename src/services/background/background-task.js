@@ -37,7 +37,7 @@ export default class BackgroundTask {
         if (cookie) {
             this.setApikey(cookie.value);
         } else {
-            setTimeout(getAuthCookie.bind(this), 300);
+            setTimeout(this.getAuthCookie.bind(this), 300);
         }
     }
 
