@@ -13,7 +13,7 @@ class DownloadManager {
     async onScanComplete(payload) {
         const { status, linkUrl, name } = payload;
 
-        if (this.settings.data.saveCleanFiles && status === ScanFile.STATUS.CLEAN) {
+        if ((this.settings.data.saveCleanFiles || this.settings.data.scanDownloads) && status === ScanFile.STATUS.CLEAN) {
             this.ignoreDownloads.push({ id: '', url: linkUrl });
             chrome.downloads.download({ url: linkUrl, filename: name }, (downloadId) => {
                 const item = this.ignoreDownloads.find(({ url }) => url === linkUrl);
