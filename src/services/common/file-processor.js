@@ -65,8 +65,7 @@ class FileProcessor {
         let fileData = null;
         BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
         try {
-            const fileUrl = downloadItem ? downloadItem.localPath || 'file://' + downloadItem.filename : linkUrl;
-            fileData = await file.getFileData(fileUrl);
+            fileData = await file.getFileData(linkUrl);
             file.size = fileData.size;
         } catch (error) {
             BrowserNotification.create(error.message);

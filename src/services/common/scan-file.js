@@ -96,7 +96,7 @@ function isSanitizedFile(url) {
  */
 async function getFileName(url, downloadItem) {
     if (downloadItem) {
-        return downloadItem.filename.split('/').pop();
+        return downloadItem.filename;
     }
     const fileUrl = await fetch(url, { method: 'HEAD', redirect: 'follow' })
         .then(response => response.url)

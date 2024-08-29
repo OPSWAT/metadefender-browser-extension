@@ -79,14 +79,12 @@ export default class BackgroundTask {
         chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
         chrome.notifications.onClosed.addListener(() => { });
 
-        chrome.downloads.onCreated.addListener(this.downloadsManager.trackInProgressDownloads.bind(this.downloadsManager));
-        chrome.downloads.onChanged.addListener(this.downloadsManager.updateActiveDownloads.bind(this.downloadsManager));
-        chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
+        chrome.downloads.onDeterminingFilename.addListener(this.downloadsManager.processDownloads.bind(this.downloadsManager));
 
         BrowserStorage.addListener(this.browserStorageListener.bind(this));
 
         this.setupContextMenu(this.settings.data.saveCleanFiles);
-        await this.getAuthCookie.call(this);
+        await this.getAuthCookie();
 
         SafeUrl.toggle(this.settings.data.safeUrl);
     }
@@ -242,10 +240,11 @@ export default class BackgroundTask {
     async browserStorageListener(data) {
         for (const key of Object.keys(data)) {
             switch (key) {
-                case MCL_CONFIG.storageKey.apikeyInfo:
+                case MCL_CONFIG.storageKey.apikeyInfo: {
                     await this.apikeyInfo.load();
                     break;
-                case MCL_CONFIG.storageKey.settings:
+                }
+                case MCL_CONFIG.storageKey.settings: {
                     const settingsData = await this.settings.load();
 
                     this.updateContextMenu(settingsData.saveCleanFiles);
@@ -255,16 +254,17 @@ export default class BackgroundTask {
                         endpoint: settingsData.coreUrl,
                     });
                     break;
+                }
                 case MCL_CONFIG.storageKey.scanHistory: {
                     await this.scanHistory.load();
                     break;
                 }
-                default:
+                default: {
                     break;
+                }
             }
         }
     }
-
 }
 
 export const Task = new BackgroundTask();
