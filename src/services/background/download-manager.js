@@ -3,7 +3,6 @@ import ScanFile from '../common/scan-file';
 
 class DownloadManager {
     constructor(fileProcessor) {
-        this.activeDownloads = [];
         this.ignoreDownloads = [];
         this.fileProcessor = fileProcessor;
         this.settings = settings;
@@ -12,11 +11,14 @@ class DownloadManager {
     }
 
     async onScanComplete(payload) {
-        const { status, downloaded, fileData, linkUrl, name } = payload;
+        const { status, linkUrl, name } = payload;
 
-        if (this.settings.data.saveCleanFiles && status === ScanFile.STATUS.CLEAN && !downloaded) {
-            const dlId = await ScanFile().download(linkUrl, fileData, name);
-            this.ignoreDownloads.push(dlId);
+        if (this.settings.data.saveCleanFiles && status === ScanFile.STATUS.CLEAN) {
+            this.ignoreDownloads.push({ id: '', url: linkUrl });
+            chrome.downloads.download({ url: linkUrl, filename: name }, (downloadId) => {
+                const item = this.ignoreDownloads.find(({ url }) => url === linkUrl);
+                item.id = downloadId;
+            });
         }
     }
 
@@ -24,14 +26,26 @@ class DownloadManager {
         if (!this.settings.data.scanDownloads) {
             return;
         }
+
+        if (this.ignoreDownloads.find(({ url }) => url === downloadItem.finalUrl)) {
+            return;
+        }
+
         chrome.downloads.search({ id: downloadItem.id }, (results) => {
             const item = results?.shift();
-            if (item?.id) {
-                chrome.downloads.cancel(downloadItem.id);
+            const itemId = item?.id;
+            if (itemId) {
+                chrome.downloads.cancel(itemId);
             }
         });
 
         await this.processTarget(downloadItem.finalUrl, downloadItem);
+    }
+
+    async processCompleteDownloads(downloadItem) {
+        if (downloadItem?.state?.current === 'complete') {
+            this.ignoreDownloads = this.ignoreDownloads.filter(({ id }) => id !== downloadItem.id);
+        }
     }
 
     /**

@@ -80,6 +80,7 @@ export default class BackgroundTask {
         chrome.notifications.onClosed.addListener(() => { });
 
         chrome.downloads.onDeterminingFilename.addListener(this.downloadsManager.processDownloads.bind(this.downloadsManager));
+        chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
 
         BrowserStorage.addListener(this.browserStorageListener.bind(this));
 

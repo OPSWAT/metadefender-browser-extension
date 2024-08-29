@@ -80,7 +80,7 @@ class FileProcessor {
 
         await scanHistory.addFile(file);
 
-        await this.scanFile(file, linkUrl, fileData, downloadItem);
+        await this.scanFile(file, linkUrl, fileData);
     }
 
     /**
@@ -125,11 +125,9 @@ class FileProcessor {
      * @param {*} file file info
      * @param {*} info file scan result
      * @param {string} linkUrl file file url
-     * @param {*} fileData file content
-     * @param {boolean} downloaded flag for files that are already downloaded
      * @returns {Promise.<void>}
      */
-    async handleFileScanResults(file, info, linkUrl, fileData, downloaded) {
+    async handleFileScanResults(file, info, linkUrl) {
         if (info.scan_results) {
             file.status = new ScanFile().getScanStatus(info.scan_results.scan_all_result_i);
             file.statusLabel = new ScanFile().getScanStatusLabel(info.scan_results.scan_all_result_i);
@@ -157,7 +155,7 @@ class FileProcessor {
         }
         else {
             file.scanResults = `${MCL.config.mclDomain}/results/file/${file.dataId}/regular/overview`;
-            if (info?.sanitized?.file_path && !Object.prototype.hasOwnProperty.call(file, 'sanitizedFileURL')) {
+            if (info?.sanitized?.file_path && !Object.hasOwn(file, 'sanitizedFileURL')) {
                 file.sanitizedFileURL = info.sanitized.file_path;
             }
         }
@@ -171,10 +169,8 @@ class FileProcessor {
 
         this.callOnScanCompleteListeners({
             status: file.status,
-            downloaded,
-            fileData,
             linkUrl,
-            name: file.fileName
+            name: file.fileName,
         });
     }
 
@@ -182,11 +178,9 @@ class FileProcessor {
      *
      * @param {*} file file info
      * @param {string} linkUrl  file file url
-     * @param {*} fileData file content
-     * @param {boolean} downloaded flag for files that are already downloaded
      * @returns {Promise.<void>}
      */
-    async startStatusPolling(file, linkUrl, fileData, downloaded) {
+    async startStatusPolling(file, linkUrl) {
         let response;
 
         if (file.useCore) {
@@ -207,7 +201,7 @@ class FileProcessor {
             return;
         }
 
-        await this.handleFileScanResults(file, response, linkUrl, fileData, downloaded);
+        await this.handleFileScanResults(file, response, linkUrl);
     }
 
     /**
@@ -215,9 +209,8 @@ class FileProcessor {
      * @param {*} file file information
      * @param {string} linkUrl file url
      * @param {*} fileData file content
-     * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
      */
-    async scanFile(file, linkUrl, fileData, downloadItem) {
+    async scanFile(file, linkUrl, fileData) {
         const customFileSizeError = 'Custom file size limit exceeded';
         const fileSizeLimit = Number(settings.data.fileSizeLimit) * 1000000;
 
@@ -236,7 +229,7 @@ class FileProcessor {
 
             file.dataId = response?.data_id;
 
-            await this.startStatusPolling(file, linkUrl, fileData, !!downloadItem);
+            await this.startStatusPolling(file, linkUrl);
         } catch (error) {
             file.scan_results = {
                 scan_all_result_i: 10
