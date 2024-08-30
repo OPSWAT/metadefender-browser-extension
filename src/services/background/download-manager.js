@@ -1,6 +1,22 @@
 import { settings } from '../common/persistent/settings';
 import ScanFile from '../common/scan-file';
 
+const getDomain = (url) => {
+    return new Promise((resolve, reject) => {
+        try {
+            if (url.startsWith('blob:')) {
+                url = url.substring(5);
+            }
+            let urlObj = new URL(url);
+            let hostname = urlObj.hostname;
+            hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
+            resolve(hostname);
+        } catch (error) {
+            reject('Invalid URL');
+        }
+    });
+};
+
 class DownloadManager {
     constructor(fileProcessor) {
         this.activeDownloads = [];
@@ -48,6 +64,12 @@ class DownloadManager {
         }
 
         if (this.ignoreDownloads.find(({ url }) => url === originalUrl)) {
+            return;
+        }
+
+        const urlToUse = downloadItem.referrer || downloadItem.url;
+        const domain = await getDomain(urlToUse);
+        if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
             return;
         }
 

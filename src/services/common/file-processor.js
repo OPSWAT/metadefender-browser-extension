@@ -38,30 +38,6 @@ class FileProcessor {
         file.canBeSanitized = file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
         file.statusLabel = file.getScanStatusLabel();
 
-        const getDomain = (url) => {
-            return new Promise((resolve, reject) => {
-                try {
-                    if (url.startsWith('blob:')) {
-                        url = url.substring(5);
-                    }
-                    let urlObj = new URL(url);
-                    let hostname = urlObj.hostname;
-                    hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
-                    resolve(hostname);
-                } catch (error) {
-                    reject('Invalid URL');
-                }
-            });
-        };
-
-        if (downloadItem) {
-            const urlToUse = downloadItem.referrer || downloadItem.url;
-            const domain = await getDomain(urlToUse);
-            if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
-                return;
-            }
-        }
-
         let fileData = null;
         BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
         try {
