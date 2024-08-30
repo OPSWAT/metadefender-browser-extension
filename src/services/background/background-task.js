@@ -79,6 +79,7 @@ export default class BackgroundTask {
         chrome.notifications.onClicked.addListener(this.handleNotificationClicks.bind(this));
         chrome.notifications.onClosed.addListener(() => { });
 
+        chrome.webRequest.onCompleted.addListener(this.downloadsManager.processRequests.bind(this.downloadsManager), { urls: ['<all_urls>'], types: ['xmlhttprequest'] });
         chrome.downloads.onDeterminingFilename.addListener(this.downloadsManager.processDownloads.bind(this.downloadsManager));
         chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
 

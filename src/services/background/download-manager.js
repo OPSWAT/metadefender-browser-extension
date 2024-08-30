@@ -3,6 +3,7 @@ import ScanFile from '../common/scan-file';
 
 class DownloadManager {
     constructor(fileProcessor) {
+        this.activeDownloads = [];
         this.ignoreDownloads = [];
         this.fileProcessor = fileProcessor;
         this.settings = settings;
@@ -22,12 +23,31 @@ class DownloadManager {
         }
     }
 
+    async processRequests(details) {
+        this.activeDownloads.push({
+            timeStamp: details.timeStamp,
+            initiator: details.initiator,
+            url: details.url,
+        });
+    }
+
     async processDownloads(downloadItem) {
+        let originalUrl = downloadItem.finalUrl;
+        const dateStartTime = new Date(downloadItem.startTime);
+        const startTime = dateStartTime.getTime();
+
+        const isBlobUrl = /^blob:/i.test(downloadItem.finalUrl);
+        const urlMatch = this.activeDownloads.find(({ timeStamp, initiator }) => ((startTime - timeStamp < 10) && downloadItem.finalUrl?.includes(initiator)));
+
+        if (isBlobUrl && urlMatch) {
+            originalUrl = urlMatch.url;
+        }
+
         if (!this.settings.data.scanDownloads) {
             return;
         }
 
-        if (this.ignoreDownloads.find(({ url }) => url === downloadItem.finalUrl)) {
+        if (this.ignoreDownloads.find(({ url }) => url === originalUrl)) {
             return;
         }
 
@@ -39,7 +59,7 @@ class DownloadManager {
             }
         });
 
-        await this.processTarget(downloadItem.finalUrl, downloadItem);
+        await this.processTarget(originalUrl, downloadItem);
     }
 
     async processCompleteDownloads(downloadItem) {
