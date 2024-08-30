@@ -259,15 +259,11 @@ class FileProcessor {
      * @param {*} fileData file content
      */
     async scanWithCore(file, fileData) {
-        let response = await CoreClient.hash.lookup(file.md5);
-
-        if (!response?.data_id || response?.error) {
-            response = await CoreClient.file.upload({
-                fileData: fileData,
-                fileName: file.fileName,
-                rule: settings.data.coreRule
-            });
-        }
+        let response = await CoreClient.file.upload({
+            fileData: fileData,
+            fileName: file.fileName,
+            rule: settings.data.coreRule
+        });
 
         return response;
     }
