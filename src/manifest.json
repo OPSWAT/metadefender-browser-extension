@@ -29,7 +29,8 @@
     "notifications",
     "scripting",
     "storage",
-    "tabs"
+    "tabs",
+    "webRequest"
   ],
   "host_permissions": [
     "http://*/",

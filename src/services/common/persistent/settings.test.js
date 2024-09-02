@@ -7,20 +7,6 @@ describe('settings', () => {
 
     const key = '/* @echo storageKey.settings */';
 
-    const initialData = {
-        scanDownloads: false,
-        shareResults: true,
-        showNotifications: true,
-        saveCleanFiles: false,
-        safeUrl: false,
-        useCore: false,
-        coreUrl: '',
-        coreApikey: '',
-        coreRule: '',
-        coreV4: false,
-        rules: []
-    };
-
     beforeEach(() => {
         jest.clearAllMocks();
     });

@@ -50,6 +50,10 @@
                     }
                 }
             }
+
+            & .infected {
+                color: $red;
+            }
         }
 
         .icon-spin {
