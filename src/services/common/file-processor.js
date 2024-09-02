@@ -20,6 +20,8 @@ class FileProcessor {
      * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
      */
     async processTarget(linkUrl, downloadItem) {
+        const isDownload = !!downloadItem;
+
         await apikeyInfo.load();
         if (!apikeyInfo.data.apikey) {
             BrowserNotification.create(chrome.i18n.getMessage('undefinedApiKey'));
@@ -56,7 +58,7 @@ class FileProcessor {
 
         await scanHistory.addFile(file);
 
-        await this.scanFile(file, linkUrl, fileData);
+        await this.scanFile(file, linkUrl, fileData, isDownload);
     }
 
     /**
@@ -101,9 +103,10 @@ class FileProcessor {
      * @param {*} file file info
      * @param {*} info file scan result
      * @param {string} linkUrl file file url
+     * @param {boolean} isDownload downloadItem boolean
      * @returns {Promise.<void>}
      */
-    async handleFileScanResults(file, info, linkUrl) {
+    async handleFileScanResults(file, info, linkUrl, isDownload) {
         if (info.scan_results) {
             file.status = new ScanFile().getScanStatus(info.scan_results.scan_all_result_i);
             file.statusLabel = new ScanFile().getScanStatusLabel(info.scan_results.scan_all_result_i);
@@ -147,6 +150,7 @@ class FileProcessor {
             status: file.status,
             linkUrl,
             name: file.fileName,
+            isDownload,
         });
     }
 
@@ -154,9 +158,10 @@ class FileProcessor {
      *
      * @param {*} file file info
      * @param {string} linkUrl  file file url
+     * @param {boolean} isDownload downloadItem boolean
      * @returns {Promise.<void>}
      */
-    async startStatusPolling(file, linkUrl) {
+    async startStatusPolling(file, linkUrl, isDownload) {
         let response;
 
         if (file.useCore) {
@@ -177,7 +182,7 @@ class FileProcessor {
             return;
         }
 
-        await this.handleFileScanResults(file, response, linkUrl);
+        await this.handleFileScanResults(file, response, linkUrl, isDownload);
     }
 
     /**
@@ -185,8 +190,9 @@ class FileProcessor {
      * @param {*} file file information
      * @param {string} linkUrl file url
      * @param {*} fileData file content
+     * @param {boolean} isDownload downloadItem boolean
      */
-    async scanFile(file, linkUrl, fileData) {
+    async scanFile(file, linkUrl, fileData, isDownload) {
         const customFileSizeError = 'Custom file size limit exceeded';
         const fileSizeLimit = Number(settings.data.fileSizeLimit) * 1000000;
 
@@ -205,7 +211,7 @@ class FileProcessor {
 
             file.dataId = response?.data_id;
 
-            await this.startStatusPolling(file, linkUrl);
+            await this.startStatusPolling(file, linkUrl, isDownload);
         } catch (error) {
             file.scan_results = {
                 scan_all_result_i: 10
