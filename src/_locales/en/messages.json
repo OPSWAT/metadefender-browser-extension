@@ -94,7 +94,7 @@
     "description": ""
   },
   "scanDownloads": {
-    "message": "Scan downloads<div class='text-secondary text-14'>Automatically scan all downloaded files. Files are scanned only after the file is downloaded on the computer. A notification* will inform you when the scan is complete.</div>",
+    "message": "Scan downloads<div class='text-secondary text-14'>Automatically scan all downloaded files. A notification* will inform you when the scan is complete.</div>",
     "description": ""
   },
   "scanDownloadsSub": {

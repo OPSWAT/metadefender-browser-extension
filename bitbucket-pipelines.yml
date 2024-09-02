@@ -8,6 +8,16 @@ pipelines:
   branches:
     "{master}":
       - step:
+          name: Run Unit tests
+          script:
+            - npm i --legacy-peer-deps;
+            - npm run coverage;
+          artifacts:
+            - coverage/**
+          services:
+            - docker
+          size: 2x
+      - step:
           name: SonarQube analysis
           script:
             - pipe: sonarsource/sonarqube-scan:2.0.1
