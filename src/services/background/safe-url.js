@@ -25,14 +25,6 @@ const cleanUrls = new Set();
 /**
  * Removes old urls that were marked as clean
  */
-const removeOldUrls = () => {
-    if (cleanUrls.size > MCL.config.maxCleanUrls) {
-        const firstValue = cleanUrls.values().next().value;
-        cleanUrls.delete(firstValue);
-    }
-};
-
-console.log('removeOldUrls', removeOldUrls)
 
 export const getDomain = (url) => {
     return new Promise((resolve, reject) => {
