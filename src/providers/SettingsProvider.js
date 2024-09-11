@@ -63,7 +63,7 @@ export const validateCustomApikey = async (newCustomApikey) => {
 export const SettingsProvider = ({ children }) => {
 
     const config = useContext(ConfigContext);
-    const [settingsData, setSettingsData] = useState(settings.data);
+    const [settingsData, setSettingsData] = useState(settings?.data);
     const [isAllowedFileSchemeAccess, setIsAllowedFileSchemeAccess] = useState(true); // ToDo: move to BrowserProvider
 
     const getScanRules = async (newApikey, newUrl) => {
@@ -216,10 +216,10 @@ export const SettingsProvider = ({ children }) => {
     };
 
     const updateSettings = async (key, newSettingsData) => {
-        const newSettings = { ...settings.data };
+        const newSettings = { ...settings?.data };
         const backgroundTask = new BackgroundTask();
         const cookie = await cookieManager.get();
-        const authCookie = JSON.parse(cookie.value);
+        const authCookie = cookie?.value && JSON?.parse(cookie?.value);
 
         switch (key) {
             case 'fileSettings': {
@@ -256,9 +256,9 @@ export const SettingsProvider = ({ children }) => {
                 break;
         }
 
-        settings.merge(newSettings);
-        await settings.save();
-        setSettingsData({ ...settings.data });
+        settings?.merge(newSettings);
+        await settings?.save();
+        setSettingsData({ ...settings?.data });
 
         GaTrack(['_trackEvent', config.gaEventCategory.name, config.gaEventCategory.action.settingsChanged, key, (newSettings[key] ? 'enabled' : 'disabled')]);
     };
@@ -274,7 +274,7 @@ export const SettingsProvider = ({ children }) => {
 
     useEffect(() => {
         (async () => {
-            await settings.init();
+            await settings?.init();
             setIsAllowedFileSchemeAccess(await BrowserExtension.isAllowedFileSchemeAccess());
             setSettingsData({ ...settings.data });
         })();
@@ -294,7 +294,10 @@ export const SettingsProvider = ({ children }) => {
             isAllowedFileSchemeAccess,
             getScanRules,
         }}>
-            {children}
+            <div data-testid="settings-available">
+                {children}
+            </div>
+
         </SettingsContext.Provider>
     );
 
