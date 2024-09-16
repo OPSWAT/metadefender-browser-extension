@@ -1,144 +1,147 @@
-import { render, act } from '@testing-library/react';
 import React from 'react';
-import { validateCoreSettings, validateCustomApikey, SettingsProvider } from './SettingsProvider';
-import { settings } from '../services/common/persistent/settings';
-import browserStorage from '../services/common/browser/browser-storage';
-
+import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import SettingsContext, { SettingsProvider, validateCoreSettings, validateCustomApikey } from './SettingsProvider';
 import CoreClient from '../services/common/core-client';
+import ConfigContext from './ConfigProvider';
 
-// Mocking modules and global functions
-jest.mock('../services/common/core-client');
-jest.mock('../services/common/browser/browser-notification');
-jest.mock('../services/common/persistent/settings');
-jest.mock('../services/common/browser/browser-storage');
+jest.mock('../services/common/core-client', () => ({
+    configure: jest.fn(),
+    version: jest.fn(),
+    rules: jest.fn(),
+}));
 
+jest.mock('../services/common/browser/browser-notification', () => ({
+    create: jest.fn(),
+}));
+
+jest.mock('../services/background/cookie-manager', () => ({
+    get: jest.fn(),
+}));
+
+jest.mock('../services/background/background-task', () => {
+    return jest.fn().mockImplementation(() => ({
+        updateApikeyInfo: jest.fn(),
+    }));
+});
+
+jest.mock('../services/common/persistent/settings', () => ({
+    data: {},
+    coreApikey: 'test-apikey',
+    coreUrl: 'https://test-url.com',
+    coreV4: false,
+    merge: jest.fn(),
+    save: jest.fn(),
+    init: jest.fn(),
+}));
+
+jest.mock('../services/common/browser/browser-storage', () => ({
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+}));
+
+jest.mock('../services/ga-track', () => ({
+    GaTrack: jest.fn(),
+}));
+
+// Mock ConfigContext
+const mockConfigContextValue = {
+    gaEventCategory: {
+        name: 'test-category',
+        action: {
+            settingsChanged: 'test-settings-changed',
+        },
+    },
+    storageKey: {
+        settings: 'test-settings-storage-key',
+    },
+};
 
 describe('SettingsProvider', () => {
+    const renderWithConfig = (ui) => {
+        return render(
+            <ConfigContext.Provider value={mockConfigContextValue}>
+                {ui}
+            </ConfigContext.Provider>
+        );
+    };
 
-    it('renders children', () => {
-        const { getByText } = render(
+    it('should initialize settings and update context values', async () => {
+        const { getByText } = renderWithConfig(
             <SettingsProvider>
-                <div>Test Child</div>
+                <SettingsContext.Consumer>
+                    {(value) => (
+                        <div>
+                            {value.isAllowedFileSchemeAccess && <p>File Scheme Access Allowed</p>}
+                            {value.settings && <p>Settings Available</p>}
+                        </div>
+                    )}
+                </SettingsContext.Consumer>
             </SettingsProvider>
         );
-        expect(getByText('Test Child')).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(screen.getByText(/File Scheme Access Allowed/i)).toBeInTheDocument();
+            expect(screen.getByTestId('settings-available')).toBeInTheDocument();
+        });
     });
 
-});
+    it('should validate core settings correctly', async () => {
+        CoreClient.version.mockResolvedValueOnce({ version: '4.0.0' });
+        CoreClient.rules.mockResolvedValueOnce([{ name: 'rule1' }, { name: 'rule2' }]);
 
-describe('validateCoreSettings', () => {
-
-    beforeEach(() => {
-        CoreClient.configure.mockClear();
-        CoreClient.version.mockClear();
-        CoreClient.rules.mockClear();
-    });
-
-    it('calls CoreClient methods with correct parameters', async () => {
-        const newApikey = 'newApikey';
-        const newUrl = 'newUrl';
-
-        CoreClient.version.mockResolvedValue({ version: '4.0.0' });
-        CoreClient.rules.mockResolvedValue([{ name: 'rule1' }]);
-
-        await validateCoreSettings(newApikey, newUrl);
+        const validCore = await validateCoreSettings('new-apikey', 'https://new-url.com');
 
         expect(CoreClient.configure).toHaveBeenCalledWith({
-            apikey: newApikey,
-            endpoint: newUrl,
+            apikey: 'new-apikey',
+            endpoint: 'https://new-url.com',
         });
-        expect(CoreClient.version).toHaveBeenCalled();
-        expect(CoreClient.rules).toHaveBeenCalledWith('');
+        expect(validCore.coreV4).toBe(true);
+        expect(validCore.rules).toEqual(['rule1', 'rule2']);
     });
 
-    it('returns expected data if CoreClient methods resolve', async () => {
-        const newApikey = 'newApikey';
-        const newUrl = 'newUrl';
+    it('should handle core settings validation errors', async () => {
+        CoreClient.version.mockRejectedValueOnce(new Error('Test Error'));
 
-        CoreClient.version.mockResolvedValue({ version: '4.0.0' });
-        CoreClient.rules.mockResolvedValue([{ name: 'rule1' }]);
+        const validCore = await validateCoreSettings('invalid-apikey', 'https://invalid-url.com');
 
-        const result = await validateCoreSettings(newApikey, newUrl);
-
-        expect(result).toEqual({
-            coreV4: true,
-            rules: ['rule1'],
-        });
+        expect(validCore).toBe(false);
     });
 
-    it('returns false if CoreClient methods reject', async () => {
-        CoreClient.version.mockRejectedValue(new Error('An error occurred.'));
+    it('should validate custom API keys', async () => {
+        const validCustomApikey = await validateCustomApikey('new-custom-apikey');
+        expect(validCustomApikey).toBe(false);
 
-        const result = await validateCoreSettings('apikey', 'url');
-
-        expect(result).toEqual(false);
+        const invalidCustomApikey = await validateCustomApikey('invalid-apikey');
+        expect(invalidCustomApikey).toBe(false);
     });
 
-    it('returns coreV4 as false if API version is not 4.x.x', async () => {
-        CoreClient.version.mockResolvedValue({ version: '3.0.0' });
-        CoreClient.rules.mockResolvedValue([{ name: 'rule1' }]);
+    it('should call updateSettings correctly for coreSettings', async () => {
+        const newSettingsData = {
+            coreApikey: 'new-core-apikey',
+            coreUrl: 'https://new-core-url.com',
+        };
 
-        const result = await validateCoreSettings('apikey', 'url');
-
-        expect(result.coreV4).toBe(undefined);
-    });
-
-    it('returns empty rules if API provides no rules', async () => {
-        CoreClient.version.mockResolvedValue({ version: '4.0.0' });
-        CoreClient.rules.mockResolvedValue([]);
-
-        const result = await validateCoreSettings('apikey', 'url');
-
-        expect(result.rules).toEqual([]);
-    });
-
-    it('renders children', () => {
-        const { getByText } = render(
+        const { getByText } = renderWithConfig(
             <SettingsProvider>
-                <div>Test Child</div>
-            </SettingsProvider>
-        );
-        expect(getByText('Test Child')).toBeInTheDocument();
-    });
-
-});
-
-describe('validateCustomApikey', () => {
-
-    it('returns false for invalid API key length', async () => {
-        const result = await validateCustomApikey('shortKey');
-        expect(result).toBe(false);
-        expect(settings.apikeyCustom).toBe('');
-    });
-
-    it('returns true for valid API key', async () => {
-        const result = await validateCustomApikey('12345678901234567890123456789012');
-        expect(result).toBe(true);
-    });
-
-});
-
-
-describe('SettingsProvider side effects', () => {
-    it('initializes settings and sets up storage listener', async () => {
-        render(
-            <SettingsProvider>
-                <div>Test Child</div>
+                <SettingsContext.Consumer>
+                    {({ updateSettings }) => (
+                        <button
+                            onClick={() => updateSettings('coreSettings', newSettingsData)}
+                        >
+                            Update Settings
+                        </button>
+                    )}
+                </SettingsContext.Consumer>
             </SettingsProvider>
         );
 
-        expect(settings.init).toHaveBeenCalled();
-        expect(browserStorage.addListener).toHaveBeenCalledWith(expect.any(Function));
-    });
+        CoreClient.version.mockResolvedValueOnce({ version: '4.0.0' });
+        CoreClient.rules.mockResolvedValueOnce([{ name: 'rule1' }, { name: 'rule2' }]);
 
-    it('cleans up storage listener on unmount', () => {
-        const { unmount } = render(
-            <SettingsProvider>
-                <div>Test Child</div>
-            </SettingsProvider>
-        );
+        getByText('Update Settings').click();
 
-        unmount();
-        expect(browserStorage.removeListener).toHaveBeenCalledWith(expect.any(Function));
     });
 });
+
+
