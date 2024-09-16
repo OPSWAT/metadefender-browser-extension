@@ -9,6 +9,7 @@ import MetascanClient from '../common/metascan-client';
 import { apikeyInfo } from '../common/persistent/apikey-info';
 import { scanHistory } from '../common/persistent/scan-history';
 import { settings } from '../common/persistent/settings';
+import { getDomain } from '../background/safe-url';
 
 
 export const ON_SCAN_COMPLETE_LISTENERS = [];
@@ -37,22 +38,6 @@ class FileProcessor {
         file.extension = file.fileName.split('.').pop();
         file.canBeSanitized = file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
         file.statusLabel = file.getScanStatusLabel();
-
-        const getDomain = (url) => {
-            return new Promise((resolve, reject) => {
-                try {
-                    if (url.startsWith('blob:')) {
-                        url = url.substring(5);
-                    }
-                    let urlObj = new URL(url);
-                    let hostname = urlObj.hostname;
-                    hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
-                    resolve(hostname);
-                } catch (error) {
-                    reject('Invalid URL');
-                }
-            });
-        };
 
         if (downloadItem) {
             const urlToUse = downloadItem.referrer || downloadItem.url;
