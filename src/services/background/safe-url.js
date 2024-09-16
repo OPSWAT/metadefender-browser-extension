@@ -25,12 +25,23 @@ const cleanUrls = new Set();
 /**
  * Removes old urls that were marked as clean
  */
-const removeOldUrls = () => {
-    if (cleanUrls.size > MCL.config.maxCleanUrls) {
-        const firstValue = cleanUrls.values().next().value;
-        cleanUrls.delete(firstValue);
-    }
+
+export const getDomain = (url) => {
+    return new Promise((resolve, reject) => {
+        try {
+            if (url.startsWith('blob:')) {
+                url = url.substring(5);
+            }
+            let urlObj = new URL(url);
+            let hostname = urlObj.hostname;
+            hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
+            resolve(hostname);
+        } catch (error) {
+            reject('Invalid URL');
+        }
+    });
 };
+
 
 /**
  * Save the url as infected or not.
@@ -54,10 +65,9 @@ const handleUrlValidatorResponse = (testUrl, err, res) => {
     catch (e) {
         cleanUrls.add(testUrl);
     }
-    removeOldUrls();
 };
 
-export const isSafeUrl = (testUrl, urlValidator) => {
+export const isSafeUrl = async (testUrl, urlValidator) => {
     return fetch(urlValidator, { sync: true, headers: { noredirect: true } })
         .then(res => handleUrlValidatorResponse(testUrl, null, res))
         .catch(err => handleUrlValidatorResponse(testUrl, err, null));
@@ -72,7 +82,12 @@ export const isSafeUrl = (testUrl, urlValidator) => {
  * @param {object} tab tab object 
  */
 export const doSafeRedirect = async (tabId, changeInfo, tab) => {
+
     const tabUrl = tab.url;
+    const domain = await getDomain(tabUrl);
+    if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
+        return;
+    }
 
     if (changeInfo.status === 'loading' && !tabUrl.startsWith(safeRedirectEndpoint)) {
         const shortUrl = tabUrl.split('?')[0];
