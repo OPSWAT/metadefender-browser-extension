@@ -9,6 +9,7 @@ import MetascanClient from '../common/metascan-client';
 import { apikeyInfo } from '../common/persistent/apikey-info';
 import { scanHistory } from '../common/persistent/scan-history';
 import { settings } from '../common/persistent/settings';
+import { getDomain } from '../background/safe-url';
 
 
 export const ON_SCAN_COMPLETE_LISTENERS = [];
@@ -20,8 +21,6 @@ class FileProcessor {
      * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
      */
     async processTarget(linkUrl, downloadItem) {
-        const isDownload = !!downloadItem;
-
         await apikeyInfo.load();
         if (!apikeyInfo.data.apikey) {
             BrowserNotification.create(chrome.i18n.getMessage('undefinedApiKey'));
@@ -40,10 +39,19 @@ class FileProcessor {
         file.canBeSanitized = file.extension && SANITIZATION_FILE_TYPES.indexOf(file.extension.toLowerCase()) > -1;
         file.statusLabel = file.getScanStatusLabel();
 
+        if (downloadItem) {
+            const urlToUse = downloadItem.referrer || downloadItem.url;
+            const domain = await getDomain(urlToUse);
+            if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
+                return;
+            }
+        }
+
         let fileData = null;
         BrowserNotification.create(chrome.i18n.getMessage('scanStarted') + file.fileName, file.id);
         try {
-            fileData = await file.getFileData(linkUrl);
+            const fileUrl = downloadItem ? downloadItem.localPath || 'file://' + downloadItem.filename : linkUrl;
+            fileData = await file.getFileData(fileUrl);
             file.size = fileData.size;
         } catch (error) {
             BrowserNotification.create(error.message);
@@ -58,7 +66,7 @@ class FileProcessor {
 
         await scanHistory.addFile(file);
 
-        await this.scanFile(file, linkUrl, fileData, isDownload);
+        await this.scanFile(file, linkUrl, fileData, downloadItem);
     }
 
     /**
@@ -103,16 +111,17 @@ class FileProcessor {
      * @param {*} file file info
      * @param {*} info file scan result
      * @param {string} linkUrl file file url
-     * @param {boolean} isDownload downloadItem boolean
+     * @param {*} fileData file content
+     * @param {boolean} downloaded flag for files that are already downloaded
      * @returns {Promise.<void>}
      */
-    async handleFileScanResults(file, info, linkUrl, isDownload) {
-        if (info.scan_results) {
+    async handleFileScanResults(file, info, linkUrl, fileData, downloaded) {
+        if (info?.scan_results) {
             file.status = new ScanFile().getScanStatus(info.scan_results.scan_all_result_i);
             file.statusLabel = new ScanFile().getScanStatusLabel(info.scan_results.scan_all_result_i);
         }
-        file.sha256 = info.file_info.sha256;
-        file.dataId = info.data_id;
+        file.sha256 = info?.file_info?.sha256;
+        file.dataId = info?.data_id;
 
         if (file.useCore) {
             if (settings.data.coreV4 === true) {
@@ -134,7 +143,7 @@ class FileProcessor {
         }
         else {
             file.scanResults = `${MCL.config.mclDomain}/results/file/${file.dataId}/regular/overview`;
-            if (info?.sanitized?.file_path && !Object.hasOwn(file, 'sanitizedFileURL')) {
+            if (info?.sanitized?.file_path && !Object.prototype.hasOwnProperty.call(file, 'sanitizedFileURL')) {
                 file.sanitizedFileURL = info.sanitized.file_path;
             }
         }
@@ -148,9 +157,10 @@ class FileProcessor {
 
         this.callOnScanCompleteListeners({
             status: file.status,
+            downloaded,
+            fileData,
             linkUrl,
-            name: file.fileName,
-            isDownload,
+            name: file.fileName
         });
     }
 
@@ -158,10 +168,11 @@ class FileProcessor {
      *
      * @param {*} file file info
      * @param {string} linkUrl  file file url
-     * @param {boolean} isDownload downloadItem boolean
+     * @param {*} fileData file content
+     * @param {boolean} downloaded flag for files that are already downloaded
      * @returns {Promise.<void>}
      */
-    async startStatusPolling(file, linkUrl, isDownload) {
+    async startStatusPolling(file, linkUrl, fileData, downloaded) {
         let response;
 
         if (file.useCore) {
@@ -175,14 +186,14 @@ class FileProcessor {
         } else {
             file.scanResults = `${MCL.config.mclDomain}/results/file/${file.dataId}/regular/overview`;
             await scanHistory.save();
-            response = await MetascanClient.setAuth(apikeyInfo.data.apikey).file.poolForResults(file.dataId, 3000);
+            response = await MetascanClient.setAuth(apikeyInfo.data.apikey)?.file?.poolForResults(file.dataId, 3000);
         }
 
-        if (response.error) {
+        if (response?.error) {
             return;
         }
 
-        await this.handleFileScanResults(file, response, linkUrl, isDownload);
+        await this.handleFileScanResults(file, response, linkUrl, fileData, downloaded);
     }
 
     /**
@@ -190,9 +201,9 @@ class FileProcessor {
      * @param {*} file file information
      * @param {string} linkUrl file url
      * @param {*} fileData file content
-     * @param {boolean} isDownload downloadItem boolean
+     * @param {*} downloadItem https://developer.chrome.com/extensions/downloads#type-DownloadItem
      */
-    async scanFile(file, linkUrl, fileData, isDownload) {
+    async scanFile(file, linkUrl, fileData, downloadItem) {
         const customFileSizeError = 'Custom file size limit exceeded';
         const fileSizeLimit = Number(settings.data.fileSizeLimit) * 1000000;
 
@@ -211,7 +222,7 @@ class FileProcessor {
 
             file.dataId = response?.data_id;
 
-            await this.startStatusPolling(file, linkUrl, isDownload);
+            await this.startStatusPolling(file, linkUrl, fileData, !!downloadItem);
         } catch (error) {
             file.scan_results = {
                 scan_all_result_i: 10
@@ -241,11 +252,15 @@ class FileProcessor {
      * @param {*} fileData file content
      */
     async scanWithCore(file, fileData) {
-        let response = await CoreClient.file.upload({
-            fileData: fileData,
-            fileName: file.fileName,
-            rule: settings.data.coreRule
-        });
+        let response = await CoreClient.hash.lookup(file.md5);
+
+        if (!response?.data_id || response?.error) {
+            response = await CoreClient.file.upload({
+                fileData: fileData,
+                fileName: file.fileName,
+                rule: settings.data.coreRule
+            });
+        }
 
         return response;
     }
