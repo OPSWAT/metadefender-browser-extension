@@ -219,7 +219,7 @@
             .form-check-input:checked+.form-check-label {
                 &:before {
                     content: '\e808';
-                    font-family: mcl-ext-icons;
+                    font-family: mcl-ext-icons, sans-serif;
                     background-color: $secondaryColor !important;
                     border: 1px solid $secondaryColor;
                     color: $colorWhite;
