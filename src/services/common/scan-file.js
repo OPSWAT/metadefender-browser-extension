@@ -1,11 +1,10 @@
-import mime from 'mime-types';
 import moment from 'moment';
 import SparkMD5 from 'spark-md5';
 import uniqid from 'uniqid';
 import MCL from '../../config/config';
 import { SCAN_STATUS } from '../constants/file';
-function ScanFile() {
 
+function ScanFile() {
     return {
         id: uniqid(),
         fileName: null,
@@ -20,7 +19,6 @@ function ScanFile() {
         // methods
         getScanStatus: getScanStatus,
         getScanStatusLabel: getScanStatusLabel,
-        download: download,
         isSanitizedFile: isSanitizedFile,
         getFileName: getFileName,
         getFileData: getFileData,
@@ -35,36 +33,6 @@ ScanFile.STATUS = SCAN_STATUS.VALUES;
 
 ScanFile.STATUS_VALUES_CLEAN = SCAN_STATUS.CLEAN_VALUES;
 ScanFile.STATUS_VALUES_INFECTED = SCAN_STATUS.INFECTED_VALUES;
-
-
-async function download(link, fileData, fileName) {
-    let fileUrl;
-    let URL;
-
-    if (typeof window !== 'undefined') {
-        URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
-    }
-
-    const fileExtension = fileName?.match(/(?<=\.)[^.]*$/);
-    const fileType = Array.isArray(fileExtension) ? mime.lookup(fileExtension[0]) : 'text/plain';
-
-    try {
-        fileUrl = URL.createObjectURL(new Blob([fileData], { type: fileType }));
-    }
-    catch (e) {
-        // fallback
-        fileUrl = link;
-    }
-
-    return new Promise((resolve) => {
-        chrome.downloads.download({
-            url: fileUrl,
-            filename: fileName
-        }, (downloadId) => {
-            resolve(downloadId);
-        });
-    });
-}
 
 /**
  * Checks if an URL points to a sanitized file.
@@ -96,7 +64,7 @@ function isSanitizedFile(url) {
  */
 async function getFileName(url, downloadItem) {
     if (downloadItem) {
-        return downloadItem.filename.split('/').pop();
+        return downloadItem.filename;
     }
     const fileUrl = await fetch(url, { method: 'HEAD', redirect: 'follow' })
         .then(response => response.url)

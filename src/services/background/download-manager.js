@@ -1,6 +1,22 @@
 import { settings } from '../common/persistent/settings';
 import ScanFile from '../common/scan-file';
 
+const getDomain = (url) => {
+    return new Promise((resolve, reject) => {
+        try {
+            if (url.startsWith('blob:')) {
+                url = url.substring(5);
+            }
+            let urlObj = new URL(url);
+            let hostname = urlObj.hostname;
+            hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
+            resolve(hostname);
+        } catch (error) {
+            reject('Invalid URL');
+        }
+    });
+};
+
 class DownloadManager {
     constructor(fileProcessor) {
         this.activeDownloads = [];
@@ -12,83 +28,69 @@ class DownloadManager {
     }
 
     async onScanComplete(payload) {
-        const { status, downloaded, fileData, linkUrl, name } = payload;
+        const { status, linkUrl, name, isDownload } = payload;
 
-        if (this.settings.data.saveCleanFiles && status === ScanFile.STATUS.CLEAN && !downloaded) {
-            const dlId = await ScanFile().download(linkUrl, fileData, name);
-            this.ignoreDownloads.push(dlId);
+        const isScanDownloads = this.settings.data.scanDownloads && isDownload && status === ScanFile.STATUS.CLEAN;
+        const isSaveCleanFiles = this.settings.data.saveCleanFiles && status === ScanFile.STATUS.CLEAN;
+
+        if (isScanDownloads || isSaveCleanFiles) {
+            this.ignoreDownloads.push({ id: '', url: linkUrl });
+            chrome.downloads.download({ url: linkUrl, filename: name }, (downloadId) => {
+                const item = this.ignoreDownloads.find(({ url }) => url === linkUrl);
+                item.id = downloadId;
+            });
         }
     }
 
-    trackInProgressDownloads(downloadItem) {
-        if (!settings.data.scanDownloads) {
-            return;
-        }
-
-        if (downloadItem.state === 'in_progress') {
-            this.activeDownloads[downloadItem?.id] = downloadItem;
-        }
+    async processRequests(details) {
+        this.activeDownloads.push({
+            timeStamp: details.timeStamp,
+            initiator: details.initiator,
+            url: details.url,
+        });
     }
 
-    /**
-     * Updates active file downloads.
-     * 
-     * @param downloadItem
-     * @returns {Promise.<void>}
-     */
-    updateActiveDownloads(downloadItem) {
-        const ignoreDownloads = this.ignoreDownloads;
-        const activeDownloads = this.activeDownloads;
+    async processDownloads(downloadItem) {
+        let originalUrl = downloadItem.finalUrl;
+        const dateStartTime = new Date(downloadItem.startTime);
+        const startTime = dateStartTime.getTime();
 
-        if (!this.settings.data.scanDownloads || typeof downloadItem.filename === 'undefined') {
+        const isBlobUrl = /^blob:/i.test(downloadItem.finalUrl);
+        const urlMatch = this.activeDownloads.find(({ timeStamp, initiator }) => ((startTime - timeStamp < 10) && downloadItem.finalUrl?.includes(initiator)));
+
+        if (isBlobUrl && urlMatch) {
+            originalUrl = urlMatch.url;
+        }
+
+        if (!this.settings.data.scanDownloads) {
             return;
         }
 
-        const ignoreDl = ignoreDownloads.indexOf(downloadItem?.id);
-        if (ignoreDl >= 0) {
-
-            // download initiated by extension, don't download again
-            ignoreDownloads.splice(ignoreDownloads.indexOf(downloadItem?.id), 1);
-            delete activeDownloads[downloadItem?.id];
+        if (this.ignoreDownloads.find(({ url }) => url === originalUrl)) {
             return;
         }
 
-        const filepath = downloadItem.filename.current;
-
-        let idx = filepath.lastIndexOf('\\');
-        if (idx === -1) {
-            idx = filepath.lastIndexOf('/');
+        const urlToUse = downloadItem.referrer || downloadItem.url;
+        const domain = await getDomain(urlToUse);
+        if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
+            return;
         }
-        const filename = filepath.substring(idx + 1);
 
-        activeDownloads[downloadItem?.id].filename = filename;
-        activeDownloads[downloadItem?.id].localPath = 'file://' + filepath;
+        chrome.downloads.search({ id: downloadItem.id }, (results) => {
+            const item = results?.shift();
+            const itemId = item?.id;
+            if (itemId) {
+                chrome.downloads.cancel(itemId);
+            }
+        });
+
+        await this.processTarget(originalUrl, downloadItem);
     }
 
-    /**
-     * Process completed file downloads.
-     * 
-     * @param downloadItem
-     * @returns {Promise.<void>}
-     */
     async processCompleteDownloads(downloadItem) {
-        const settings = this.settings;
-        const activeDownloads = this.activeDownloads;
-        if (!settings.data?.scanDownloads) {
-            return;
+        if (downloadItem?.state?.current === 'complete') {
+            this.ignoreDownloads = this.ignoreDownloads.filter(({ id }) => id !== downloadItem.id);
         }
-
-        if (typeof downloadItem.state === 'undefined' || downloadItem?.state?.current !== 'complete') {
-            return;
-        }
-
-        if (!activeDownloads[downloadItem?.id]) {
-            return;
-        }
-
-        downloadItem = activeDownloads[downloadItem?.id];
-        await this.processTarget(downloadItem.url, downloadItem);
-        delete activeDownloads[downloadItem?.id];
     }
 
     /**

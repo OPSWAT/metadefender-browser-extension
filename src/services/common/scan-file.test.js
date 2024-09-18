@@ -11,19 +11,10 @@ describe('scan-file', () => {
     const url = 'http://mock.com';
     const urlSafe = 'https://mocl.t.files.metadefender.com';
     const urlMdcSafe = 'https://mock/file/converted/mock?apikey=mockApyKey';
-    const filename = 'mock.txt';
     const file = new Blob(['This is some file content'], { type: 'text/plain' });
 
     beforeEach(() => {
         mockFetch.mockImplementation(() => Promise.resolve({ json: () => Promise.resolve(), url: 'mockUrl', headers: { get: () => 200 } }));
-    });
-
-    it('should download a file', () => {
-        const downloadSpy = jest.spyOn(chrome.downloads, 'download');
-
-        scanFile.download(url, {}, filename);
-
-        expect(downloadSpy).toHaveBeenCalledWith({ url, filename }, expect.any(Function));
     });
 
     it('should check if url is sanitezed', () => {
