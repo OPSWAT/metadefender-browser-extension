@@ -107,12 +107,12 @@ class FileProcessor {
      * @returns {Promise.<void>}
      */
     async handleFileScanResults(file, info, linkUrl, isDownload) {
-        if (info.scan_results) {
+        if (info?.scan_results) {
             file.status = new ScanFile().getScanStatus(info.scan_results.scan_all_result_i);
             file.statusLabel = new ScanFile().getScanStatusLabel(info.scan_results.scan_all_result_i);
         }
-        file.sha256 = info.file_info.sha256;
-        file.dataId = info.data_id;
+        file.sha256 = info?.file_info?.sha256;
+        file.dataId = info?.data_id;
 
         if (file.useCore) {
             if (settings.data.coreV4 === true) {
@@ -175,10 +175,10 @@ class FileProcessor {
         } else {
             file.scanResults = `${MCL.config.mclDomain}/results/file/${file.dataId}/regular/overview`;
             await scanHistory.save();
-            response = await MetascanClient.setAuth(apikeyInfo.data.apikey).file.poolForResults(file.dataId, 3000);
+            response = await MetascanClient?.setAuth(apikeyInfo?.data?.apikey)?.file?.poolForResults(file.dataId, 3000);
         }
 
-        if (response.error) {
+        if (response?.error) {
             return;
         }
 
