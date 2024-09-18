@@ -8,7 +8,7 @@ const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess) => {
                 <p>
                     {chrome.i18n.getMessage('fileAccessDisabled')}
                     {' '}
-                    <a href="" onClick={() => {
+                    <button className='buttonCustom' onClick={() => {
                         chrome.tabs.query({ url: `chrome://extensions/?id=${chrome.runtime.id.toString()}` }, (tabs) => {
                             if (tabs.length === 0) {
                                 chrome.tabs.update({ url: `chrome://extensions/?id=${chrome.runtime.id.toString()}` });
@@ -19,7 +19,7 @@ const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess) => {
                         });
                     }}>
                         {chrome.i18n.getMessage('goToExtension')}
-                    </a>
+                    </button>
 
                 </p>
                 <sub className='warning'>{chrome.i18n.getMessage('scanDownloadsSub')}</sub>

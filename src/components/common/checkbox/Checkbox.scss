@@ -4,6 +4,16 @@
 @import '../../../../node_modules/bootstrap/scss/mixins/_breakpoints.scss';
 
 .form-group-wrapper {
+    .buttonCustom {
+        color: $secondaryColor !important;
+        border: none !important;
+        background: none !important;
+    }
+
+    .buttonCustom:hover {
+        color: $colorBlack !important;
+    }
+
     padding: 20px 0;
 
     &:not(:last-of-type) {

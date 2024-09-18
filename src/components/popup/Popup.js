@@ -104,9 +104,9 @@ const Popup = () => {
     return <div className="popup--wrapper">
         <div className="popup--header">
             <div className="popup--header__logo"></div>
-            <a href='#' className="popup--header__btn" onClick={goToSettings}>
+            <button className="popup--header__btn" onClick={goToSettings}>
                 <span className="icon-cog text-14"></span>
-            </a>
+            </button>
         </div>
 
         <div className="popup--scan__history">
@@ -114,10 +114,10 @@ const Popup = () => {
         </div>
 
         <div className={viewScanHistoryClassName}>
-            <a href="#" onClick={goToHistory}>
+            <button className='buttonCustom' onClick={goToHistory}>
                 View Scan History
                 <span className="mcl-icon icon-right"></span>
-            </a>
+            </button>
         </div>
     </div>;
 };

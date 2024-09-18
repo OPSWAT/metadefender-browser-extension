@@ -31,9 +31,9 @@ const ScanHistoryTableRow = ({ fileName, scanUrl, hash, scanTime, results, remov
             <span className={`${getStatusIcon(status)} ${cleanClassName}`} />
         </td>
         <td className="p-0">
-            <a href="#" onClick={removeFile} title={chrome.i18n.getMessage('deleteTooltip')} className='trash'>
+            <button onClick={removeFile} title={chrome.i18n.getMessage('deleteTooltip')} className='trash'>
                 <span className={trashClassName} />
-            </a>
+            </button>
         </td>
     </tr>;
 };
