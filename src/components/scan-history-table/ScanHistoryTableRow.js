@@ -9,7 +9,8 @@ const ScanHistoryTableRow = ({ fileName, scanUrl, hash, scanTime, results, remov
     }, 'mcl-icon icon-trash');
 
     const cleanClassName = classNames({
-        'noThreatsFound': results === 'No threats found'
+        'noThreatsFound': results === 'No threats found',
+        'infected': results === 'Infected / Known'
     });
 
     return <tr
