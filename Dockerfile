@@ -5,7 +5,7 @@ LABEL description="Linux with node:18 and chromium browser"
 
 RUN apt update
 
-RUN apt install -y bash \
+RUN apt-get update && apt-get install -y --no-install-recommends bash \
     python3 \
     pkg-config \
     autoconf \
