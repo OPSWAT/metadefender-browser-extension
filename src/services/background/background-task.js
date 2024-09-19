@@ -34,7 +34,7 @@ export default class BackgroundTask {
 
     generateSecureRandomId() {
         const array = new Uint32Array(1);
-        self.crypto.getRandomValues(array);
+        self.crypto?.getRandomValues(array);
         return array[0];
     }
 
