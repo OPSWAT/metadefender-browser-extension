@@ -20,15 +20,22 @@ import BrowserStorage from '../common/browser/browser-storage';
 const MCL_CONFIG = MCL.config;
 
 const contextMenus = {};
+
 export default class BackgroundTask {
     constructor() {
-        this.id = Math.random();
+        this.id = this.generateSecureRandomId();
         this.apikeyInfo = apikeyInfo;
         this.settings = settings;
         this.scanHistory = scanHistory;
         this.downloadsManager = new DownloadManager(FileProcessor);
 
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
+    }
+
+    generateSecureRandomId() {
+        const array = new Uint32Array(1);
+        self.crypto.getRandomValues(array);
+        return array[0];
     }
 
     async getAuthCookie() {
