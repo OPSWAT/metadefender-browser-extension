@@ -109,7 +109,7 @@
     "description": ""
   },
   "showNotifications": {
-    "message": "Show Browser Notifications<div class='text-secondary text-14'>Enable chrome notifications to be notified when a scan is complete.</div>",
+    "message": "Show Browser Notifications<div class='text-secondary text-14'>Enable browser notifications to be notified when a scan is complete.</div>",
     "description": ""
   },
   "saveCleanFiles": {
