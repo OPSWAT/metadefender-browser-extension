@@ -17,7 +17,7 @@ jest.mock('../common/scan-file', () => {
 });
 
 describe('download-manager', () => {
-    const proceessTargetSpy = jest.spyOn(FileProcessor, 'processTarget');
+    const processTargetSpy = jest.spyOn(FileProcessor, 'processTarget');
     const item = { id: 0, url: 'http://example.com' };
     const downloadItem = { state: { current: 'complete' }, id: item.id, url: item.url };
 
@@ -26,12 +26,11 @@ describe('download-manager', () => {
         downloadManager = new DownloadManager(FileProcessor);
     });
 
-    it('should initialize correct', async () => {
+    it('should initialize correctly', async () => {
         downloadManager = new DownloadManager(FileProcessor);
 
         expect(downloadManager.ignoreDownloads).toEqual([]);
         expect(downloadManager.fileProcessor).toEqual(FileProcessor);
-
     });
 
     it('should handle scan complete when scan is clean and not downloaded', async () => {
@@ -47,12 +46,12 @@ describe('download-manager', () => {
         expect(downloadManager.ignoreDownloads.pop().url).toContain(item.url);
     });
 
-    it('should proceess complete downloads', async () => {
+    it('should process complete downloads', async () => {
         const complete = { state: { current: 'complete' }, id: 0 };
 
         await downloadManager.processCompleteDownloads(complete);
 
-        expect(proceessTargetSpy);
+        expect(processTargetSpy);
     });
 
     it('should remove download from ignoreDownloads when processing complete download', async () => {
@@ -70,5 +69,36 @@ describe('download-manager', () => {
         await downloadManager.processCompleteDownloads(downloadItem);
 
         expect(downloadManager.ignoreDownloads).toHaveLength(0);
+    });
+
+    it('should process downloads without scanDownloads enabled', async () => {
+        settings.data.scanDownloads = false;
+
+        await downloadManager.processDownloads(downloadItem);
+
+        expect(downloadManager.ignoreDownloads).toEqual([]);
+        expect(processTargetSpy).not.toHaveBeenCalled();
+    });
+
+    it('should skip processing if the download is whitelisted', async () => {
+        settings.data.scanDownloads = true;
+        settings.data.useWhiteList = true;
+        settings.data.whiteListCustom = ['example.com'];
+
+        await downloadManager.processDownloads(downloadItem);
+
+        expect(processTargetSpy).not.toHaveBeenCalled();
+    });
+
+    it('should block downloads not in whitelist', async () => {
+        settings.data.scanDownloads = true;
+        settings.data.useWhiteList = true;
+        settings.data.whiteListCustom = ['*.trusted.com'];
+
+        const nonWhitelistedItem = { state: { current: 'complete' }, id: 2, url: 'http://untrusted.com' };
+
+        await downloadManager.processDownloads(nonWhitelistedItem);
+
+        expect(processTargetSpy).toHaveBeenCalled();
     });
 });
