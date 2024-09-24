@@ -120,6 +120,8 @@ export default class BackgroundTask {
             });
 
             await this.settings.save();
+
+            console.log('Settings:', this.settings);
         });
     }
 
@@ -200,7 +202,7 @@ export default class BackgroundTask {
             chrome.tabs.create({
                 url: 'index.html#/about'
             });
-            
+
             this.handleManagedSettings();
         } else if (details.reason === 'update') {
             this.updateExtensionFrom(details.previousVersion);
