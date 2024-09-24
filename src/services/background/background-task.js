@@ -1,4 +1,3 @@
-
 import MCL from '../../config/config';
 
 import { settings } from '../common/persistent/settings';
@@ -16,10 +15,27 @@ import SafeUrl from './safe-url';
 import BrowserNotification from '../common/browser/browser-notification';
 import BrowserStorage from '../common/browser/browser-storage';
 
-
 const MCL_CONFIG = MCL.config;
 
+// Mocked managed settings
+const mockManagedSettings = {
+    manage_scanDownloads: true,
+    manage_shareResults: true,
+    manage_showNotifications: true,
+    manage_saveCleanFiles: false,
+    manage_safeUrl: true,
+    manage_skipLimit: true,
+    manage_fileSizeLimit: '80',
+    manage_useCore: true,
+    manage_coreUrl: 'https://sdcsdjcifiervfr.core',
+    manage_coreApikey: '9584858hedcw324vweve',
+    manage_useWhiteList: true,
+    manage_whiteListCustom: ['opswat.com', 'kbcam.com', 'facebook.com', 'salesfore.com']
+};
+
+
 const contextMenus = {};
+
 export default class BackgroundTask {
     constructor() {
         this.id = Math.random();
@@ -29,6 +45,25 @@ export default class BackgroundTask {
         this.downloadsManager = new DownloadManager(FileProcessor);
 
         chrome.runtime.onInstalled.addListener(this.onInstallExtensionListener.bind(this));
+        chrome.storage.local.set({ managed: mockManagedSettings });
+
+        // Mock chrome.storage.managed.get if not defined
+        if (typeof chrome.storage) {
+            chrome.storage.managed = {
+                get: (keys, callback) => {
+                    if (typeof keys === 'string') {
+                        return callback({ [keys]: mockManagedSettings[keys] });
+                    }
+                    if (Array.isArray(keys)) {
+                        let result = {};
+                        console.log('keys',);
+                        keys.forEach(key => result[key] = mockManagedSettings[key]);
+                        return callback(result);
+                    }
+                    return callback(mockManagedSettings);
+                }
+            };
+        }
     }
 
     async getAuthCookie() {
@@ -82,6 +117,30 @@ export default class BackgroundTask {
         chrome.webRequest.onCompleted.addListener(this.downloadsManager.processRequests.bind(this.downloadsManager), { urls: ['<all_urls>'], types: ['xmlhttprequest'] });
         chrome.downloads.onDeterminingFilename.addListener(this.downloadsManager.processDownloads.bind(this.downloadsManager));
         chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
+        chrome.storage.onChanged.addListener(async (changes, areaName) => {
+            console.log('areaName', areaName);
+            if (areaName === 'local') {
+                console.log('Local settings changed:', changes?.settings?.newValue);
+                const newSettings = changes?.settings?.newValue;
+
+                console.log(newSettings?.manage_safeUrl, newSettings?.manage_saveCleanFiles);
+                this.settings.merge({
+                    isManaged: true,
+                    useCore: newSettings?.manage_useCore,
+                    coreApikey: newSettings?.manage_coreApikey,
+                    coreUrl: newSettings?.manage_coreUrl,
+                    scanDownloads: newSettings?.manage_scanDownloads,
+                    shareResults: newSettings?.manage_shareResults,
+                    saveCleanFiles: newSettings?.manage_saveCleanFiles,
+                    skipLimit: newSettings?.manage_skipLimit,
+                    fileSizeLimit: newSettings?.manage_fileSizeLimit,
+                    useWhiteList: newSettings?.manage_useWhiteList,
+                    whiteListCustom: newSettings?.manage_whiteListCustom,
+                    safeUrl: newSettings?.manage_safeUrl,
+                });
+                await this.settings.save();
+            }
+        });
 
         BrowserStorage.addListener(this.browserStorageListener.bind(this));
 
@@ -89,6 +148,23 @@ export default class BackgroundTask {
         await this.getAuthCookie();
 
         SafeUrl.toggle(this.settings.data.safeUrl);
+
+        // Get the managed settings (mocked or real)
+        this.getManagedSettings();
+    }
+
+    async getManagedSettings() {
+        chrome.storage.managed.get(null, (managedSettings) => {
+            console.log('Managed settings:', managedSettings);
+            this.applyManagedSettings(managedSettings);
+        });
+    }
+
+    applyManagedSettings(settings) {
+        // Apply the managed settings logic here
+        console.log('Applying managed settings:', { ...settings });
+        this.settings.data = { ...this.settings.data, ...settings };
+        SafeUrl.toggle(settings.enable_safe_url);
     }
 
     /**
@@ -142,7 +218,7 @@ export default class BackgroundTask {
 
         if (settingsData?.apikeyCustom && settingsData.apikeyCustom !== "") {
             await this.updateApikeyInfo(settingsData?.apikeyCustom, true);
-            return
+            return;
         }
 
         try {
