@@ -1,7 +1,6 @@
 import React from 'react';
 
 const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess, isManaged) => {
-    console.log("isManaged", isManaged);
     return [
         {
             label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('scanDownloads') }} />,

@@ -30,7 +30,8 @@
     "scripting",
     "storage",
     "tabs",
-    "webRequest"
+    "webRequest",
+    "managed"
   ],
   "host_permissions": [
     "http://*/",
