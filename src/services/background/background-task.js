@@ -96,9 +96,15 @@ export default class BackgroundTask {
     }
 
     async handleManagedSettings() {
-        await chrome.storage.managed.get(null, async (managed) => {
+        await chrome.storage.managed.get(['settings'], async (managed) => {
+            console.log('Managed settings:', managed);
+            const isManaged = Object.keys(managed).length > 0;
+            if (!isManaged) {
+                return;
+            }
+
             this.settings.merge({
-                isManaged: true,
+                isManaged,
                 scanDownloads: managed?.scan_downloads,
                 useCore: managed?.use_core,
                 coreApikey: managed?.core_apikey,
@@ -194,6 +200,7 @@ export default class BackgroundTask {
             chrome.tabs.create({
                 url: 'index.html#/about'
             });
+            
             this.handleManagedSettings();
         } else if (details.reason === 'update') {
             this.updateExtensionFrom(details.previousVersion);
