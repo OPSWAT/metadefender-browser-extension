@@ -1,7 +1,7 @@
 {
   "name": "opswat-file-security-chrome",
   "version": "4.3.0",
-  "description": "Scan files and downloads with OPSWAT File Security for Chrome",
+  "description": "Scan files and downloads with OPSWAT File Security for Browser",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com:OPSWAT/metadefender-browser-extension.git"
