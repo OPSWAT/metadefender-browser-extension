@@ -1,0 +1,44 @@
+{
+    "type": "object",
+    "properties": {
+        "scan_downloads": {
+            "type": "boolean"
+        },
+        "share_results": {
+            "type": "boolean"
+        },
+        "show_notifications": {
+            "type": "boolean"
+        },
+        "save_clean_files": {
+            "type": "boolean"
+        },
+        "safe_url": {
+            "type": "boolean"
+        },
+        "skip_limit": {
+            "type": "boolean"
+        },
+        "file_size_limit": {
+            "type": "string"
+        },
+        "use_core": {
+            "type": "boolean"
+        },
+        "core_url": {
+            "type": "string"
+        },
+        "core_apikey": {
+            "type": "string"
+        },
+        "use_whitelist": {
+            "type": "boolean"
+        },
+        "white_list_custom": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    }
+}

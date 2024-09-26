@@ -81,7 +81,7 @@ export default class BackgroundTask {
         chrome.webRequest.onCompleted.addListener(this.downloadsManager.processRequests.bind(this.downloadsManager), { urls: ['<all_urls>'], types: ['xmlhttprequest'] });
         chrome.downloads.onDeterminingFilename.addListener(this.downloadsManager.processDownloads.bind(this.downloadsManager));
         chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
-        chrome.storage.onChanged.addListener(async (changes, areaName) => {
+        chrome.storage.onChanged.addListener((changes, areaName) => {
             if (areaName === 'managed') {
                 this.handleManagedSettings();
             }
@@ -96,9 +96,9 @@ export default class BackgroundTask {
     }
 
     async handleManagedSettings() {
-        await chrome.storage.managed.get(['settings'], async (managed) => {
-            console.log('Managed settings:', managed);
+        await chrome.storage.managed.get(null, async (managed) => {
             const isManaged = Object.keys(managed).length > 0;
+
             if (!isManaged) {
                 return;
             }
@@ -194,6 +194,8 @@ export default class BackgroundTask {
     }
 
     onInstallExtensionListener(details) {
+        this.handleManagedSettings();
+        
         if (details.reason === 'install') {
             chrome.tabs.create({
                 url: `${MCL_CONFIG.mclDomain}/extension/get-apikey`
@@ -202,8 +204,6 @@ export default class BackgroundTask {
             chrome.tabs.create({
                 url: 'index.html#/about'
             });
-
-            this.handleManagedSettings();
         } else if (details.reason === 'update') {
             this.updateExtensionFrom(details.previousVersion);
         }
