@@ -96,10 +96,18 @@ export default class BackgroundTask {
     }
 
     async handleManagedSettings() {
-        await chrome.storage.managed.get(null, async (managed) => {
-            const isManaged = Object.keys(managed).length > 0;
+        await chrome.storage.managed.get(null, async (storage) => {
+            let managed;
+            const isManaged = typeof storage?.settings === 'string';
 
             if (!isManaged) {
+                return;
+            }
+
+            try {
+                managed = JSON.parse(storage?.settings);
+            } catch (error) {
+                console.log(error);
                 return;
             }
 
@@ -120,8 +128,6 @@ export default class BackgroundTask {
             });
 
             await this.settings.save();
-
-            console.log('Settings:', this.settings);
         });
     }
 
