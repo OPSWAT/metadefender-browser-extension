@@ -43,6 +43,5 @@
   ],
   "content_security_policy": {
     "extension_pages": "object-src 'self'; script-src 'self'"
-  },
-   "update_url": "https://metadefender-extension.s3.us-west-2.amazonaws.com/updates.xml"
+  }
 }
