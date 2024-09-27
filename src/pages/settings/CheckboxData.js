@@ -1,30 +1,10 @@
 import React from 'react';
 
-const CheckboxData = (isPaidUser, isAllowedFileSchemeAccess, isManaged) => {
+const CheckboxData = (isPaidUser, isManaged) => {
     return [
         {
             label: <p className='label' dangerouslySetInnerHTML={{ __html: chrome.i18n.getMessage('scanDownloads') }} />,
-            otherContent: <>
-                <p>
-                    {chrome.i18n.getMessage('fileAccessDisabled')}
-                    {' '}
-                    <a href="" onClick={() => {
-                        chrome.tabs.query({ url: `chrome://extensions/?id=${chrome.runtime.id.toString()}` }, (tabs) => {
-                            if (tabs.length === 0) {
-                                chrome.tabs.update({ url: `chrome://extensions/?id=${chrome.runtime.id.toString()}` });
-                            }
-                            else {
-                                chrome.tabs.update(tabs[0].id, { active: true });
-                            }
-                        });
-                    }}>
-                        {chrome.i18n.getMessage('goToExtension')}
-                    </a>
-
-                </p>
-                <sub className='warning'>{chrome.i18n.getMessage('scanDownloadsSub')}</sub>
-            </>,
-            isDisabled: isManaged || !isAllowedFileSchemeAccess,
+            isDisabled: isManaged,
             labelFor: 'scanDownloads'
         },
         {
