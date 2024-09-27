@@ -17,7 +17,6 @@ const Settings = () => {
     const {
         settingsData,
         updateSettings,
-        isAllowedFileSchemeAccess,
         getScanRules,
     } = useContext(SettingsContext);
 
@@ -32,7 +31,7 @@ const Settings = () => {
     }, []);
 
     const checkboxDom = useMemo(() => {
-        return CheckboxData(apikeyData?.paidUser, isAllowedFileSchemeAccess).map((item) => <Checkbox
+        return CheckboxData(apikeyData?.paidUser, settingsData?.isManaged).map((item) => <Checkbox
             key={item.labelFor}
             label={item.label}
             isDisabled={item?.isDisabled ?? false}
@@ -52,8 +51,9 @@ const Settings = () => {
             apikeyCustom={(item.labelFor === 'useCustomApiKey') ? settingsData.apikeyCustom : null}
             whiteListCustom={(item.labelFor === 'useWhiteList') ? settingsData.whiteListCustom : null}
             getScanRules={getScanRules}
+            isManaged={settingsData?.isManaged}
         />);
-    }, [settingsData, apikeyData, isAllowedFileSchemeAccess]);
+    }, [settingsData, apikeyData]);
 
     const content = <Form>
         {checkboxDom}

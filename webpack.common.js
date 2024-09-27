@@ -110,6 +110,7 @@ module.exports = {
         new CopyWebpackPlugin({
             patterns: [
                 { from: './src/manifest.json' },
+                { from: './src/managed_schema.json' },
                 { from: './src/components/popup/extension.html' },
                 { from: './src/assets/icons/icon-16.png' },
                 { from: './src/assets/icons/icon-19.png' },

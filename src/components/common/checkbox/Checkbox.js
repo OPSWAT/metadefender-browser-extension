@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 import { validateCoreSettings, validateCustomApikey } from '../../../providers/SettingsProvider';
 import BrowserTranslate from '../../../services/common/browser/browser-translate';
 import BackgroundTask from '../../../services/background/background-task';
-import BrowserNotification from '../../../services/common/browser/browser-notification'
+import BrowserNotification from '../../../services/common/browser/browser-notification';
 
 import './Checkbox.scss';
 
-const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, hasFormWhiteList, fileSizeLimit, handleCheckboxChange, whiteListCustom, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules }) => {
+const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasFormApikey, hasFormWhiteList, fileSizeLimit, handleCheckboxChange, whiteListCustom, labelFor, getScanRules, coreApikey, apikeyCustom, coreUrl, coreRule, scanRules, isManaged }) => {
     const checkboxRef = useRef(null);
     const inputRef = useRef(null);
     const [isInputChecked, setIsInputChecked] = useState(typeof isChecked === 'boolean' ? isChecked : false);
@@ -76,7 +76,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
     const checkCoreSettings = async () => {
         getScanRules(apikey, url);
-    }
+    };
 
     const handleApikeyChange = (e) => {
         setApikey(e.target.value);
@@ -141,12 +141,12 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
         return (
             <fieldset className="form-with-inputs" disabled={!isInputChecked}>
-                <Form.Group controlId="skipLimit">
+                <Form.Group controlId="skipLimit" className={`${isManaged ? 'disabled' : ''}`}>
                     <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Limit (MB)</Form.Label>
-                    <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={skipLimit || ''} onChange={handleSkipLimitChange} />
+                    <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={skipLimit || ''} onChange={handleSkipLimitChange} disabled={isManaged} />
                 </Form.Group>
                 <div className="col-md-12 d-flex justify-content-end p-0">
-                    <Button variant="primary" type="button" onClick={saveFileSettings}>
+                    <Button variant="primary" type="button" onClick={saveFileSettings} disabled={isManaged}>
                         {chrome.i18n.getMessage('coreSettingsSave')}
                     </Button>
                 </div>
@@ -160,34 +160,33 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         }
 
         return <fieldset className="form-with-inputs" disabled={!isInputChecked}>
-            <Form.Group controlId="apiKey">
+            <Form.Group controlId="apiKey" className={`${isManaged ? 'disabled' : ''}`}>
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
-                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={customApikey || ''} onChange={handleCustomApikeyChange} />
+                <Form.Control className="col-md-10 col-sm-12" type={`${isManaged ? "password" : "text"}`} placeholder="" value={customApikey || ""} onChange={handleCustomApikeyChange} />
             </Form.Group>
 
             <div className="col-md-12 d-flex justify-content-end p-0">
-                <Button variant="primary" type="button" onClick={saveCustomSettings}>
+                <Button variant="primary" type="button" onClick={saveCustomSettings} disabled={isManaged}>
                     {chrome.i18n.getMessage('coreSettingsSave')}
                 </Button>
             </div>
         </fieldset>;
     }, [hasFormApikey, isInputChecked, customApikey]);
 
-    const formDom = useMemo(() => {
+    const formCoreDom = useMemo(() => {
         if (!hasForm) {
             return;
         }
 
-        return <fieldset className="form-with-inputs" disabled={!isInputChecked}>
-            <Form.Group controlId="apiKey">
+        return <fieldset className="form-with-inputs" disabled={isManaged || !isInputChecked}>
+            <Form.Group controlId="apiKey" className={`${isManaged ? 'disabled' : ''}`}>
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
-                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={apikey || ''} onChange={handleApikeyChange} onBlur={checkCoreSettings} />
+                <Form.Control className={`${isManaged ? 'disabled' : ''} col-md-10 col-sm-12`} type={`${isManaged ? 'password' : 'text'}`} placeholder="" value={apikey || ''} onChange={handleApikeyChange} onBlur={checkCoreSettings} />
             </Form.Group>
             <Form.Group controlId="url" className={error?.coreUrl ? "m-0" : ""}>
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">URL</Form.Label>
                 <div className="col-md-10 col-sm-12 p-0">
-                    <Form.Control className="w-100" type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings} />
-
+                    <Form.Control className={`${isManaged ? 'disabled' : ''} w-100`} type="text" placeholder="" value={url || ''} onChange={handleUrlChange} onBlur={checkCoreSettings} />
                 </div>
 
             </Form.Group>
@@ -195,7 +194,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                 <span className='col-md-2 col-sm-12'></span>
                 <p className='red col-md-10 col-sm-12 p-0'>{error?.coreUrl}</p>
             </Form.Group>
-            <Form.Group controlId="workflow">
+            <Form.Group controlId="workflow" className={`${isManaged ? 'disabled' : ''}`}>
                 <Form.Label className="col-sm-2 text-md-right text-left">Workflow</Form.Label>
 
                 <Form.Control as="select" disabled={!scanRules?.length} value={rule} className="col-md-5" onChange={handleWorkflowChange}>
@@ -206,7 +205,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                 </Form.Control>
 
                 <div className="col-md-5 p-0">
-                    <Button variant="primary" type="button" onClick={saveCoreSettings}>
+                    <Button variant="primary" type="button" disabled={isManaged} onClick={saveCoreSettings}>
                         {chrome.i18n.getMessage('coreSettingsSave')}
                     </Button>
                 </div>
@@ -221,7 +220,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
 
         return (
             <fieldset className="form-with-inputs">
-                <Form.Group controlId="whiteList">
+                <Form.Group controlId="whiteList" className={`${isManaged ? 'disabled' : ''}`}>
                     <Form.Label className="col-md-2 col-sm-12 text-md-right text-left form-label whitelistLabel"> AllowList</Form.Label>
                     <div className="col-md-10 col-sm-12 nopadding">
                         <div
@@ -231,7 +230,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                                 type="text"
                                 placeholder=""
                                 onKeyDown={handleWhiteList}
-                                disabled={!isInputChecked}
+                                disabled={isManaged || !isInputChecked}
                                 ref={inputRef}
                             />
 
@@ -252,6 +251,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                                             <Button
                                                 type='button'
                                                 className="close-icon"
+                                                disabled={isManaged}
                                                 onClick={() => handleRemove(index)}
                                                 variant='close-icon'
                                             >
@@ -264,7 +264,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
                         </div>
 
                         <div className="col-md-12 p-0 mt-3">
-                            <Button variant="primary" type="button" onClick={saveCustomWhiteList} disabled={!isInputChecked}>
+                            <Button variant="primary" type="button" onClick={saveCustomWhiteList} disabled={isManaged || !isInputChecked}>
                                 {chrome.i18n.getMessage('coreSettingsSave')}
                             </Button>
                         </div>
@@ -297,7 +297,7 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
             </div>
             {skipLimitDom}
             {formDomApikey}
-            {formDom}
+            {formCoreDom}
             {formWhiteList}
         </div>
 
@@ -322,6 +322,7 @@ Checkbox.propTypes = {
     apikeyCustom: PropTypes.string,
     whiteListCustom: PropTypes.array,
     fileSizeLimit: PropTypes.string,
+    isManaged: PropTypes.bool
 };
 
 export default Checkbox;
