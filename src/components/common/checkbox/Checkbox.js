@@ -322,6 +322,7 @@ Checkbox.propTypes = {
     apikeyCustom: PropTypes.string,
     whiteListCustom: PropTypes.array,
     fileSizeLimit: PropTypes.string,
+    isManaged: PropTypes.bool
 };
 
 export default Checkbox;
