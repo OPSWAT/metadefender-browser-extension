@@ -162,11 +162,11 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
         return <fieldset className="form-with-inputs" disabled={!isInputChecked}>
             <Form.Group controlId="apiKey" className={`${isManaged ? 'disabled' : ''}`}>
                 <Form.Label className="col-md-2 col-sm-12 text-md-right text-left">Apikey</Form.Label>
-                <Form.Control className="col-md-10 col-sm-12" type="text" placeholder="" value={customApikey || ''} onChange={handleCustomApikeyChange} />
+                <Form.Control className="col-md-10 col-sm-12" type={`${isManaged ? "password" : "text"}`} placeholder="" value={customApikey || ""} onChange={handleCustomApikeyChange} />
             </Form.Group>
 
             <div className="col-md-12 d-flex justify-content-end p-0">
-                <Button variant="primary" type="button" onClick={saveCustomSettings}>
+                <Button variant="primary" type="button" onClick={saveCustomSettings} disabled={isManaged}>
                     {chrome.i18n.getMessage('coreSettingsSave')}
                 </Button>
             </div>

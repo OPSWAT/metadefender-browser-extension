@@ -111,18 +111,25 @@ export default class BackgroundTask {
                 return;
             }
 
+            const useCustomApiKey = !!managed?.custom_apikey;
+            const useCore = (!!managed?.core_url) && (!!managed?.core_apikey);
+            const skipLimit = !!managed?.file_size_limit;
+            const useWhiteList = Array.isArray(managed?.domain_allowlist) && (managed.domain_allowlist.length > 0);
+
             this.settings.merge({
                 isManaged,
+                useCustomApiKey,
+                apikeyCustom: managed?.custom_apikey,
                 scanDownloads: managed?.scan_downloads,
-                useCore: managed?.use_core,
+                useCore,
                 coreApikey: managed?.core_apikey,
                 coreUrl: managed?.core_url,
                 shareResults: managed?.share_results,
                 saveCleanFiles: managed?.save_clean_files,
-                skipLimit: managed?.skip_limit,
+                skipLimit,
                 fileSizeLimit: managed?.file_size_limit,
-                useWhiteList: managed?.use_whitelist,
-                whiteListCustom: managed?.white_list_custom,
+                useWhiteList,
+                whiteListCustom: managed?.domain_allowlist,
                 safeUrl: managed?.safe_url,
                 showNotifications: managed?.show_notifications
             });
