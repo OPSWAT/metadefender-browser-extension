@@ -1,4 +1,3 @@
-
 import MCL from '../../config/config';
 
 import { settings } from '../common/persistent/settings';
@@ -16,10 +15,10 @@ import SafeUrl from './safe-url';
 import BrowserNotification from '../common/browser/browser-notification';
 import BrowserStorage from '../common/browser/browser-storage';
 
-
 const MCL_CONFIG = MCL.config;
 
 const contextMenus = {};
+
 export default class BackgroundTask {
     constructor() {
         this.id = Math.random();
@@ -82,6 +81,11 @@ export default class BackgroundTask {
         chrome.webRequest.onCompleted.addListener(this.downloadsManager.processRequests.bind(this.downloadsManager), { urls: ['<all_urls>'], types: ['xmlhttprequest'] });
         chrome.downloads.onDeterminingFilename.addListener(this.downloadsManager.processDownloads.bind(this.downloadsManager));
         chrome.downloads.onChanged.addListener(this.downloadsManager.processCompleteDownloads.bind(this.downloadsManager));
+        chrome.storage.onChanged.addListener((changes, areaName) => {
+            if (areaName === 'managed') {
+                this.handleManagedSettings();
+            }
+        });
 
         BrowserStorage.addListener(this.browserStorageListener.bind(this));
 
@@ -89,6 +93,49 @@ export default class BackgroundTask {
         await this.getAuthCookie();
 
         SafeUrl.toggle(this.settings.data.safeUrl);
+    }
+
+    async handleManagedSettings() {
+        await chrome.storage.managed.get(null, async (storage) => {
+            let managed;
+            const isManaged = typeof storage?.settings === 'string';
+
+            if (!isManaged) {
+                return;
+            }
+
+            try {
+                managed = JSON.parse(storage?.settings);
+            } catch (error) {
+                console.log(error);
+                return;
+            }
+
+            const useCustomApiKey = !!managed?.custom_apikey;
+            const useCore = (!!managed?.core_url) && (!!managed?.core_apikey);
+            const skipLimit = !!managed?.file_size_limit;
+            const useWhiteList = Array.isArray(managed?.domain_allowlist) && (managed.domain_allowlist.length > 0);
+
+            this.settings.merge({
+                isManaged,
+                useCustomApiKey,
+                apikeyCustom: managed?.custom_apikey,
+                scanDownloads: managed?.scan_downloads,
+                useCore,
+                coreApikey: managed?.core_apikey,
+                coreUrl: managed?.core_url,
+                shareResults: managed?.share_results,
+                saveCleanFiles: managed?.save_clean_files,
+                skipLimit,
+                fileSizeLimit: managed?.file_size_limit,
+                useWhiteList,
+                whiteListCustom: managed?.domain_allowlist,
+                safeUrl: managed?.safe_url,
+                showNotifications: managed?.show_notifications
+            });
+
+            await this.settings.save();
+        });
     }
 
     /**
@@ -142,7 +189,7 @@ export default class BackgroundTask {
 
         if (settingsData?.apikeyCustom && settingsData.apikeyCustom !== "") {
             await this.updateApikeyInfo(settingsData?.apikeyCustom, true);
-            return
+            return;
         }
 
         try {
@@ -160,6 +207,8 @@ export default class BackgroundTask {
     }
 
     onInstallExtensionListener(details) {
+        this.handleManagedSettings();
+        
         if (details.reason === 'install') {
             chrome.tabs.create({
                 url: `${MCL_CONFIG.mclDomain}/extension/get-apikey`
@@ -168,7 +217,6 @@ export default class BackgroundTask {
             chrome.tabs.create({
                 url: 'index.html#/about'
             });
-
         } else if (details.reason === 'update') {
             this.updateExtensionFrom(details.previousVersion);
         }

@@ -212,7 +212,7 @@ export const SettingsProvider = ({ children }) => {
     };
 
     const toggleScanDownloads = async (newSettings) => {
-        newSettings.scanDownloads = !newSettings.scanDownloads && isAllowedFileSchemeAccess;
+        newSettings.scanDownloads = !newSettings.scanDownloads;
     };
 
     const updateSettings = async (key, newSettingsData) => {

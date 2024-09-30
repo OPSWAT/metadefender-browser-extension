@@ -31,6 +31,7 @@ function Settings() {
             whiteListCustom: [],
             coreRule: '',
             rules: [],
+            isManaged: false
         },
 
         // methods
