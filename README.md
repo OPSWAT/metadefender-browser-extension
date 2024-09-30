@@ -4,7 +4,7 @@
 
 ## Intro
 
-OPSWAT File Security for Chrome, provides the ability to quickly scan a file for malware prior to download directly from the browser. At the moment this only works with google chrome, but can be extended to any other browser.
+OPSWAT File Security for Browser, provides the ability to quickly scan a file for malware prior to download directly from the browser. At the moment this only works with google browser, but can be extended to any other browser.
 
 ## Using `mocli`
 
