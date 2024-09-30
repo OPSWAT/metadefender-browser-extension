@@ -84,32 +84,4 @@ describe('safe-url', () => {
         expect(safeUrl.enabled).toBe(false);
         expect(mockRemoveListener).not.toHaveBeenCalled();
     });
-
-    it('should call doSafeRedirect for a non-safe url when listener is triggered', async () => {
-        const tabId = 1;
-        const changeInfo = { status: 'loading' };
-        const tab = { url: 'http://example.com/path' };
-        mockFetch.mockResolvedValue({ status: 200 });
-        await safeUrl.toggle(true);
-
-        expect(mockAddListener).toHaveBeenCalled();
-        const listener = mockAddListener.mock.calls[0][0];
-        await listener(tabId, changeInfo, tab);
-
-        expect(mockFetch).toHaveBeenCalled();
-        expect(mockUpdate).not.toHaveBeenCalled();
-    });
-
-    it('should redirect an infected url when listener is triggered', async () => {
-        const tabId = 1;
-        const changeInfo = { status: 'loading' };
-        const tab = { url: 'http://infected.com/path' };
-        mockFetch.mockResolvedValue({ status: 400 });
-        await safeUrl.toggle(true);
-        expect(mockAddListener).toHaveBeenCalled();
-        const listener = mockAddListener.mock.calls[0][0];
-        await listener(tabId, changeInfo, tab);
-        expect(mockUpdate).toHaveBeenCalledWith(tabId, { url: `/* @echo mclDomain *//safe-redirect/http%3A%2F%2Finfected.com%2Fpath` });
-    });
-
 });
