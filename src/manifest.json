@@ -3,7 +3,7 @@
   "name": "__MSG_appName__",
   "short_name": "__MSG_appShortName__",
   "description": "__MSG_appDescription__",
-  "version": "4.3.0",
+  "version": "4.4.0",
   "action": {
     "default_popup": "index.html",
     "default_title": "__MSG_browserActionTitle__",
@@ -32,10 +32,12 @@
     "tabs",
     "webRequest"
   ],
+  "storage": {
+    "managed_schema": "managed_schema.json"
+  },
   "host_permissions": [
     "http://*/",
     "https://*/",
-    "file://*",
     "<all_urls>"
   ],
   "content_security_policy": {

@@ -16,11 +16,11 @@
 
         .list-group-item {
             padding: 0;
-            
+
             &:not(:first-of-type) {
                 border-top: 1px solid $colorGreyLight;
             }
-            
+
             a {
                 display: block;
                 font-size: 15px;
@@ -37,7 +37,7 @@
 
                     &:after {
                         content: '\e805';
-                        font-family: mcl-ext-icons;
+                        font-family: mcl-ext-icons, sans-serif;
                         color: $colorBlacker;
                     }
                 }

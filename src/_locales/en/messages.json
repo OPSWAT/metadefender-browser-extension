@@ -1,18 +1,18 @@
 {
   "appName": {
-    "message": "OPSWAT File Security for Chrome",
+    "message": "OPSWAT File Security for Browser",
     "description": "The name of the application"
   },
   "appShortName": {
-    "message": "OPSWAT for Chrome",
+    "message": "OPSWAT for Browser",
     "description": "The short_name (maximum of 12 characters recommended) is a short version of the app's name"
   },
   "appDescription": {
-    "message": "Scan files and downloads with OPSWAT File Security for Chrome",
+    "message": "Scan files and downloads with OPSWAT File Security for Browser",
     "description": "The description of the application"
   },
   "browserActionTitle": {
-    "message": "OPSWAT File Security for Chrome",
+    "message": "OPSWAT File Security for Browser",
     "description": "The title of the browser action button"
   },
   "contextMenuScanTitle": {
@@ -44,11 +44,11 @@
     "description": ""
   },
   "aboutTitle": {
-    "message": "About OPSWAT File Security for Chrome",
+    "message": "About OPSWAT File Security for Browser",
     "description": ""
   },
   "aboutThankYou": {
-    "message": "Thank you for installing <strong>OPSWAT File Security for Chrome</strong>! This extension gives you the ability to scan downloads* for malware with 30+ anti-malware engines using OPSWAT's <a target='_blank' href=https://metadefender.opswat.com/?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud</a>.",
+    "message": "Thank you for installing <strong>OPSWAT File Security for Browser</strong>! This extension gives you the ability to scan downloads* for malware with 30+ anti-malware engines using OPSWAT's <a target='_blank' href=https://metadefender.opswat.com/?utm_source=extension&utm_medium=extension&utm_campaign=extension&utm_term=about'>MetaDefender Cloud</a>.",
     "description": ""
   },
   "aboutApiKeyInfo": {
@@ -64,26 +64,26 @@
     "description": ""
   },
   "aboutHowToUse": {
-    "message": "How to use OPSWAT File Security for Chrome",
+    "message": "How to use OPSWAT File Security for Browser",
     "description": ""
   },
   "aboutHowTo1": {
-    "message": "On any web page, right click on the download link for the file you would like to scan for malware. In the context menu, select 'Scan with OPSWAT'. OPSWAT File Security for Chrome will begin analyzing the file at the selected URL, and results will be available on the Scan History page. Last 3 scans are also visible in the extension popup",
+    "message": "On any web page, right click on the download link for the file you would like to scan for malware. In the context menu, select 'Scan with OPSWAT'. OPSWAT File Security for Browser will begin analyzing the file at the selected URL, and results will be available on the Scan History page. Last 3 scans are also visible in the extension popup",
     "description": ""
   },
   "aboutHowTo2": {
-    "message": "If you would like to automatically scan all downloads, go to OPSWAT File Security for Chrome settings page and enable 'Scan downloads'",
+    "message": "If you would like to automatically scan all downloads, go to OPSWAT File Security for Browser settings page and enable 'Scan downloads'",
     "description": ""
   },
   "howToOpenSettings": {
-    "message": "To access the OPSWAT File Security for Chrome extension settings page, right click on the 'OPSWAT File Security for Chrome' button in the Chrome top bar and select 'Options' from the drop down menu",
+    "message": "To access the OPSWAT File Security for Browser extension settings page, right click on the 'OPSWAT File Security for Browser' button in the Browser top bar and select 'Options' from the drop down menu",
     "description": ""
   },
   "chromeExtensionHelp": {
-    "message": "Read more about OPSWAT File Security for Chrome extension settings on our <a target='blank' href='https://docs.opswat.com/mdcloud/integrations/opswat-file-security-for-chrome#settings'>documentation</a> page."
+    "message": "Read more about OPSWAT File Security for Browser extension settings on our <a target='blank' href='https://docs.opswat.com/mdcloud/integrations/opswat-file-security-for-chrome#settings'>documentation</a> page."
   },
   "githubInfo": {
-    "message": "The chrome extension is an open-source tool developed by OPSWAT, the source code is published on github: <a target='blank' href='https://github.com/OPSWAT/metadefender-browser-extension'>metadefender-browser-extension</a>"
+    "message": "The browser extension is an open-source tool developed by OPSWAT, the source code is published on github: <a target='blank' href='https://github.com/OPSWAT/metadefender-browser-extension'>metadefender-browser-extension</a>"
   },
   "contactOpswat": {
     "message": "Contact OPSWAT Sales to increase your limits",
@@ -98,7 +98,7 @@
     "description": ""
   },
   "scanDownloadsSub": {
-    "message": "* Chrome Notifications must be enabled"
+    "message": "* Browser Notifications must be enabled"
   },
   "shareResults": {
     "message": "Share scan results<div class='text-secondary text-14'>Anonymously share scan results with the community to help improve vulnerability detection.</div>",
@@ -109,7 +109,7 @@
     "description": ""
   },
   "showNotifications": {
-    "message": "Show Chrome Notifications<div class='text-secondary text-14'>Enable chrome notifications to be notified when a scan is complete.</div>",
+    "message": "Show Browser Notifications<div class='text-secondary text-14'>Enable browser notifications to be notified when a scan is complete.</div>",
     "description": ""
   },
   "saveCleanFiles": {

@@ -28,6 +28,16 @@ pipelines:
             - docker
           size: 2x
       - step:
+          name: Run Unit tests
+          script:
+            - npm i --legacy-peer-deps;
+            - npm run coverage;
+          artifacts:
+            - coverage/**
+          services:
+            - docker
+          size: 2x
+      - step:
           name: Check Quality Gate on SonarQube
           max-time: 5 # value you should use depends on the analysis time for your project
           script:
