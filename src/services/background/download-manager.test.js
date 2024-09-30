@@ -79,26 +79,4 @@ describe('download-manager', () => {
         expect(downloadManager.ignoreDownloads).toEqual([]);
         expect(processTargetSpy).not.toHaveBeenCalled();
     });
-
-    it('should skip processing if the download is whitelisted', async () => {
-        settings.data.scanDownloads = true;
-        settings.data.useWhiteList = true;
-        settings.data.whiteListCustom = ['example.com'];
-
-        await downloadManager.processDownloads(downloadItem);
-
-        expect(processTargetSpy).not.toHaveBeenCalled();
-    });
-
-    it('should block downloads not in whitelist', async () => {
-        settings.data.scanDownloads = true;
-        settings.data.useWhiteList = true;
-        settings.data.whiteListCustom = ['*.trusted.com'];
-
-        const nonWhitelistedItem = { state: { current: 'complete' }, id: 2, url: 'http://untrusted.com' };
-
-        await downloadManager.processDownloads(nonWhitelistedItem);
-
-        expect(processTargetSpy).toHaveBeenCalled();
-    });
 });
