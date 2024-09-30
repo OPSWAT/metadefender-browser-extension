@@ -13,18 +13,18 @@
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-  
+
     &__logo {
-      background-image: url('../../assets/images/metadefender-chrome-black.svg');
+      background-image: url('../../assets/images/browser-logo-black.svg');
       position: relative;
       margin-top: 0;
       background-size: contain;
       background-repeat: no-repeat;
       display: block;
-      width: 117px;
-      height: 53px;
+      width: 200px;
+      height: 40px;
     }
-  
+
     &__btn {
       background: $colorWhite;
       border: 1px solid $colorGrey;
@@ -55,7 +55,8 @@
     height: 60px;
   }
 
-  .header, .footer{
+  .header,
+  .footer {
     padding: $padding;
     background-color: $colorWhite;
   }
