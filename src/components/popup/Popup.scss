@@ -30,6 +30,11 @@
       border: 1px solid $colorGrey;
       padding: 4px 5px 3px 5px;
       display: block;
+      color: $secondaryColor;
+    }
+
+    &__btn:hover {
+      color: $colorBlack
     }
   }
 
@@ -60,4 +65,14 @@
     padding: $padding;
     background-color: $colorWhite;
   }
+}
+
+.buttonCustom {
+  color: $secondaryColor !important;
+  border: none !important;
+  background: none !important;
+}
+
+.buttonCustom:hover {
+  color: $colorBlack !important;
 }
