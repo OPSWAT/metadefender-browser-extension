@@ -1,7 +1,7 @@
 import { settings } from '../common/persistent/settings';
 import ScanFile from '../common/scan-file';
 
-export const getDomain = (url, allowList = []) => {
+export const getDomain = (url) => {
     return new Promise((resolve, reject) => {
         try {
             if (url.startsWith('blob:')) {
