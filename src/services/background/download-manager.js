@@ -1,7 +1,7 @@
 import { settings } from '../common/persistent/settings';
 import ScanFile from '../common/scan-file';
 
-const getDomain = (url) => {
+export const getDomain = (url) => {
     return new Promise((resolve, reject) => {
         try {
             if (url.startsWith('blob:')) {
@@ -10,7 +10,27 @@ const getDomain = (url) => {
             let urlObj = new URL(url);
             let hostname = urlObj.hostname;
             hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
-            resolve(hostname);
+
+            const isExplicitlyAllowed = allowList.some(allowedDomain => allowedDomain === hostname);
+
+            if (isExplicitlyAllowed) {
+                resolve(hostname);
+                return;
+            }
+
+            const isBlockedByWildcard = allowList.some(allowedDomain => {
+                if (allowedDomain.startsWith('*.')) {
+                    const baseDomain = allowedDomain.substring(2);
+                    return hostname.endsWith(`.${baseDomain}`);
+                }
+                return false;
+            });
+
+            if (!isBlockedByWildcard) {
+                resolve(hostname);
+            } else {
+                resolve(null);
+            }
         } catch (error) {
             reject('Invalid URL');
         }
@@ -72,8 +92,19 @@ class DownloadManager {
 
         const urlToUse = downloadItem.referrer || downloadItem.url;
         const domain = await getDomain(urlToUse);
-        if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
-            return;
+        if (settings?.data?.useWhiteList === true && domain) {
+            const whiteList = settings?.data?.whiteListCustom || [];
+            const isWhitelisted = whiteList.some(allowedDomain => {
+                if (allowedDomain.startsWith('*.')) {
+                    const baseDomain = allowedDomain.substring(2);
+                    return domain === baseDomain || domain.endsWith(`.${baseDomain}`);
+                }
+                return domain === allowedDomain;
+            });
+
+            if (isWhitelisted) {
+                return;
+            }
         }
 
         chrome.downloads.search({ id: downloadItem.id }, (results) => {

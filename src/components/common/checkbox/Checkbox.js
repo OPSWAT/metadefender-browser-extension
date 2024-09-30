@@ -108,7 +108,8 @@ const Checkbox = ({ label, isChecked, isDisabled, otherContent, hasForm, hasForm
             let value = inputRef.current.value.trim();
             value = value.replace(/^(https?:\/\/)?(www\.)?/, '');
             value = value.split('/')[0];
-            if (value !== "" && validateDomainName(value)) {
+
+            if (value !== "" && (validateDomainName(value) || value.startsWith('*.'))) {
                 setWhiteList(prevWhiteList => {
                     if (prevWhiteList && !prevWhiteList.includes(value)) {
                         return [...prevWhiteList, value];
