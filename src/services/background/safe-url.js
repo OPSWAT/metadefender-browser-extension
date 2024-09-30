@@ -1,5 +1,6 @@
 import MCL from '../../config/config';
 import { settings } from '../common/persistent/settings';
+import { getDomain } from './download-manager';
 
 /**
  * Metadefender Cloud Endpoint for url check
@@ -25,22 +26,6 @@ const cleanUrls = new Set();
 /**
  * Removes old urls that were marked as clean
  */
-
-export const getDomain = (url) => {
-    return new Promise((resolve, reject) => {
-        try {
-            if (url.startsWith('blob:')) {
-                url = url.substring(5);
-            }
-            let urlObj = new URL(url);
-            let hostname = urlObj.hostname;
-            hostname = hostname.replace(/^www\./, '').replace(/^m\./, '');
-            resolve(hostname);
-        } catch (error) {
-            reject('Invalid URL');
-        }
-    });
-};
 
 
 /**
@@ -85,8 +70,19 @@ export const doSafeRedirect = async (tabId, changeInfo, tab) => {
 
     const tabUrl = tab.url;
     const domain = await getDomain(tabUrl);
-    if (settings?.data?.useWhiteList === true && settings?.data?.whiteListCustom?.includes(domain)) {
-        return;
+    if (settings?.data?.useWhiteList === true && domain) {
+        const whiteList = settings?.data?.whiteListCustom || [];
+        const isWhitelisted = whiteList.some(allowedDomain => {
+            if (allowedDomain.startsWith('*.')) {
+                const baseDomain = allowedDomain.substring(2);
+                return domain === baseDomain || domain.endsWith(`.${baseDomain}`);
+            }
+            return domain === allowedDomain;
+        });
+
+        if (isWhitelisted) {
+            return;
+        }
     }
 
     if (changeInfo.status === 'loading' && !tabUrl.startsWith(safeRedirectEndpoint)) {
