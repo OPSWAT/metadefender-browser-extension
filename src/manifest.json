@@ -32,10 +32,12 @@
     "tabs",
     "webRequest"
   ],
+  "storage": {
+    "managed_schema": "managed_schema.json"
+  },
   "host_permissions": [
     "http://*/",
     "https://*/",
-    "file://*",
     "<all_urls>"
   ],
   "content_security_policy": {

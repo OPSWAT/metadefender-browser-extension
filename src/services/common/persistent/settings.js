@@ -10,9 +10,16 @@ const storageKey = MCL.config.storageKey?.settings;
  * @returns {{scanDownloads: boolean, shareResults: boolean, showNotifications: boolean, saveCleanFiles: boolean, init: init, merge: merge, save: save, load: load}}
  * @constructor
  */
+
+function generateSecureRandomId() {
+    const array = new Uint32Array(1);
+    self.crypto?.getRandomValues(array);
+    return array[0];
+}
+
 function Settings() {
     return {
-        id: Math.random(),
+        id: generateSecureRandomId(),
         data: {
             scanDownloads: false,
             shareResults: true,
@@ -31,6 +38,7 @@ function Settings() {
             whiteListCustom: [],
             coreRule: '',
             rules: [],
+            isManaged: false
         },
 
         // methods
