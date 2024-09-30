@@ -12,7 +12,7 @@ import './Header.scss';
 const Header = () => {
     const config = useContext(ConfigContext);
     const { apikeyData } = useContext(UserContext);
-    const [ isUserLoggedIn, setIsUserLoggedin ] = useState(apikeyData?.loggedIn || false);
+    const [isUserLoggedIn, setIsUserLoggedin] = useState(apikeyData?.loggedIn || false);
 
     useEffect(() => {
         setIsUserLoggedin(apikeyData?.loggedIn || false);
@@ -43,7 +43,7 @@ const Header = () => {
         <Container>
             <Navbar className="align-items-center pl-0 pr-0 main justify-content-between">
                 <Navbar.Brand>
-                    <span className="metadefender-chrome-logo"></span>
+                    <span className="metadefender-logo"></span>
                 </Navbar.Brand>
 
                 {signInButtonDom}

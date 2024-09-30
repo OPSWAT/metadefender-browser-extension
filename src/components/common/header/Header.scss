@@ -1,18 +1,18 @@
 @import "../../../assets/style/colors.scss";
 
 .header {
-    background-color: $primaryColor;
-    padding: 20px;
-    border-bottom: 1px solid $colorGrey;
-  
-    .metadefender-chrome-logo {
-      background-size: contain;
-      background-repeat: no-repeat;
-      display: block;
-      width: 117px;
-      height: 53px;
-      margin-top: -5px;
-      position: relative;
-      background-image: url('../../../assets/images/metadefender-chrome.svg');
-    }
+  background-color: $primaryColor;
+  padding: 20px;
+  border-bottom: 1px solid $colorGrey;
+
+  .metadefender-logo {
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: block;
+    width: 200px;
+    height: 40px;
+    margin-top: -5px;
+    position: relative;
+    background-image: url('../../../assets/images/browser-logo.svg');
+  }
 }
