@@ -27,7 +27,11 @@ global.chrome = {
         onChanged: { addListener: () => null },
         get: () => 'mocki value'
     },
-
+    webRequest: {
+        onCompleted: {
+            addListener: jest.fn()
+        }
+    },
     tabs: {
         create: mockCreate,
         query: () => null
@@ -41,15 +45,22 @@ global.chrome = {
         }
     },
     storage: {
-        local: { get: () => null },
+        local: {
+            get: jest.fn(),
+            set: jest.fn()
+        },
         onChanged: {
-            addListener: () => null,
-            removeListener: () => null
+            addListener: jest.fn(),
+            removeListener: jest.fn(),
         }
     },
     downloads: {
         onCreated: { addListener: jest.fn() },
         onChanged: { addListener: jest.fn() },
+        onDeterminingFilename: {
+            addListener: jest.fn()
+        },
+        onChanged: { addListener: jest.fn() }
     },
     notifications: {
         onClicked: { addListener: jest.fn() },
@@ -83,7 +94,6 @@ describe('background-task', () => {
 
     });
 
-
     it('should set new apikey', (done) => {
         backgroundTask.setApikey('{"apikey":"mock"}');
 
@@ -97,13 +107,6 @@ describe('background-task', () => {
         }, 0);
     });
 
-    it('should create two new tabs on extension install', () => {
-        backgroundTask.onInstallExtensionListener({ reason: 'install' });
-
-        expect(mockCreate).toHaveBeenCalledTimes(2);
-    });
-
-
     describe('handleContextMenuClicks', () => {
         it('should do nothing', async () => {
             await backgroundTask.handleContextMenuClicks({ menuItemId: 'any' });
@@ -113,22 +116,6 @@ describe('background-task', () => {
 
     });
 
-    xit('should initialize class correctly', async () => {
-        await waitFor(() => backgroundTask.init());
-
-        expect(settingsInitSpy).toHaveBeenCalled();
-        expect(apikeyInitSpy).toHaveBeenCalled();
-        expect(scanHistoryInitSpy).toHaveBeenCalled();
-        expect(scanHistoryCleanSpy).toHaveBeenCalled();
-        expect(safeUrlToggleSpy).toHaveBeenCalledWith(false);
-        expect(onChangeSpy).toHaveBeenCalled();
-    });
-
-    it('should create two new tabs on extension install', () => {
-        backgroundTask.onInstallExtensionListener({ reason: 'install' });
-
-        expect(mockCreate).toHaveBeenCalledTimes(2);
-    });
 
     it('should create a tab for extension update', () => {
         const previousVersion = '0.1';
@@ -149,4 +136,65 @@ describe('background-task', () => {
         await backgroundTask.browserStorageListener(data);
     });
 
+    it('should set new apikey from cookie', (done) => {
+        const mockCookie = '{"apikey":"mockKey"}';
+        backgroundTask.setApikey(mockCookie);
+
+        setTimeout(() => {
+            expect(metascanInfoSpy).toHaveBeenCalledWith('mockKey');
+            expect(apikeySaveSpy).toHaveBeenCalled();
+            done();
+        }, 0);
+    });
+
+    it('should handle managed settings update correctly', async () => {
+        // Create a mock managed settings object
+        const mockManagedSettings = {
+            settings: JSON.stringify({
+                scan_downloads: true,
+                core_apikey: 'mockKey',
+                safe_url: true
+            })
+        };
+
+        // Mock chrome.storage.managed.get to simulate getting the settings
+        chrome.storage = {
+            managed: {
+                get: jest.fn((_, callback) => callback(mockManagedSettings))
+            }
+        };
+
+        // Call the function to test
+        await backgroundTask.handleManagedSettings();
+
+        // Expectations
+        expect(settingsSaveSpy).toHaveBeenCalled();
+    });
+
+    it('should handle managed settings update correctly', async () => {
+        // Create a mock managed settings object
+        const mockManagedSettings = {
+        };
+
+        // Mock chrome.storage.managed.get to simulate getting the settings
+        chrome.storage = {
+            managed: {
+                get: jest.fn((_, callback) => callback(mockManagedSettings))
+            }
+        };
+
+        // Call the function to test
+        await backgroundTask.handleManagedSettings();
+
+        // Expectations
+        expect(settingsSaveSpy).not.toHaveBeenCalled();
+    });
+
+    it('should handle extension install and create new tabs', () => {
+        backgroundTask.onInstallExtensionListener({ reason: 'install' });
+
+        expect(mockCreate).toHaveBeenCalledTimes(2);
+        expect(mockCreate).toHaveBeenCalledWith({ url: `${MCL.config.mclDomain}/extension/get-apikey` });
+        expect(mockCreate).toHaveBeenCalledWith({ url: 'index.html#/about' });
+    });
 });
