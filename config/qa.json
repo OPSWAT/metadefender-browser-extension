@@ -1,5 +1,5 @@
 {
-  "env": "prod",
-  "mclDomain": "https://metadefender.opswat.com/",
-  "metadefenderDomain": "https://api-prod-uswest2.metadefender.com"
+  "env": "qa",
+  "mclDomain": "https://mcl-qa.opswat.com",
+  "metadefenderDomain": "https://api-qa-uswest2.metadefender.com"
 }
