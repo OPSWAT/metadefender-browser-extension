@@ -32,7 +32,6 @@ describe('download-manager', () => {
         downloadManager.ignoreDownloads = [];
     });
 
-    // Original Tests
     it('should initialize correctly', async () => {
         downloadManager = new DownloadManager(FileProcessor);
 
@@ -86,8 +85,6 @@ describe('download-manager', () => {
         expect(downloadManager.ignoreDownloads).toEqual([]);
         expect(processTargetSpy).not.toHaveBeenCalled();
     });
-
-    // Additional Tests
 
     it('should initialize correctly with default settings and no downloads', async () => {
         expect(downloadManager.activeDownloads).toEqual([]);
