@@ -71,9 +71,9 @@ export const SettingsProvider = ({ children }) => {
         const validCore = await validateCoreSettings(newApikey, newUrl);
         if (validCore) {
             const { coreV4, rules } = validCore;
-            settings.merge({ coreV4, rules });
-            await settings.save();
-            setSettingsData({ ...settings.data });
+            settings?.merge({ coreV4, rules });
+            await settings?.save();
+            setSettingsData({ ...settings?.data });
         }
     };
 
