@@ -13,7 +13,8 @@ const ScanHistoryTable = ({ data, filterBy, removeFile, getStatusIcon }) => {
         }
 
         return data.filter((item) => {
-            return item.fileName.includes(filterBy);
+            const filter = filterBy.toLowerCase();
+            return item.fileName.toLowerCase().includes(filter) || item.hash.toLowerCase().includes(filter);
         });
     }, [data, filterBy]);
 
@@ -33,7 +34,7 @@ const ScanHistoryTable = ({ data, filterBy, removeFile, getStatusIcon }) => {
 
             <tbody>
                 {processedData.map((item, key) => (
-                   <ScanHistoryTableRow
+                    <ScanHistoryTableRow
                         key={key}
                         fileName={item.fileName}
                         scanUrl={item.scanUrl}
