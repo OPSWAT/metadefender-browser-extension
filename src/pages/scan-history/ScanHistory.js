@@ -16,8 +16,8 @@ const ScanHistory = () => {
     const config = useContext(ConfigContext);
     const { gaTrackEvent } = useContext(GAContext);
     const { files, clearnScanHistory, removeScanHistoryFile } = useContext(ScanHistoryContext);
-    const [ searchValue, setSearchValue ] = useState('');
-    const [ totalScannedFiles, setTotalScannedFiles ] = useState(files.length) ;
+    const [searchValue, setSearchValue] = useState('');
+    const [totalScannedFiles, setTotalScannedFiles] = useState(files.length);
     const scanUrl = config.mclDomain;
 
     useEffect(() => {
@@ -83,7 +83,7 @@ const ScanHistory = () => {
             scanTime: item.scanTime,
             results: item.statusLabel,
             status: item.status,
-            id: item.id, 
+            id: item.id,
             useCore: item?.useCore
         }));
     }, [files]);
@@ -121,7 +121,7 @@ const ScanHistory = () => {
                     <strong className="history--scanned__files">{`${totalScannedFiles} ${filesPlacehoder} scanned`}</strong>
                 </Col>
                 <Col xs={6} className="text-right">
-                    <Button variant="outline-primary" className="small" onClick={() => (async() => await clearScanHistory())()}>Clear Scan History</Button>
+                    <Button variant="outline-primary" className="small" onClick={() => (async () => await clearScanHistory())()}>Clear Scan History</Button>
                 </Col>
             </Row>
 
