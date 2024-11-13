@@ -10,18 +10,18 @@ const safeRedirectEndpoint = `${MCL.config.mclDomain}/safe-redirect/`;
 /**
  * A list of urls that are currently redirecting.
  */
-const activeRedirects = new Set();
+export const activeRedirects = new Set();
 
 /**
  * A list of urls that are infected.
  */
-const infectedUrls = new Set();
+export const infectedUrls = new Set();
 
 /**
  * A list of urls that are not infected.
  * Used to speed-up navigation after fist check.
  */
-const cleanUrls = new Set();
+export const cleanUrls = new Set();
 
 /**
  * Removes old urls that were marked as clean

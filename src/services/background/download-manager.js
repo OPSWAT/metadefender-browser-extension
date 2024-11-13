@@ -31,8 +31,8 @@ export const getDomain = (url) => {
             } else {
                 resolve(null);
             }
-        } catch (error) {
-            reject('Invalid URL');
+        } catch {
+            resolve(null);
         }
     });
 };
@@ -91,7 +91,7 @@ class DownloadManager {
         }
 
         const urlToUse = downloadItem.referrer || downloadItem.url;
-        const domain = await getDomain(urlToUse);
+        const domain = getDomain(urlToUse);
         if (settings?.data?.useWhiteList === true && domain) {
             const whiteList = settings?.data?.whiteListCustom || [];
             const isWhitelisted = whiteList.some(allowedDomain => {
