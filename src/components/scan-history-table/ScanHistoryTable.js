@@ -14,7 +14,7 @@ const ScanHistoryTable = ({ data, filterBy, removeFile, getStatusIcon }) => {
 
         return data.filter((item) => {
             const filter = filterBy.toLowerCase();
-            return item.fileName.toLowerCase().includes(filter) || item.hash.toLowerCase().includes(filter);
+            return item.fileName.toLowerCase().includes(filter) || item?.hash?.toLowerCase().includes(filter);
         });
     }, [data, filterBy]);
 
