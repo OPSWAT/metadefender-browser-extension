@@ -5,7 +5,7 @@ PROJECT_VERSION=${PROJECT_VERSION-${VERSION}}
 PR_ID=$1
 SOURCE=$2
 TARGET=$3
-echo "test"
+
 docker run \
     --rm \
     --add-host=sonar.opswat.com:10.192.9.121 \
