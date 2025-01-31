@@ -2,7 +2,8 @@
 
 SONARQUBE_URL=${SONARQUBE_URL-"https://sonar.opswat.com"}
 PROJECT_VERSION=${PROJECT_VERSION-${VERSION}}
-
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+isPR=${PR}
 PR_ID=${1:-""}
 SOURCE=${2:-""}
 TARGET=${3:-""}
@@ -11,8 +12,9 @@ echo "Debugging parameters:"
 echo "PR_ID: ${PR_ID}"
 echo "SOURCE: ${SOURCE}"
 echo "TARGET: ${TARGET}"
+echo "BRANCH_NAME: ${BRANCH_NAME}"
 
-if [[ "$PR_ID" != "%teamcity.pullRequest.number%" && "$SOURCE" != "%teamcity.pullRequest.source.branch%" && "$TARGET" != "%teamcity.pullRequest.target.branch%" && -n "$PR_ID" && -n "$SOURCE" && -n "$TARGET" ]]; then
+if [[ "$isPR" == "true" && "$PR_ID" != "%teamcity.pullRequest.number%" && "$SOURCE" != "%teamcity.pullRequest.source.branch%" && "$TARGET" != "%teamcity.pullRequest.target.branch%" && -n "$PR_ID" && -n "$SOURCE" && -n "$TARGET" ]]; then
     echo "Performing pull request scan..."
     docker run \
         --rm \
@@ -33,5 +35,6 @@ else
         -e SONAR_TOKEN="${SONARQUBE_TOKEN}" \
         -v "$(pwd):/usr/src" \
         sonarsource/sonar-scanner-cli:latest \
-        -Dsonar.projectVersion="${PROJECT_VERSION}"
+        -Dsonar.projectVersion="${PROJECT_VERSION}" \
+        -Dsonar.branch.name="${BRANCH_NAME}"
 fi
