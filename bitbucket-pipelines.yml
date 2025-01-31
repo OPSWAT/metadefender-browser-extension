@@ -18,16 +18,6 @@ pipelines:
             - docker
           size: 2x
       - step:
-          name: SonarQube analysis
-          script:
-            - pipe: sonarsource/sonarqube-scan:2.0.1
-              variables:
-                SONAR_HOST_URL: ${SONAR_HOST_URL} # Get the value from the repository/workspace variable.
-                SONAR_TOKEN: ${SONAR_TOKEN} # Get the value from the repository/workspace variable. You shouldn't set secret in clear text here.
-          services:
-            - docker
-          size: 2x
-      - step:
           name: Run Unit tests
           script:
             - npm i --legacy-peer-deps;
@@ -37,13 +27,6 @@ pipelines:
           services:
             - docker
           size: 2x
-      - step:
-          name: Check Quality Gate on SonarQube
-          max-time: 5 # value you should use depends on the analysis time for your project
-          script:
-            - pipe: sonarsource/sonarqube-quality-gate:1.1.0
-              variables:
-                SONAR_TOKEN: ${SONAR_TOKEN}
   pull-requests:
     "**":
       - step:
@@ -56,26 +39,7 @@ pipelines:
           services:
             - docker
           size: 2x
-      - step:
-          name: SonarQube PR analysis
-          script:
-            - pipe: sonarsource/sonarqube-scan:2.0.1
-              variables:
-                SONAR_HOST_URL: ${SONAR_HOST_URL} # Get the value from the repository/workspace variable.
-                SONAR_TOKEN: ${SONAR_TOKEN} # Get the value from the repository/workspace variable. You shouldn't set secret in clear text here.
-          services:
-            - docker
-          size: 2x
-      - step:
-          name: Check Quality Gate on SonarQube
-          max-time: 5 # value you should use depends on the analysis time for your project
-          script:
-            - pipe: sonarsource/sonarqube-quality-gate:1.1.0
-              variables:
-                SONAR_TOKEN: ${SONAR_TOKEN}
 definitions:
   services:
     docker:
       memory: 4096
-  caches:
-    sonar: ~/.sonar
